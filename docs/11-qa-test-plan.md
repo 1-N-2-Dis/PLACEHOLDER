@@ -1,0 +1,186 @@
+> ⚠️ PROVENANCE: Generated from idea.md while DRAFT / not freeze-eligible (no first-party or paid/committed evidence yet). Demand is UNVALIDATED. Provisional MVP scaffolding only — re-validate and regenerate after first-party interviews (post-July 2). No evidence fabricated.
+
+# QA — Test Plan & Test Cases
+
+> **Purpose:** how quality is proven, and the **traceability home**. Every feature in the PRD must
+> appear here with at least one test.
+> Traces back to: PRD (`docs/03-prd.md`), System Design (`docs/06-system-design.md`), `idea.md`.
+> **Build context:** 2-day SparkFest hackathon MVP (elimination July 2). Lean, mostly-manual test
+> plan runnable by a small team. P0 = must demo; P1 (F-004) = cut-safe stretch.
+
+## Test strategy
+
+- **Levels:** mostly manual e2e (the 3 P0 journeys) + targeted manual/semi-automated security
+  checks on Firestore Security Rules. No unit-test harness is mandated for a 2-day build; add unit
+  tests only around freshness-window logic if time allows `[unverified]`.
+- **Automation vs manual:** manual steps are acceptable and expected. Firestore rules SHOULD be
+  exercised with the Firebase Emulator / rules test runner if set up; otherwise manual console
+  attempts are the fallback `[unverified]`.
+- **Ownership:** small team, shared ownership. Whoever builds a feature (per the Day 1/Day 2 build
+  sequence in system design) runs its TCs before the demo rehearsal.
+
+## Scope
+
+### In scope
+- F-001 map render + seeded flags + tap-to-inspect.
+- F-002 authenticated one-tap condition report → Firestore → map.
+- F-003 pre-trip per-segment route check (type + freshness).
+- F-004 (P1) Gemini dedup/structure summary, no added facts.
+- Security: Firestore rules (auth-to-write BR-005, closed enum / no crime-label BR-001), Maps key
+  referrer-restriction, Gemini key server-side only.
+- Negative/edge: empty zone, stale flags, offline.
+
+### Out of scope
+- Real-time rescue / SOS / dispatch (BR-002 — explicitly not built; verified absent, not tested as a feature).
+- Metro-wide coverage / multi-zone (BR-003).
+- Native mobile, load/scale, cost modeling — N/A for hackathon (see Regression/Exit).
+
+## Environments
+
+- **One collapsed demo/prod environment** on Firebase Hosting (system design: single environment,
+  `[unverified]` no staging). Firestore + Auth in one Firebase project; Cloud Function (P1) in a
+  single region (`asia-*` `[unverified]`).
+- **Test data:** the 8 provisional seed segment pins (idea §7), all `[unverified]` demo content,
+  not evidence. Add hand-crafted reports for dedup/freshness tests.
+- **Secrets handling:** reference only, never inline. Maps key lives in client bundle but MUST be
+  referrer-restricted; Gemini key MUST live only in the Cloud Function. Tests assert this, never print key values.
+- **Freshness window value** for "tonight" is `[unverified]` — a value must be chosen at build step 6
+  and documented before TC-009/TC-010 can have a concrete pass bar.
+
+## Traceability matrix
+
+> Factory gate: every F-001..F-004 and BR-001..BR-006 maps to ≥1 TC. No orphans.
+
+| ID  | Feature / Rule | Test case ID(s) | Type | Status |
+|-----|----------------|-----------------|------|--------|
+| F-001 | Zone map + seeded flags + tap detail | TC-001, TC-002 | e2e (manual) | todo |
+| F-002 | Authed one-tap condition report → Firestore → map | TC-003, TC-004 | e2e (manual) | todo |
+| F-003 | Pre-trip per-segment route check (type + freshness) | TC-005, TC-009, TC-010 | e2e (manual) | todo |
+| F-004 | Gemini dedup/structure summary (P1) | TC-006 | e2e (manual) | todo |
+| BR-001 | Condition-only; no crime-label field/storage | TC-004, TC-008 | e2e + security | todo |
+| BR-002 | No SOS/rescue/dispatch promise in UI/copy | TC-012 | manual review | todo |
+| BR-003 | Single PUP Sta. Mesa zone only | TC-013 | manual review | todo |
+| BR-004 | Flag carries condition type + timestamp (freshness) | TC-002, TC-009 | e2e (manual) | todo |
+| BR-005 | Report write requires authenticated user | TC-007 | security | todo |
+| BR-006 | Summary derived only from reports; adds no facts | TC-006 | e2e (manual) | todo |
+
+Security-specific TCs: TC-007 (auth-to-write), TC-008 (reject non-enum/crime-label field),
+TC-014 (Maps key referrer-restricted), TC-015 (Gemini key never in client bundle).
+Negative/edge TCs: TC-009 (stale flags), TC-010 (freshness boundary), TC-011 (empty zone), TC-016 (offline).
+
+**Orphan check:** none. Every F-### and BR-### has ≥1 TC; every TC maps to ≥1 F-###/BR-###.
+
+## Test cases
+
+### TC-001 — Map renders zone with seeded flags ⭐DEMO-CRITICAL
+- **Covers:** F-001
+- **Preconditions:** App deployed; Maps key set + restricted; Firestore seeded with 8 pins.
+- **Steps:** Open app; let zone map load.
+- **Expected:** Sta. Mesa zone renders via Google Maps; ≥ the seeded segment flags are visible.
+
+### TC-002 — Tap a flag shows condition type + timestamp ⭐DEMO-CRITICAL
+- **Covers:** F-001, BR-004
+- **Preconditions:** TC-001 passed.
+- **Steps:** Tap a flagged segment.
+- **Expected:** Detail shows condition type {poor lighting | no crowd | recent incident} and a timestamp.
+
+### TC-003 — Authed user files one-tap report; persists; appears on map ⭐DEMO-CRITICAL
+- **Covers:** F-002
+- **Preconditions:** User authenticated (BR-005); map loaded.
+- **Steps:** Select a segment; tap one condition flag.
+- **Expected:** Report {segmentId, conditionType, timestamp, uid} written to Firestore; map flag updates live (no reload).
+
+### TC-004 — Report form has NO free-form crime-label field
+- **Covers:** F-002, BR-001
+- **Preconditions:** Report form open.
+- **Steps:** Inspect all inputs in the report UI.
+- **Expected:** Only the closed condition enum is selectable; no free-text "crime"/neighborhood-classification field exists.
+
+### TC-005 — Route check returns per-segment okay vs flagged ⭐DEMO-CRITICAL
+- **Covers:** F-003
+- **Preconditions:** Zone has a mix of flagged + unflagged segments; freshness window defined `[unverified]`.
+- **Steps:** Select/enter a route through the zone; run the check.
+- **Expected:** Each segment shows a status; flagged-tonight segments are visually distinct from "okay."
+
+### TC-006 — Gemini summary deduplicates and invents nothing (P1)
+- **Covers:** F-004, BR-006
+- **Preconditions:** A segment seeded with multiple overlapping free-text report notes.
+- **Steps:** Request the structured summary for that segment.
+- **Expected:** One structured summary; overlapping reports merged; every claim traces to an input note — no incident/fact absent from inputs. If F-004 cut, UJ-003 degrades to raw flag list (mark N/A and verify the fallback).
+
+### TC-007 — Firestore rules reject unauthenticated write
+- **Covers:** BR-005
+- **Preconditions:** Rules deployed; emulator or signed-out client.
+- **Steps:** Attempt to write a report with `request.auth == null`.
+- **Expected:** Write rejected (permission denied).
+
+### TC-008 — Firestore rules reject non-enum / crime-label field
+- **Covers:** BR-001
+- **Preconditions:** Authenticated client; rules deployed.
+- **Steps:** Attempt writes with (a) `conditionType` outside the enum, (b) an extra crime/classification field.
+- **Expected:** Both rejected by security rules (not just client validation).
+
+### TC-009 — Stale flag treated as not "tonight"
+- **Covers:** F-003, BR-004 (edge)
+- **Preconditions:** A flag older than the freshness window `[unverified]`.
+- **Steps:** Run route check over that segment.
+- **Expected:** Segment is NOT shown as flagged-tonight (or shown as stale per chosen rule).
+
+### TC-010 — Freshness window boundary
+- **Covers:** F-003 (edge)
+- **Preconditions:** Reports just inside and just outside the window `[unverified]`.
+- **Steps:** Run route check.
+- **Expected:** Inside-window flags count as tonight; outside do not. (Concrete bar blocked until window value chosen — `[unverified]`.)
+
+### TC-011 — Empty zone (no reports)
+- **Covers:** F-001/F-003 (edge)
+- **Preconditions:** Segment(s) with zero reports.
+- **Steps:** Load map / run route check.
+- **Expected:** No false flags; empty/"no reports" state shown; route check returns all "okay" without error.
+
+### TC-012 — No SOS / rescue / dispatch copy anywhere
+- **Covers:** BR-002
+- **Steps:** Review all UI copy/screens.
+- **Expected:** No real-time rescue/SOS/dispatch promise present.
+
+### TC-013 — Coverage limited to single zone
+- **Covers:** BR-003
+- **Steps:** Inspect map bounds + content.
+- **Expected:** Only PUP Sta. Mesa zone; no metro-wide expansion.
+
+### TC-014 — Maps key is referrer-restricted
+- **Covers:** Security (system design §Auth point 3)
+- **Steps:** Confirm Cloud Console key has HTTP-referrer + API allowlist; attempt use from a non-allowed origin.
+- **Expected:** Restrictions present; off-origin use blocked.
+
+### TC-015 — Gemini key never in client bundle
+- **Covers:** Security (system design §Auth point 4)
+- **Steps:** Grep built client bundle / network calls for the Gemini key; confirm Gemini is called via Cloud Function only.
+- **Expected:** Key absent from client; only the Function holds it. (If a throwaway client-side fallback is used, this FAILS — flag as a knowing demo tradeoff.)
+
+### TC-016 — Offline behavior
+- **Covers:** Edge (Firestore offline cache; system design integration notes)
+- **Steps:** Load app, go offline, browse map / attempt a report.
+- **Expected:** Cached flags still viewable; writes queue or fail gracefully with a clear state — no crash.
+
+## Acceptance criteria
+
+Pulled verbatim-in-intent from PRD: F-001 (map + seeded flags, tap shows type+timestamp), F-002
+(authed one-tap enum report persists + appears, no crime-label field), F-003 (per-segment status,
+okay vs flagged tonight), F-004 (single dedup summary, no added facts). A feature passes when its
+mapped TCs pass.
+
+## Regression plan
+
+Before each demo rehearsal, re-run the 3 P0 journeys (TC-001/002/003/005) plus the two gate
+security checks (TC-007, TC-008). Re-run TC-014/TC-015 after any key/deploy change.
+
+## Exit criteria
+
+- **Demo-critical (must pass for July 2 elimination):** the 3 P0 journeys — **TC-001, TC-002,
+  TC-003, TC-005** (covering UJ-001/002/003 P0 paths) — plus security gates **TC-007** and
+  **TC-008** must pass (a world-writable Firestore or stored crime label is a disqualifier).
+- F-004 / TC-006 is **not** demo-critical; if cut, verify the raw-flag-list fallback instead.
+- Scale/load/cost testing: **N/A — because** single-zone, single-environment hackathon demo on
+  Google-managed autoscaling infra (system design §Scaling). Availability/latency/freshness targets
+  are `[unverified]`, deferred post-July 2.

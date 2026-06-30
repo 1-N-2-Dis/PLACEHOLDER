@@ -1,0 +1,144 @@
+> ⚠️ PROVENANCE: Generated from idea.md while DRAFT / not freeze-eligible (no first-party or paid/committed evidence yet). Demand is UNVALIDATED. Provisional MVP scaffolding only — re-validate and regenerate after first-party interviews (post-July 2). No evidence fabricated.
+
+# PRD — Product Requirements Document
+
+> **Purpose:** the WHAT, for the team. Translates business + market needs into product. The
+> team's primary build reference.
+> Traces back to: `idea.md` §6, §7; BRD; MRD. Traces forward to: FRD, QA test plan.
+> **Build context:** 2-day hackathon MVP for SparkFest elimination (July 2). Scope is
+> deliberately narrow; stretch items are flagged P1.
+
+## Overview & goals
+
+A community-sourced safer-routing guide for the PUP Sta. Mesa commute zone. It shows women
+which route segments to avoid tonight and why — before they leave — by structuring the
+route-safety crowdsourcing they already do by hand in private group chats (idea §1, §6).
+
+Goals for the hackathon build:
+- Demo a zone safety map with crowdsourced segment flags (F-001).
+- Let a user file a one-tap segment condition report (F-002).
+- Let a user run a pre-trip "is my route okay tonight" check (F-003).
+- Show a Gemini-generated structured, deduplicated risk summary from free-text reports (F-004, stretch).
+- Flag **fixable/observable conditions only** (lighting / crowd / recent incident) — never neighborhood crime-profiling (idea §9, §10).
+
+**Google technology mapping** (hackathon requires ≥1 Google tech):
+- **Google Maps Platform** — map render + segment overlays + route check (F-001, F-003).
+- **Firebase** (Auth + Firestore + Hosting) — auth, report storage, backend, deploy (F-002).
+- **Gemini API** — free-text reports → structured deduplicated risk summary (F-004).
+
+## Personas & use cases
+
+- **Primary — Maya, 2nd-year PUP student (18–24)** (idea §2): rides LRT-2 to Pureza, walks
+  Teresa Street home after a 7pm class. Wants to know which segments are bad *tonight* before
+  she sets out, and to warn others about what she sees.
+- **Secondary — trans woman rider in the same zone** (idea §2): same harassment-driven
+  avoidance problem; uses the same map and reports.
+
+Use cases: pre-trip route check after evening class; one-tap flag of a dark/empty/incident
+segment on arrival; reading the aggregated risk picture for a zone before deciding to walk vs. pay for a ride.
+
+## User stories
+
+Primary commuter (Maya):
+- As a commuter, I want to see flagged segments on a map of my zone, so that I know which
+  stretches to avoid tonight.
+- As a commuter, I want to report a bad condition in one tap, so that the danger I just saw
+  gets written down for others.
+- As a commuter, I want to check my planned route before I leave, so that I can re-route or
+  pay for a ride before I'm exposed.
+- As a commuter, I want a clean summary instead of raw noisy reports, so that I can trust the
+  signal quickly (F-004).
+
+Secondary rider (trans woman): same stories; same zone and conditions.
+
+## User journeys
+
+- **UJ-001** — Pre-trip route check: a commuter, before leaving an evening class, opens the
+  app and checks whether her route through the zone is okay tonight, to decide walk vs. re-route vs. pay. (F-003, F-001)
+- **UJ-002** — One-tap segment report: a commuter who observes a dark / empty / incident
+  condition on a segment files a one-tap report, to write the danger down for others. (F-002)
+- **UJ-003** — Read the risk picture: a commuter views the map and a structured risk summary
+  for a zone to understand current conditions at a glance. (F-001, F-004)
+
+## Feature list (with priorities)
+
+> IDs inherited from idea.md §7. Priority column uses hackathon scope (P0 = must demo July 2;
+> P1 = high-value stretch). MVP/Final tier from idea §7 noted in Notes.
+
+| F-ID  | Feature | Priority | Solves (problem) | Notes |
+|-------|---------|----------|------------------|-------|
+| F-001 | Zone safety map with crowdsourced segment flags | P0 | "Danger knowledge is scattered and invisible" (idea §1, §4) | Google Maps Platform; seed with §7 provisional pins `[unverified]` |
+| F-002 | One-tap report of a route/segment condition (poor lighting / no crowd / recent incident) | P0 | "Lived danger is never written down" (idea §4) | Firebase Auth + Firestore; condition flags only, no crime labels (§9/§10) |
+| F-003 | Pre-trip "is my route okay tonight" check for the zone | P0 | "No way to know before setting out" (idea §1) | Google Maps Platform route/segment lookup |
+| F-004 | Structured, deduplicated risk summary from free-text reports | P1 | "Crowd noise isn't trustworthy signal" (idea §5 alternatives gap) | Gemini API; innovation hook; stretch if time allows |
+
+## Business rules
+
+- **BR-001** — Reports may only describe **fixable/observable conditions** (lighting, crowd
+  density, recent incident); the system must not render or store neighborhood "crime zone"
+  profiling labels (idea §9 regulatory kill-criterion, §10).
+- **BR-002** — The product makes **no real-time rescue / SOS / dispatch promise** anywhere in
+  UI or copy (idea §10).
+- **BR-003** — Coverage is restricted to the single **PUP Sta. Mesa commute zone**; no
+  metro-wide expansion in the MVP (idea §10).
+- **BR-004** — A segment flag must carry a condition type and a timestamp so "tonight" /
+  freshness can be computed for the pre-trip check (F-003 depends on this).
+- **BR-005** — Report submission requires an authenticated user (Firebase Auth) to enable
+  basic abuse control. Auth method `[unverified]` — choose lightweight (e.g., anonymous/Google sign-in) for the hackathon.
+- **BR-006** — The F-004 summary must be derived only from submitted reports (no invented
+  incidents); it deduplicates and structures, it does not add facts.
+
+## User flows
+
+UJ-001 (pre-trip check, F-003/F-001):
+1. User opens app → zone map loads with current segment flags (F-001).
+2. User selects / enters route through the zone.
+3. System returns per-segment condition status for tonight (flag type + freshness, BR-004).
+4. User decides: proceed, re-route, or pay for a ride.
+
+UJ-002 (one-tap report, F-002):
+1. Authenticated user (BR-005) selects a segment on the map.
+2. User taps a condition flag (poor lighting / no crowd / recent incident) — condition-only (BR-001).
+3. Report saved to Firestore with type + timestamp; map flag updates.
+
+UJ-003 (risk picture, F-001/F-004):
+1. User views zone map with flags.
+2. System shows a structured, deduplicated risk summary generated by Gemini from free-text/report data (F-004, BR-006).
+
+## Acceptance criteria
+
+- **F-001:** Map renders the Sta. Mesa zone via Google Maps Platform and displays at least the
+  seeded segment flags; tapping a flagged segment shows its condition type and timestamp.
+- **F-002:** An authenticated user can flag a selected segment with one of {poor lighting, no
+  crowd, recent incident} in one tap; the report persists to Firestore and appears on the map; no free-form crime-label field exists (BR-001).
+- **F-003:** Given a route in the zone, the system returns each segment's current condition
+  status (flag type + freshness), distinguishing "okay" from "flagged tonight."
+- **F-004:** Given multiple overlapping free-text reports for a segment, Gemini returns a
+  single structured summary that deduplicates them and adds no facts not present in the inputs (BR-006).
+
+## Non-goals
+
+(Mirrors idea §10.)
+- No real-time rescue, SOS dispatch, or in-the-moment intervention.
+- No metro-wide coverage before the Sta. Mesa zone is proven.
+- No physical-accessibility routing for seniors/PWDs (different problem).
+- No B2B/B2G compliance product for operators in this build.
+- No audio/scream detection or any always-listening capability.
+- No neighborhood crime-profiling — conditions only (idea §9).
+
+## Dependencies
+
+- **Google Maps Platform** — map tiles, segments, route lookup (F-001, F-003). API key/billing `[unverified]`.
+- **Firebase** — Auth, Firestore, Hosting (F-002, deploy). Project setup `[unverified]`.
+- **Gemini API** — summarization (F-004). API access/quota `[unverified]`.
+- **Seed map content** — provisional pins from idea §7 (8 segments), all `[unverified]` — to be confirmed/killed post-July 2; used as demo content, not evidence.
+
+## Open questions
+
+- Will women actually consult the guide before commuting AND contribute enough reports to make
+  it useful? (idea §9 single riskiest assumption — unvalidated, resolve via interviews post-July 2.) `[unverified]`
+- Does "danger" stay harassment-led (women wedge) or widen to all-crime/all-commuters? Do not
+  resolve from desk research; decide post-July 2 (idea §7 open decision). `[unverified]`
+- Which Firebase auth method for the hackathon (anonymous vs. Google sign-in)? `[unverified]`
+- Are the 8 seed pins real and current? All flagged `[unverified]` in idea §7 — confirm in field-walks. `[unverified]`
+- How is "tonight" / freshness windowed for F-003 (e.g., decay of stale flags)? Not specified in idea. `[unverified]`
