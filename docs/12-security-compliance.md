@@ -1,0 +1,198 @@
+> ⚠️ PROVENANCE: Generated from idea.md while DRAFT / not freeze-eligible (no first-party or paid/committed evidence yet). Demand is UNVALIDATED. Provisional MVP scaffolding only — re-validate and regenerate after first-party interviews (post-July 2). No evidence fabricated.
+
+# Security & Compliance / Threat Model — Safer-route awareness (MVP)
+
+> **Purpose:** risk and obligations for the 2-day SparkFest hackathon MVP. Default posture: flag
+> missing auth on every exposed surface.
+> Traces back to: system design (`docs/06-system-design.md`), data model (`docs/09-data-model.md`),
+> `idea.md` (esp. §9 kill-criteria).
+> **Sensitivity note:** this is a SAFETY app for women + LGBTQ+ commuters. Data sensitivity is HIGH
+> even though the MVP stores little — the *subject matter* (who is unsafe, where) is itself sensitive,
+> and the regulatory/ethical kill-criteria in idea §9 are first-class design constraints, not afterthoughts.
+> **This document is not legal advice.** Specific regulatory obligations are flagged `[unverified]` for counsel.
+
+## Data classification
+
+Pulled from data model `09`. The MVP deliberately minimizes what it holds (data minimization is a
+mitigation, not just hygiene — see Threat T6 and BR-001).
+
+| Data | Classification | Where it lives | Notes |
+|------|----------------|----------------|-------|
+| `segment.*` (id, name, geo) | **Public** | Firestore `segments` | Seeded demo content, `[unverified]` (idea §7 pins). No PII. |
+| `report.conditionType` (closed enum) | **Public** | Firestore `reports` | Observable, fixable condition only (BR-001). No crime/neighborhood label exists by design. |
+| `report.createdAt`, `report.segmentId` | **Public** | Firestore `reports` | Operational metadata. |
+| `report.uid` | **Internal — pseudonymous identifier** | Firestore `reports` | Firebase Auth UID linking a report to an account for abuse control (BR-005). **Not displayed in UI.** Anonymous-auth UID is not directly identifying, but it *links a person to the places/times they flagged* — that linkage is the sensitive part. |
+| `report.note` (optional free text) | **User-generated — potential incidental PII** | Firestore `reports` | May contain names, plate numbers, descriptions of people, "my" locations. Exists ONLY to feed F-004 (BR-006). Highest-risk field in the system. |
+| Maps API key | **Secret-in-client (by design)** | Client bundle | Browser key; protected by referrer restriction, not concealment (see Secrets). |
+| Gemini API key | **Secret (must stay server-side)** | Cloud Function env (P1) | MUST NOT ship in client bundle. |
+
+## Authn / authz model (per network-exposed surface)
+
+Mirrors system-design §"Authentication & authorization." Each exposed surface is stated explicitly —
+a silent unauthenticated surface is a factory-gate failure.
+
+1. **Cloud Firestore (read/write reports + read segments)** — **Authz = Firestore Security Rules.**
+   - **Reads: open** (`allow read: if true`). Flags are public safety info; the only non-public field
+     is `uid`, which is internal but readable in MVP — see Threat T6 / open question on whether to
+     strip `uid` from client reads post-July-2 `[unverified]`.
+   - **Writes (`reports` create): require `request.auth != null`** (BR-005), enforce `uid ==
+     request.auth.uid` (no spoofing), closed `conditionType` enum (BR-001), required `segmentId`/`createdAt`
+     types (BR-004), and a **closed field allowlist** `hasOnly([...])` that rejects any crime/neighborhood
+     field (BR-001). `update`/`delete` denied (immutable).
+   - **`segments`: read open, write denied** (seeded out-of-band).
+   - Without deployed rules, **Firestore is world-writable/world-readable** — rules are mandatory, a
+     pre-demo gate (see checklist).
+2. **Firebase Auth** — the identity surface. **Method `[unverified]`**: anonymous (chosen for demo speed)
+   vs. Google sign-in. Anonymous yields a `uid` but gives **weak abuse control** (a user can drop the
+   anonymous identity and get a fresh `uid` at will) — documented limitation feeding Threats T3/T4.
+3. **Google Maps JS API key** — exposed in the client bundle **by design** (browser key). Only viable
+   authz is **HTTP-referrer restriction + API allowlist** in Cloud Console. Unrestricted = anyone can
+   bill the key (Threat T2).
+4. **Gemini API key (P1)** — **server-side only**, held in a Cloud Function; invoked by the
+   authenticated client. Client-side Gemini calls **leak the key** and are acceptable ONLY as a
+   knowingly-throwaway demo fallback, never for any real deployment (Threat T2).
+
+## Threat model (STRIDE-lite)
+
+Scoped to the MVP's real attack surface. T1–T6 are the priority threats called out in the brief/system design.
+
+| # | Threat (STRIDE) | Vector | Impact | Mitigation |
+|---|-----------------|--------|--------|------------|
+| **T1** | **Tampering / Elevation — world-writable Firestore** | Default Firestore has no rules → anyone writes/reads any document | Data poisoning, junk/abusive docs, schema breakage, total trust collapse of the map | **Deploy Security Rules before any write demo** (BR-001/004/005): auth-to-write, `uid` ownership, closed enum, closed field allowlist, `segments` write-locked. Test rules pass *before* demoing writes. |
+| **T2** | **Info disclosure / DoS — API key abuse (Maps + Gemini)** | Maps browser key unrestricted; Gemini key shipped in client | Third parties run up Google billing on our keys; Gemini key theft | Maps key: **HTTP-referrer + API allowlist** in Console. Gemini key: **Cloud Function only**, never in client bundle. No secrets in repo (checklist). |
+| **T3** | **Spoofing / abuse — report spam via anonymous auth** | Anonymous auth lets a user churn `uid`s and flood reports | Flag inflation, fake "danger tonight," map made useless (ties to idea §9 technical kill-criterion: usable density) | Auth-to-write gate (BR-005) raises the floor; **anonymous = weak control, documented.** MVP has **no rate-limit** `[unverified]` — flagged as a known gap; post-July-2 consider per-uid write throttle / Google sign-in / App Check. |
+| **T4** | **Tampering — malicious / false reports (false-flag poisoning)** | A bad actor flags a safe segment as bad, or floods to bury real signal | Wrong routing advice; could defame a place/business; erodes trust | Closed condition enum (no crime labels) limits blast radius (BR-001); immutable reports + `createdAt` give an audit trail; **freshness window** decays stale/maliciously-old flags (BR-004; window value `[unverified]`). F-004 dedup (BR-006) reduces flood amplification. No reputation/verification system in MVP `[unverified]` — flagged. |
+| **T5** | **Repudiation — disputed reports** | "I never flagged that" / who flagged this? | Hard to adjudicate abuse | Every `report` carries `uid` + server `createdAt`; reports are append-only/immutable (no update/delete). Sufficient for MVP audit; not a full audit system. |
+| **T6** | **Info disclosure — incidental PII in `note` + uid linkage** | Free-text `note` contains a name/plate/description; `uid` links a person to flagged places/times | Privacy harm to third parties named in notes; deanonymization risk of reporters; sensitive in a safety context | `note` is **optional** and feeds F-004 only (BR-006); F-004 prompt is constrained (no new facts). **Data minimization**: no precise/continuous user-location tracking anywhere (see below). **Gaps `[unverified]`:** no PII redaction/scrubbing on `note`, no retention/deletion policy, `uid` not stripped from open reads — all flagged for post-July-2. Consider input hint discouraging naming individuals. |
+
+> **Spoofing of the map itself / DoS at infra level:** N/A beyond Google defaults — **because** Hosting,
+> Firestore, and Functions run on Google-managed autoscaling infra (system design §"Scaling strategy");
+> we add no custom server to harden. App-level abuse (T3/T4) is the real DoS-shaped risk, not infra DoS.
+
+### No precise user-location tracking (data minimization)
+The MVP stores **no user GPS trail, no live position, no continuous location**. A `report` records the
+*segment* a user chose to flag (`segmentId`) plus their `uid` and a timestamp — not where the user is or
+was. Route checks (F-003) happen client-side against public segment data; the user's route is not persisted.
+This is a deliberate minimization: the app reasons about *places*, not *people's movements*. Anything that
+would track a user's location over time is **out of scope** and would require re-doing this threat model.
+
+## Compliance obligations
+
+> **Not legal advice. Flag all specifics for counsel before anything beyond a hackathon demo.**
+
+The central regulatory risk is the one named in **idea §9 kill-criteria**: publishing segment-level
+"danger" data could expose the team to **defamation / privacy liability**, or be found to **unlawfully
+profile neighborhoods** (and, by extension, the people or businesses associated with them).
+
+**Primary mitigation — the conditions-only design (BR-001):** the system records only *fixable, observable
+conditions* — `poor_lighting`, `no_crowd`, `recent_incident` — as a closed enum. There is **no field
+anywhere** for a crime label, a neighborhood "danger" rating, or a classification of people. This is
+enforced twice: client-side AND in Security Rules (closed field allowlist). This directly implements idea
+§9's prescribed redesign ("redesign around fixable conditions only") *up front* rather than after a kill
+event. The seed pins (idea §7) are likewise framed as conditions, not crime zones, and are `[unverified]`
+demo content. Tied to **BR-002** (no SOS/rescue promise) the product avoids both the "we profile places"
+and the "we promised to save you" liability shapes.
+
+**Named regulatory context (specifics `[unverified]` — for counsel):**
+- **PH Data Privacy Act of 2012 (RA 10173)** — likely relevant the moment `report.note` or `uid` can be
+  tied to an identifiable person. Implies obligations around consent, purpose limitation, retention, and
+  data-subject rights. The MVP has **no retention/deletion policy and no privacy notice** `[unverified]` —
+  must be addressed before any real users. Specific applicability and obligations: **`[unverified]`,
+  confirm with counsel.**
+- **RA 11313 (Safe Spaces Act)** — relevant context for the problem domain (gender-based harassment in
+  public/transit spaces) and a future closed-loop reporting feature (idea §7 Final). It is **not** a
+  compliance burden the MVP discharges. Specific duties (esp. any operator/LGU reporting obligations):
+  **`[unverified]`, confirm with counsel.**
+- Formal data-protection registration, DPIA, or operator liability scoping: **deferred, `[unverified]`** —
+  a real-product concern, not a 2-day demo concern. Flagged, not implemented.
+
+## Abuse & safety-specific risks (ethical)
+
+This app's failure modes can *harm the people it claims to protect* — treat these as design constraints.
+
+- **False-flag poisoning** (T4): false "danger tonight" could push a commuter onto a genuinely worse route,
+  or smear a location. Mitigated by closed enum (BR-001), freshness decay (BR-004, window `[unverified]`),
+  F-004 dedup (BR-006), and immutable audit. No verification/reputation layer in MVP — `[unverified]`, flagged.
+- **Harassment via reports**: notes could be used to target a person (T6). Mitigated by `note` being
+  optional + F-004-only (BR-006) and by *not* exposing it as a public classification. PII scrubbing is a
+  `[unverified]` gap.
+- **Stigmatizing places/people** (idea §9 ethical core): the whole point of BR-001 is to describe *fixable
+  conditions* (lighting, crowd) rather than brand a street or community as "criminal." BR-002 keeps the app
+  preventive-informational, not an enforcement/vigilante tool. The open §7 decision — whether "danger" stays
+  harassment-led (women wedge) or widens to all-crime — is a **product+ethics decision to make post-July-2
+  with real input**, not in this doc `[unverified]`.
+
+## Secrets handling
+
+- **Gemini API key (P1):** Cloud Function environment only; referenced, never inlined; **never committed to
+  the repo** (public repo per system design). If F-004 is cut, no Gemini key ships at all.
+- **Maps API key:** present in the client bundle by necessity; security comes from **referrer + API-allowlist
+  restriction in Console**, not secrecy. Restrict it the moment it's added (Day-1 build step 2).
+- **Firebase config** (apiKey/projectId in client): not a secret in the traditional sense — it's an
+  identifier; Firestore **Security Rules** are the actual access control, not the config.
+- **No secret values appear in this document, in code, or in git history.** Rotation: N/A for a 2-day demo —
+  **because** keys are demo-scoped and disposable; for any real deployment, rotation + a secret manager are
+  required `[unverified]`.
+
+## Audit & logging
+
+- **Log:** report writes carry `uid` + server `createdAt` (immutable) — this is the audit trail for abuse
+  adjudication (T4/T5). Auth events are handled by Firebase.
+- **Never log:** the Maps/Gemini key values, raw `note` contents (potential PII — T6), or any data that
+  re-identifies a reporter.
+- A dedicated security log / SIEM is **N/A for the MVP — because** there is no custom backend to instrument;
+  Firebase/GCP console gives basic usage + auth visibility. Flagged for post-July-2 `[unverified]`.
+
+## Incident response basics
+
+- **Detection (demo-grade):** watch the Firebase/GCP console for abnormal Firestore write volume (spam — T3)
+  and abnormal Maps/Gemini usage/billing (key abuse — T2).
+- **Containment levers:** tighten/redeploy Security Rules (can hard-stop writes); disable or re-restrict the
+  Maps key in Console; disable the Cloud Function to cut Gemini. Anonymous auth can be turned off to stop a
+  spam wave.
+- **Recovery:** reports are immutable, so cleanup = deleting poisoned docs out-of-band (console/admin), not
+  editing. No automated rollback in MVP `[unverified]`.
+- **Escalation / notification:** N/A formal path for a hackathon — **because** there are no real users yet;
+  for real users a breach-notification process under RA 10173 would be required `[unverified]`, for counsel.
+
+## Pre-demo security checklist (MUST be true before the July 2 demo)
+
+Hard gates — a world-writable Firestore or an unrestricted key is a demo-day liability, not a polish item.
+
+- [ ] **Firestore Security Rules deployed and tested** — auth-to-write (BR-005), `uid == request.auth.uid`,
+  closed `conditionType` enum (BR-001), required `segmentId`/`createdAt` types (BR-004), closed field
+  allowlist (rejects any crime/neighborhood key), `segments` write-locked, reports immutable. **Do not demo
+  writes until rules pass.** (Kills T1.)
+- [ ] **Maps API key restricted** in Cloud Console — HTTP-referrer (the Hosting domain) + API allowlist.
+  Done the moment the key is added (Day-1 step 2). (Kills T2.)
+- [ ] **Gemini key server-side only** (if F-004 ships) — in the Cloud Function env, **not** in the client
+  bundle. If client-side fallback is used, it is a *knowingly-throwaway* demo key, flagged aloud. (Kills T2.)
+- [ ] **No secrets in the repo** — scan committed files; no Gemini key, no service-account JSON. Firebase
+  client config is fine; rules are the gate. (Public repo.)
+- [ ] **Auth method decided + wired** — anonymous (default) or Google sign-in; if anonymous, the **weak
+  abuse-control limitation is stated in the demo/readme** (T3). `[unverified]` until chosen.
+- [ ] **Closed enum verified end-to-end** — UI offers only the 3 conditions; no free-text crime label exists
+  anywhere; rules reject extra fields (BR-001). (Defamation/profiling mitigation — idea §9.)
+- [ ] **No SOS / rescue copy anywhere** (BR-002); **single zone only** (BR-003). (Avoids over-promise liability.)
+- [ ] **`note` handling sane** — optional, not rendered as a classification, not logged; ideally a UI hint
+  discouraging naming individuals (T6). PII scrubbing remains a known `[unverified]` gap.
+- [ ] **HTTPS everywhere** — automatic via Firebase Hosting; confirm the deployed URL is HTTPS.
+
+## Open items / `[unverified]` flags (carried for post-July-2)
+
+- Auth method (anonymous vs. Google sign-in) — affects abuse control (T3).
+- Freshness-window length — affects false-flag decay (T4) and "tonight" logic (BR-004).
+- No rate-limiting / App Check on writes (T3); no reputation/verification layer (T4) — MVP gaps.
+- `note` PII redaction policy; data **retention/deletion** policy; whether `uid` is stripped from open
+  reads (T6).
+- RA 10173 and RA 11313 specific obligations — **for counsel**, not resolved here.
+- Privacy notice / consent flow — none in MVP.
+- The §7 "harassment-led vs. all-crime/all-commuters" scope decision — product+ethics call, post-July-2.
+
+## Sections marked N/A
+
+- **Infra-level DoS hardening** — N/A: Google-managed autoscaling infra; app-level abuse (T3/T4) is the real risk.
+- **Key rotation / secret manager** — N/A for the disposable demo; required for real deployment `[unverified]`.
+- **Dedicated SIEM / security logging** — N/A: no custom backend; console visibility suffices for the demo.
+- **Formal incident escalation + breach notification** — N/A: no real users yet; required under RA 10173 later `[unverified]`.
+- **Migration/data-handling for legacy data** — N/A: greenfield, single environment.

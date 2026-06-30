@@ -1,0 +1,187 @@
+> ⚠️ PROVENANCE: Generated from idea.md while DRAFT / not freeze-eligible (no first-party or paid/committed evidence yet). Demand is UNVALIDATED. Provisional MVP scaffolding only — re-validate and regenerate after first-party interviews (post-July 2). No evidence fabricated.
+
+# Data Model / Schema
+
+> **Purpose:** the data. Entities, relationships, constraints, and privacy classification for the
+> MVP. Models **Cloud Firestore** (NoSQL document store) per system-design §"Segment / report data
+> shape" and §"Authentication & authorization."
+> Traces back to: system design (`docs/06-system-design.md`), PRD (`docs/03-prd.md`), `idea.md`.
+> Traces forward to: API spec, Firestore Security Rules.
+> **Build context:** 2-day SparkFest hackathon MVP. Single zone (BR-003). F-004 (Gemini) is P1 stretch.
+
+## Entities & relationships (ERD)
+
+Two top-level Firestore collections. A `report` references a `segment` by `segmentId` (logical
+foreign key — Firestore does not enforce referential integrity; the app/rules do).
+
+```
+segments (collection)
+  └─ {segmentId} (document)        # one per seeded zone segment (idea §7: 8 provisional pins [unverified])
+         ▲
+         │  segmentId (logical FK, string-equal)
+         │
+reports (collection)
+  └─ {reportId} (document)         # many reports per segment (1 segment : N reports)
+         conditionType ∈ closed enum (BR-001)
+         uid  → Firebase Auth user (BR-005)
+         createdAt timestamp (BR-004)
+         note? → free text, feeds F-004 ONLY (BR-006)
+```
+
+Relationship: **`segments` 1 — N `reports`**, joined on `reports.segmentId == segments.{segmentId}`.
+No `users` collection in MVP — identity lives in Firebase Auth; `uid` is stored on the report only.
+
+## Schema / field definitions
+
+### segment (`segments/{segmentId}`)
+
+Seeded reference data (idea §7 provisional pins — `[unverified]` demo content, not evidence). Read by
+F-001 (render flags) and F-003 (route → segment matching).
+
+| Field | Type | Null? | Default | Description |
+|-------|------|-------|---------|-------------|
+| `segmentId` | string (doc ID) | No | — | Stable segment key; also the document ID. Used as join key by `reports.segmentId`. |
+| `name` | string | No | — | Human-readable segment label (e.g., "Teresa Street stretch"). For map/pin display. |
+| `geo` | GeoPoint **or** array of GeoPoint | No | — | Point (pin) or polyline (path) geometry for Maps overlay (F-001) + route matching (F-003). Shape `[unverified]` — system design lists "point or polyline"; pick one at build time. |
+
+> No crime/neighborhood-classification field exists on `segment` (BR-001).
+
+### report (`reports/{reportId}`)
+
+Written by F-002 (one-tap report). Read by F-001/F-003 (current flags) and F-004 (notes → Gemini).
+
+| Field | Type | Null? | Default | Description |
+|-------|------|-------|---------|-------------|
+| `reportId` | string (doc ID) | No | auto-ID | Firestore auto-generated document ID. |
+| `segmentId` | string | No | — | **Required** (BR-004). Logical FK to `segments/{segmentId}`. |
+| `conditionType` | string (**closed enum**) | No | — | **Required.** One of `{poor_lighting, no_crowd, recent_incident}` ONLY (BR-001). No other value accepted client-side or in rules. |
+| `createdAt` | timestamp | No | server time | **Required** (BR-004). Server timestamp; drives "tonight"/freshness for F-003. |
+| `uid` | string | No | — | **Required** (BR-005). Firebase Auth UID of the authenticated reporter. Must equal `request.auth.uid`. |
+| `note` | string | **Yes (optional)** | — | Optional free text. Exists **only** to feed F-004's Gemini summary (BR-006). Not a condition/crime label; not rendered as a classification. |
+
+> **No** `crimeType`, `neighborhoodRating`, `dangerLabel`, or any crime/neighborhood-classification field
+> anywhere (BR-001). The enum is the only condition vocabulary.
+
+### Example documents (JSON)
+
+`segments/seg_teresa_st` (point geometry shown):
+```json
+{
+  "segmentId": "seg_teresa_st",
+  "name": "Teresa Street stretch",
+  "geo": { "latitude": 14.5985, "longitude": 121.0102 }
+}
+```
+> Coordinates are placeholder demo content — `[unverified]` (idea §7 pins not field-confirmed).
+
+`reports/auto_9f3k...` (with optional note feeding F-004):
+```json
+{
+  "segmentId": "seg_teresa_st",
+  "conditionType": "poor_lighting",
+  "createdAt": "2025-06-30T19:42:11Z",
+  "uid": "Xy7aB...firebaseAuthUid",
+  "note": "Two streetlights out near the corner since last week."
+}
+```
+
+`reports/auto_2pq8...` (minimal — no note; note is optional):
+```json
+{
+  "segmentId": "seg_teresa_st",
+  "conditionType": "no_crowd",
+  "createdAt": "2025-06-30T20:05:00Z",
+  "uid": "Xy7aB...firebaseAuthUid"
+}
+```
+
+## Constraints & indexes
+
+**Document-level constraints (enforced client-side AND in Security Rules):**
+- `conditionType` ∈ `{poor_lighting, no_crowd, recent_incident}` — closed enum, reject anything else (BR-001).
+- `reports` write requires `request.auth != null` and `uid == request.auth.uid` (BR-005).
+- `reports` must contain `segmentId` (string) and `createdAt` (timestamp) (BR-004).
+- No crime-label / neighborhood-classification key permitted on any document (BR-001) — rules reject
+  unknown fields (closed field allowlist).
+- `note` is optional and free-text; allowed only as a Gemini input (BR-006), never a classification.
+
+**Indexes / query patterns** (per feature):
+
+| Feature | Query | Index needed |
+|---------|-------|--------------|
+| **F-001** render flags | `segments`: read all (single zone, small set, BR-003). `reports`: read current flags per segment. | Single-field auto-index on `reports.segmentId`. No composite needed for the all-segments read. |
+| **F-002** write report | `reports.add({...})` write — no query. | None (write). |
+| **F-003** per-segment freshness / "tonight" | Newest report per segment: `where('segmentId','==',X).orderBy('createdAt','desc').limit(1)`. | **Composite index** `(segmentId ASC, createdAt DESC)` — required by Firestore for equality + orderBy on different fields. |
+| **F-004** notes → Gemini | Reports for a segment with notes: `where('segmentId','==',X)` (filter `note` present client/function-side) or `where('segmentId','==',X).orderBy('createdAt','desc')`. | Reuses `(segmentId, createdAt DESC)` composite; or single-field `segmentId` if unordered. |
+
+> Firestore auto-creates single-field indexes; the `(segmentId ASC, createdAt DESC)` **composite must be
+> declared** in `firestore.indexes.json`. This is the one index F-003 and F-004 depend on.
+
+## Firestore Security Rules — data-validation view
+
+> What the rules must enforce at the document level. Cross-references system-design §"Authentication &
+> authorization" (item 1: Firestore). Reads open (public safety info, no PII beyond `uid`); writes gated.
+
+Rules must enforce, on `reports` create:
+1. **Auth required** — `request.auth != null` (BR-005). Reject anonymous-of-record writes lacking a UID.
+2. **UID ownership** — `request.resource.data.uid == request.auth.uid` (no spoofing another reporter).
+3. **Closed enum** — `request.resource.data.conditionType in ['poor_lighting','no_crowd','recent_incident']` (BR-001).
+4. **Required fields + types** — `segmentId` is string, `createdAt` is timestamp (BR-004).
+5. **Closed field allowlist** — document keys ⊆ `{segmentId, conditionType, createdAt, uid, note}`. Any
+   extra key (e.g., a crime/neighborhood label) is rejected (BR-001). `note`, if present, must be a string.
+6. **`segments`** — read open; writes locked (seeded by admin/console only, not by clients in MVP).
+
+Illustrative rule sketch (`[unverified]` exact syntax — validate before demo, per system design):
+```
+match /reports/{id} {
+  allow read: if true;
+  allow create: if request.auth != null
+    && request.resource.data.uid == request.auth.uid
+    && request.resource.data.conditionType in ['poor_lighting','no_crowd','recent_incident']
+    && request.resource.data.segmentId is string
+    && request.resource.data.createdAt is timestamp
+    && request.resource.data.keys().hasOnly(['segmentId','conditionType','createdAt','uid','note']);
+  allow update, delete: if false;   // immutable in MVP
+}
+match /segments/{id} {
+  allow read: if true;
+  allow write: if false;            // seeded out-of-band
+}
+```
+> Auth **method** (anonymous vs. Google sign-in) is `[unverified]` per system design; either yields a
+> `request.auth.uid` the rules above rely on.
+
+## Freshness / "tonight" window — `[unverified]`
+
+The freshness window length (how long a report counts as "tonight" before it goes stale) is **undecided** —
+not specified in idea or PRD (carried open question; system design §"Segment / report data shape" and PRD
+§"Open questions"). **Decision required at build (Day-2 step 6).**
+
+How the data model supports computing it once the value is chosen:
+- Every `report` carries `createdAt` (timestamp, BR-004), so freshness is purely a query/compute concern, not
+  a schema change.
+- F-003 computes a segment's "tonight" status as: **newest report per segment within the window** —
+  `where('segmentId','==',X).orderBy('createdAt','desc').limit(1)`, then compare `createdAt` to
+  `now - WINDOW`. Inside window → "flagged tonight"; older/none → "okay."
+- Changing the window value is a **client/function constant only** — no migration. The
+  `(segmentId, createdAt DESC)` composite index already supports the query for any window value.
+
+## Retention & privacy classification
+
+| Field | Classification | Retention / deletion | Notes |
+|-------|----------------|----------------------|-------|
+| `segment.*` | Public | Seed data; persists for demo | No PII; demo content `[unverified]`. |
+| `report.conditionType` | Public | MVP: no deletion policy `[unverified]` | Observable condition only (BR-001). |
+| `report.createdAt` / `segmentId` | Public | MVP: none defined `[unverified]` | Operational metadata. |
+| `report.uid` | Internal (pseudonymous identifier) | MVP: none defined `[unverified]` | Firebase Auth UID; links report to an account for abuse control (BR-005). Not displayed in UI. |
+| `report.note` | User-generated free text (potential incidental PII) | MVP: none defined `[unverified]` | Free text may contain incidental personal detail; feeds F-004 only (BR-006). Retention/redaction policy **`[unverified]`** — must be set post-July 2. |
+
+> No general retention/deletion policy is defined for the hackathon (`[unverified]`); flagged for post-July-2.
+
+## Migration notes
+
+N/A — **because** this is a greenfield 2-day hackathon MVP with a single environment (system design
+§"Deployment topology"); there is no prior schema to migrate from and no backfill. The one declared
+artifact to ship is the `(segmentId ASC, createdAt DESC)` composite index in `firestore.indexes.json`.
+The freshness-window value is a code constant, not a schema migration. Post-MVP schema evolution is
+deferred and `[unverified]`.
