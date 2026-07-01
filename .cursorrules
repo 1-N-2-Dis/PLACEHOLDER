@@ -1,2 +1,4 @@
 See AGENTS.md in the project root for all project instructions.
-Optional: scoped, path-specific rules can be added under .cursor/rules/*.mdc if needed.
+
+Scoped rule: .cursor/rules/docs-consistency.mdc runs the "Docs consistency check" (defined in
+AGENTS.md) whenever you edit spec docs, AGENTS.md, or idea.md — it keeps docs from contradicting.

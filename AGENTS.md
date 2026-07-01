@@ -86,6 +86,28 @@ Security Rules pass.
 - Business rules verified end-to-end (no SOS copy, single zone, condition-only data).
 - Docs updated when behavior changes.
 
+## Docs consistency check (all agents: Kiro, Claude, Cursor, Gemini)
+
+> **This is the one canonical copy of the check.** Kiro runs it automatically on save via the
+> "Docs Consistency Guard" hook (`.kiro/hooks/`). Claude Code, Cursor, and Gemini don't get that
+> auto-trigger, so they must run it themselves whenever they edit a doc in `docs/`, `AGENTS.md`,
+> or `idea.md`. The tool entrypoints (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/docs-consistency.mdc`)
+> only point here — they do not restate the steps.
+
+When you edit any spec doc, before you finish:
+1. Read `docs/index.md` §0 — the source-of-truth map (one fact, one canonical owner).
+2. Identify the concern you touched and its owner: map/routing stack → `docs/06-system-design.md`;
+   features `F-###` / journeys `UJ-###` / business rules `BR-###` → `docs/03-prd.md`; data schema →
+   `docs/09-data-model.md`; security / auth / secrets / compliance → `docs/12-security-compliance.md`;
+   tests / traceability → `docs/11-qa-test-plan.md`.
+3. If your edit restated a fact owned by another doc and now disagrees, fix it: update the
+   canonical owner (if it's a real decision change) or replace the restatement with a link to the owner.
+4. Spot-check invariants: every `F-###` still has ≥1 QA test; every network surface declares
+   auth/authz; the Google-tech requirement is still satisfied (Firebase + Gemini not both removed);
+   no doc reintroduces "Google Maps" as the map stack.
+5. Report contradictions with file+line and a proposed fix; if consistent, say so in one line. Do
+   not rewrite docs unless asked.
+
 ## References
 
 > **Read [docs/index.md](./docs/index.md) first.** Its §0 *source-of-truth map* says which single

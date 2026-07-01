@@ -1,0 +1,16 @@
+---
+description: Docs consistency guard — enforce the source-of-truth map when editing spec docs
+globs: docs/**/*.md, AGENTS.md, idea.md
+alwaysApply: false
+---
+
+# Docs consistency guard (Cursor)
+
+When editing any file matching the globs above (spec docs, AGENTS.md, idea.md), you MUST run the
+**"Docs consistency check"** defined canonically in [AGENTS.md](../../AGENTS.md).
+
+Do not restate the steps here — follow the version in AGENTS.md so there is only one copy. In
+short: read `docs/index.md` §0 (one fact, one owner), don't restate a fact owned by another doc,
+keep every `F-###` traced to a QA test, keep auth declared on every network surface, keep the
+Google-tech requirement satisfied via Firebase + Gemini, and never reintroduce "Google Maps" as
+the map stack (it's MapLibre GL + OpenFreeMap + OpenRouteService — see `docs/06-system-design.md`).
