@@ -11,7 +11,7 @@ features sit on top of.
 "Danger knowledge is scattered and invisible" (idea §1, §4).
 
 ## Acceptance (docs/11-qa-test-plan.md)
-- TC-001: map renders the zone via Google Maps and shows the seeded flags.
+- TC-001: map renders the zone via MapLibre GL + OpenFreeMap and shows the seeded flags.
 - TC-002: tapping a flag shows its condition type and timestamp (BR-004).
 
 ## Rules in play
