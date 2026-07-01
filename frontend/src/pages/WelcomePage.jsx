@@ -1,8 +1,8 @@
 // guidHER — public landing page + auth gate.
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
-import { useState } from 'react';
-import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
 import Owly from '../components/Owly.jsx';
 import BrandMark from '../components/BrandMark.jsx';
@@ -18,15 +18,15 @@ const COMMUTE_PREFS = [
 ];
 
 const FEATURES = [
-  { title: 'Zone Safety Map',       body: 'See every flagged segment of the Sta. Mesa zone live — tap any flag for its condition, severity, and exact report time.' },
-  { title: 'Route Recommendations', body: 'Get 2–3 ranked routes to your destination, scored by tonight\'s real reported conditions.' },
-  { title: 'AI Route Check',        body: 'Ask "Is my route okay tonight?" and get a Gemini-written verdict grounded only in real reports near your path.' },
-  { title: 'Community Reporting',   body: 'Flag poor lighting, thin crowds, or a recent incident, with a required note and an optional photo.' },
-  { title: 'Risk Summary',          body: 'A segment with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
-  { title: 'Incident Heatmap',      body: 'Toggle a density overlay of validated reports to see where risk clusters across the zone at a glance.' },
-  { title: 'Safety Tips',           body: 'Zone-specific guidance for before, during, and after your commute — plus transport-specific advice.' },
-  { title: 'Conditions-Only Data',  body: 'We describe observable states — lighting, crowds, incidents — never crime labels or place ratings.' },
-  { title: 'Emergency Contacts',    body: 'Save trusted contacts on your profile so they\'re one tap away if you ever need them.' },
+  { icon: Map,         title: 'Zone Safety Map',       body: 'See every flagged segment of the Sta. Mesa zone live. You can tap any flag for its condition, severity, and exact report time.' },
+  { icon: Route,       title: 'Route Recommendations', body: 'Get 2–3 ranked routes to your destination, scored by tonight\'s real reported conditions.' },
+  { icon: Bot,         title: 'AI Route Check',        body: 'Ask "Is my route okay tonight?" and get a Gemini-written verdict grounded only in real reports near your path.' },
+  { icon: Flag,        title: 'Community Reporting',   body: 'Flag poor lighting, thin crowds, or a recent incident, with a required note and an optional photo.' },
+  { icon: ShieldAlert, title: 'Risk Summary',          body: 'A segment with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
+  { icon: Layers,      title: 'Incident Heatmap',      body: 'Toggle a density overlay of validated reports to see where risk clusters across the zone at a glance.' },
+  { icon: BookOpen,    title: 'Safety Tips',           body: 'Zone-specific guidance for before, during, and after your commute, including transport-specific advice.' },
+  { icon: Fingerprint, title: 'Conditions-Only Data',  body: 'We describe observable states like lighting, crowds, and incidents. We never use crime labels or place ratings.' },
+  { icon: PhoneCall,   title: 'Emergency Contacts',    body: 'Save trusted contacts on your profile so they\'re one tap away if you ever need them.' },
 ];
 
 const ZONE_PREVIEW = [
@@ -44,8 +44,27 @@ function BrandWordmark() {
 
 // ── Landing nav ───────────────────────────────────────────────────────────────
 function LandingNav({ onLogin, onSignup }) {
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    let lastScroll = window.scrollY;
+    
+    function handleScroll() {
+      const currentScroll = window.scrollY;
+      if (currentScroll > lastScroll && currentScroll > 80) {
+        setHidden(true); // scrolling down
+      } else {
+        setHidden(false); // scrolling up
+      }
+      lastScroll = currentScroll;
+    }
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="landing-nav">
+    <div className={`landing-nav ${hidden ? 'nav-hidden' : ''}`}>
       <div className="landing-nav-inner">
         <div className="landing-nav-left">
           <div className="landing-nav-brand">
@@ -97,7 +116,7 @@ function LoginView({ onBack, onDone, onSignup }) {
         </div>
         <div className="owly-wrap" style={{ margin: '12px 0' }}>
           <Owly size={72} pose="welcome" />
-          <p className="owly-msg">Welcome back — your route is waiting.</p>
+          <p className="owly-msg">Welcome back! Your route is waiting.</p>
         </div>
         <h2 className="auth-title">Log in</h2>
         <form onSubmit={handleSubmit}>
@@ -209,7 +228,7 @@ function SignupView({ onBack, onDone, onLogin }) {
               </div>
               {err && <p className="status-err" style={{ marginBottom: 12 }}>{err}</p>}
               <button type="submit" className="btn btn-primary btn-full">
-                Next — Commute preferences <ArrowRight size={16} />
+                Next: Commute preferences <ArrowRight size={16} />
               </button>
             </form>
           </>
@@ -256,44 +275,37 @@ function LandingPage({ onLogin, onSignup }) {
 
   return (
     <div className="landing">
+      <div className="landing-bg-abstracts">
+        <div className="landing-bg-grid" />
+        <div className="landing-blob blob-1" />
+        <div className="landing-blob blob-2" />
+        <div className="landing-blob blob-3" />
+      </div>
       <LandingNav onLogin={onLogin} onSignup={onSignup} />
 
       {/* ── Hero ── */}
       <section className="hero-section" id="home" ref={heroRef}>
-        <div className="hero-grid">
-          <div>
-            <span className="eyebrow">Sta. Mesa commute zone · PUP</span>
-            <h1 className="hero-h1">
-              Know your route.<br /><span className="accent">Own</span> your night.
-            </h1>
-            <p className="hero-lead">
-              GuidHer structures the safety knowledge PUP women already share with each other —
-              which street, which exit, which hour — into a tool you can check before you even leave.
-            </p>
-            <div className="hero-ctas">
-              <button className="btn btn-primary" onClick={onSignup}>
-                <Users size={17} /> Join GuidHer
-              </button>
-              <button className="btn btn-secondary" onClick={onLogin}>
-                Log in to your account
-              </button>
-            </div>
-            <div className="hero-stats">
-              <div className="hero-stat"><b>412</b><span>reports this month</span></div>
-              <div className="hero-stat"><b>8</b><span>zone segments tracked</span></div>
-              <div className="hero-stat"><b>3,140</b><span>community members</span></div>
-            </div>
+        <div className="hero-text-center fade-up">
+          <span className="eyebrow">Sta. Mesa commute zone · PUP</span>
+          <h1 className="hero-h1">
+            Know your route.<br /><span className="accent">Own</span> your night.
+          </h1>
+          <p className="hero-lead">
+            PUP women already share safety knowledge about which street, which exit, and which hour to use. 
+            GuidHer structures those insights into a tool you can check before you even leave.
+          </p>
+          <div className="hero-ctas">
+            <button className="btn btn-primary btn-lg" onClick={onSignup}>
+              <Users size={18} /> Join GuidHer
+            </button>
+            <button className="btn btn-secondary btn-lg" onClick={onLogin}>
+              Log in to your account
+            </button>
           </div>
-          <div className="hero-visual">
-            <div className="mascot-halo" />
-            <div className="mascot-card">
-              <div className="speech-bubble">Teresa St. is clear right now</div>
-              <Owly size={260} pose="welcome" className="owly-float" />
-              <div className="owl-caption">
-                <b>Meet Owly</b>
-                <span>Wise, watchful, with you — your GuidHer companion.</span>
-              </div>
-            </div>
+          <div className="hero-stats">
+            <div className="hero-stat"><b>412</b><span>reports this month</span></div>
+            <div className="hero-stat"><b>8</b><span>zone segments tracked</span></div>
+            <div className="hero-stat"><b>3,140</b><span>community members</span></div>
           </div>
         </div>
       </section>
@@ -304,18 +316,31 @@ function LandingPage({ onLogin, onSignup }) {
           <div className="land-section-head">
             <span className="land-tag">What GuidHer does</span>
             <h2 className="land-h2">Everything you need for a safer commute</h2>
-            <p className="land-lead">Built around what riders actually need — not a crime dashboard, not an emergency hotline. Just clear, actionable commute conditions.</p>
+            <p className="land-lead">Built around what riders actually need. This is not a crime dashboard or an emergency hotline, but a tool for clear, actionable commute conditions.</p>
           </div>
-          <div className="feature-index">
-            {FEATURES.map(({ title, body }) => (
-              <div key={title} className="feature-index-item">
-                <span className="owl-eyes" aria-hidden="true"><span /><span /></span>
-                <div className="feature-index-text">
-                  <div className="feature-index-title">{title}</div>
-                  <p className="feature-index-body">{body}</p>
+          <div className="feature-carousel-container">
+            <div className="feature-carousel-track">
+              {FEATURES.map(({ title, body, icon: Icon }) => (
+                <div key={title} className="feature-card-v2">
+                  <div className="feature-card-v2-icon">
+                    <Icon size={24} />
+                  </div>
+                  <div className="feature-card-v2-title">{title}</div>
+                  <p className="feature-card-v2-body">{body}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="feature-carousel-track" aria-hidden="true">
+              {FEATURES.map(({ title, body, icon: Icon }) => (
+                <div key={title} className="feature-card-v2">
+                  <div className="feature-card-v2-icon">
+                    <Icon size={24} />
+                  </div>
+                  <div className="feature-card-v2-title">{title}</div>
+                  <p className="feature-card-v2-body">{body}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -326,11 +351,11 @@ function LandingPage({ onLogin, onSignup }) {
           <div className="land-section-head">
             <span className="land-tag">How it works</span>
             <h2 className="land-h2">Three steps to a safer commute</h2>
-            <p className="land-lead">GuidHer is built around the commute decision moment — not a realtime tracker, not an SOS tool. Just clear conditions before you leave.</p>
+            <p className="land-lead">GuidHer is built around the commute decision moment. It is not a realtime tracker or an SOS tool, but a way to check clear conditions before you leave.</p>
           </div>
           <div className="how-it-works-grid">
             {[
-              { n: '01', title: 'Check tonight\'s conditions', body: 'See what riders flagged on each segment of the Sta. Mesa zone — lighting, crowd levels, and recent incidents.' },
+              { n: '01', title: 'Check tonight\'s conditions', body: 'See what riders flagged on each segment of the Sta. Mesa zone, including lighting, crowd levels, and recent incidents.' },
               { n: '02', title: 'Pick your safest route',       body: 'Routes are ranked by condition scores. Choose the one that avoids flagged segments, or the most direct if all is clear.' },
               { n: '03', title: 'Share what you notice',        body: 'See something off on your commute? Flag it in 20 seconds. Your report helps the next rider make a better call.' },
             ].map(({ n, title, body }) => (
@@ -352,7 +377,7 @@ function LandingPage({ onLogin, onSignup }) {
               <span className="land-tag">Zone data, tonight</span>
               <h2 className="land-h2">See what riders are saying right now</h2>
               <p className="land-lead" style={{ marginBottom: 20 }}>
-                Conditions are submitted by commuters in the zone. Every flag describes an observable state — lighting, crowd level, or a recent incident — never a crime label.
+                Conditions are submitted by commuters in the zone. Every flag describes an observable state like lighting, crowd level, or a recent incident, but never a crime label.
               </p>
               <button className="btn btn-primary" onClick={onSignup}>
                 <ArrowRight size={16} /> Sign up to see full conditions
@@ -370,20 +395,18 @@ function LandingPage({ onLogin, onSignup }) {
                 </div>
               ))}
               <div className="zone-preview-foot">
-                Conditions only — no crime labels (BR-001)
+                Conditions only. No crime labels (BR-001)
               </div>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* ── Community CTA ── */}
-      <section className="land-section land-band-cream" id="community" ref={communityRef}>
-        <div className="land-section-inner">
+        
+        {/* ── Community CTA ── */}
+        <div className="land-section-inner" id="community" ref={communityRef} style={{ marginTop: 160 }}>
           <div className="cta-banner">
             <div>
               <h3>Built by students navigating this exact commute, for the next one behind them.</h3>
-              <p>Join GuidHer — your reports become someone else's peace of mind on the walk home.</p>
+              <p>Join GuidHer. Your reports become someone else's peace of mind on the walk home.</p>
               <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap' }}>
                 <button className="btn btn-gold" onClick={onSignup}>
                   <Users size={16} /> Join the community
@@ -393,7 +416,7 @@ function LandingPage({ onLogin, onSignup }) {
                 </button>
               </div>
             </div>
-            <Owly size={140} pose="shareandhelp" />
+            <Owly size={320} pose="shareandhelp" className="owly-flipped" />
           </div>
         </div>
       </section>
@@ -425,7 +448,7 @@ function LandingPage({ onLogin, onSignup }) {
             </div>
           </div>
           <div className="land-foot-bottom">
-            <span>© 2026 GuidHer — prototype for the Sta. Mesa commute zone</span>
+            <span>© 2026 GuidHer prototype for the Sta. Mesa commute zone</span>
           </div>
         </div>
       </footer>

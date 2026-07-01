@@ -14,6 +14,16 @@ export function ThemeProvider({ children }) {
     try { localStorage.setItem(KEY, theme); } catch {}
   }, [theme]);
 
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === KEY && e.newValue) {
+        setThemeState(e.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   function toggleTheme() {
     setThemeState((t) => (t === 'light' ? 'dark' : 'light'));
   }
