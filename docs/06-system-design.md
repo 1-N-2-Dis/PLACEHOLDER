@@ -21,14 +21,14 @@ flowchart TB
 
     subgraph Client["Web App — React + Vite (Firebase Hosting)"]
         UI["Map UI + Report UI + Route-check UI"]
-        SDK["Firebase JS SDK + Maps JS SDK"]
+        SDK["Firebase JS SDK + MapLibre GL JS"]
     end
 
     subgraph Google["Google Cloud / Firebase"]
         Auth["Firebase Auth<br/>(anonymous or Google sign-in)"]
         FS["Cloud Firestore<br/>segments + reports"]
         CF["Cloud Function (optional)<br/>Gemini proxy — F-004"]
-        Maps["Google Maps JS API"]
+        Maps["Map tiles + routing<br/>(MapLibre GL + OpenFreeMap + ORS)"]
         Gem["Gemini API"]
     end
 
@@ -40,8 +40,10 @@ flowchart TB
     FS -->|report text in| CF
 ```
 
-`[unverified]` — exact Maps SDK surface (Maps JS vs. Routes API) for F-003 route lookup; see
-"Key technology choices."
+**Resolved (2026-07-01):** the build uses MapLibre GL JS + OpenFreeMap vector tiles (free, no API
+key) for rendering, and OpenRouteService (ORS) foot-walking directions for point-to-point routing
+— not Google Maps Platform as originally planned here. See "Key technology choices" below and
+`docs/superpowers/specs/2026-07-01-highway-aware-routing-design.md` for the routing behavior.
 
 ## Components & responsibilities
 
@@ -51,7 +53,8 @@ flowchart TB
 | **Firebase Auth** | Authenticate reporters (BR-005) | User identity / session token | — |
 | **Cloud Firestore** | Store + serve segment reports with type + timestamp (BR-004); serve seed pins | Report documents, segment metadata | Auth (via security rules) |
 | **Firestore Security Rules** | Authz gate: enforce auth-to-write, condition-only schema, no crime-label fields (BR-001/005) | Access policy | Auth |
-| **Google Maps JS API** | Map tiles, segment overlays (F-001), route/segment lookup (F-003) | Map render + geometry | API key (HTTP-referrer restricted) |
+| **MapLibre GL + OpenFreeMap** | Map tiles, segment overlays (F-001) | Map render + geometry | None — OpenFreeMap is keyless |
+| **OpenRouteService (ORS)** | Point-to-point routing, safety-scored to avoid flagged segments and highway-class legs where possible | Route geometry | API key (ships in client bundle; not yet referrer-restricted — open item, see Security must-dos in `AGENTS.md`) |
 | **Gemini API (P1)** | Dedup + structure free-text reports into a summary; adds no facts (BR-006) | Summary text only | Report data from Firestore |
 | **Cloud Function (P1, optional)** | Server-side proxy that holds the Gemini key and calls Gemini | Gemini secret + prompt | Gemini API, Firestore |
 
@@ -62,6 +65,15 @@ flowchart TB
 2. User selects/enters a route through the zone.
 3. App matches route to segments, computes per-segment status from flag type + freshness window (BR-004), and renders "okay" vs. "flagged tonight."
 4. User decides: proceed / re-route / pay. (No SOS or dispatch anywhere — BR-002.)
+
+**Map point-to-point routing (beyond original F-003 scope, added 2026-07-01):**
+1. User sets Point A (defaults to zone center) and clicks a destination Point B on the map.
+2. App fetches a route from ORS, preferring one that avoids both flagged-segment zones and
+   highway-class legs ("yellow roads"); when no street-level alternative exists for one or both,
+   it falls back and labels the result accordingly.
+3. Route line renders green ("safe") or orange, with a badge naming the reason for caution:
+   passes a flagged area, uses a major road, or both. Capped at 2 ORS calls per request — see
+   `docs/superpowers/specs/2026-07-01-highway-aware-routing-design.md` for the full cascade.
 
 **UJ-002 — One-tap segment report (F-002):**
 1. User authenticates (BR-005); anonymous or Google sign-in.

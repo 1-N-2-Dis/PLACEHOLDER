@@ -1,0 +1,6 @@
+{
+  "//": "default = demo-saferroute lets the emulator run with NO real project (demo mode). Before you DEPLOY, change default to your real Firebase project id.",
+  "projects": {
+    "default": "demo-saferroute"
+  }
+}

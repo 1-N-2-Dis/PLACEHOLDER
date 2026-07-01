@@ -1,0 +1,12 @@
+{
+  "name": "saferroute-backend-tools",
+  "description": "Backend tooling for SaferRoute (seed script). The deployed Cloud Function lives in functions/.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node scripts/seed-segments.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.1"
+  }
+}

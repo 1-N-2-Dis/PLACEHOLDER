@@ -1,0 +1,15 @@
+{
+  "//": "Declared Firestore indexes for SaferRoute. Traces to docs/09-data-model.md §Constraints & indexes.",
+  "//required-index": "reports (segmentId ASC, createdAt DESC) — used by the F-004 backend query (equality + orderBy on different fields).",
+  "indexes": [
+    {
+      "collectionGroup": "reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "segmentId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

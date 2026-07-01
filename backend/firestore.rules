@@ -1,0 +1,34 @@
+// Firestore Security Rules for SaferRoute.
+// Role: the access gate. Without deployed rules, Firestore is world-writable (Threat T1).
+// Traces to: docs/09-data-model.md (rule sketch), docs/12-security-compliance.md (authz model).
+//
+// PRE-DEMO GATE: deploy + test these rules BEFORE demoing any write (TC-007, TC-008).
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // reports — public read; authed, schema-validated, immutable create.
+    match /reports/{id} {
+      allow read: if true;
+
+      allow create: if request.auth != null                                   // BR-005 auth-to-write
+        && request.resource.data.uid == request.auth.uid                       // no spoofing another reporter
+        && request.resource.data.conditionType in
+             ['poor_lighting', 'no_crowd', 'recent_incident']                  // BR-001 closed enum
+        && request.resource.data.segmentId is string                          // BR-004 required field/type
+        && request.resource.data.createdAt is timestamp                       // BR-004 required field/type
+        && request.resource.data.keys().hasOnly(
+             ['segmentId', 'conditionType', 'createdAt', 'uid', 'note'])       // BR-001 closed field allowlist
+        && (!('note' in request.resource.data) || request.resource.data.note is string);
+
+      allow update, delete: if false;                                          // reports are immutable
+    }
+
+    // segments — public read; clients never write (seeded out-of-band by the admin script).
+    match /segments/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

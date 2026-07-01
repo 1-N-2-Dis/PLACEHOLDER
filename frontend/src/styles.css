@@ -1,0 +1,97 @@
+/* SaferRoute — minimal demo styles. Functional, not the final visual design. */
+:root {
+  --flag: #c62828;
+  --okay: #2e7d32;
+  --ink: #1a1a2e;
+  --muted: #667;
+  --line: #e2e2ea;
+  --accent: #3949ab;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--ink);
+}
+
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
+.app-header { padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.app-header h1 { margin: 0 0 4px; font-size: 1.4rem; }
+.tagline { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 60ch; }
+
+.app-main { display: flex; flex: 1; min-height: 0; }
+.map-pane { flex: 1 1 60%; min-height: 420px; }
+.side-pane { flex: 1 1 40%; max-width: 460px; padding: 16px 20px; overflow-y: auto; }
+
+.map-fallback {
+  height: 100%; display: flex; align-items: center; justify-content: center;
+  background: #f4f4f8; color: var(--muted); padding: 24px; text-align: center;
+}
+
+section { margin-bottom: 28px; }
+h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.muted { color: var(--muted); font-size: 0.85rem; }
+
+label { display: block; margin: 8px 0; font-size: 0.9rem; }
+select, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+textarea { min-height: 64px; resize: vertical; }
+
+button {
+  font: inherit; padding: 8px 12px; border: 1px solid var(--accent); color: var(--accent);
+  background: #fff; border-radius: 6px; cursor: pointer; margin: 4px 6px 4px 0;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button:not(:disabled):hover { background: #eef0fb; }
+
+.condition-buttons { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+
+.status-ok { color: var(--okay); font-size: 0.9rem; }
+.status-err { color: var(--flag); font-size: 0.9rem; }
+
+.route-picker { list-style: none; padding: 0; margin: 8px 0; }
+.route-picker label { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.route-results ul { list-style: none; padding: 0; }
+.seg-flagged { color: var(--flag); }
+.seg-okay { color: var(--okay); }
+
+.segment-detail { font-size: 0.9rem; max-width: 240px; }
+.segment-detail .note { margin-top: 6px; font-style: italic; }
+.summary-text { background: #f4f6ff; padding: 10px; border-radius: 6px; font-size: 0.9rem; }
+
+.app-footer { padding: 10px 20px; border-top: 1px solid var(--line); color: var(--muted); }
+
+/* Nav bar */
+.app-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+.nav-brand { font-size: 1rem; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.nav-link { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+.nav-link:hover { text-decoration: underline; }
+
+/* Home page layout */
+.home-layout { display: flex; flex: 1; width: 100%; min-height: 0; }
+
+/* Report page layout */
+.report-page { flex: 1; display: flex; justify-content: center; overflow-y: auto; padding: 32px 20px; }
+.report-page-inner { width: 100%; max-width: 560px; }
+.back-link { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 0.875rem; text-decoration: none; }
+.back-link:hover { color: var(--ink); }
+
+/* Map overlay controls (sit above the Leaflet canvas) */
+/* MapLibre marker dots */
+.marker-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.35); cursor: grab; }
+.marker-a { background: #1976d2; }
+.marker-b { background: #e53935; }
+.seg-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.35); cursor: pointer; }
+.seg-dot--flagged { background: #c62828; }
+.seg-dot--okay { background: #2e7d32; }
+
+.map-controls { position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; pointer-events: none; }
+.map-ctrl-btn { pointer-events: auto; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font: inherit; font-size: 0.85rem; cursor: pointer; color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.map-ctrl-btn:hover { background: #eef0fb; }
+.map-ctrl-clear { color: var(--flag); }
+.map-ctrl-hint { pointer-events: none; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 0.85rem; color: var(--muted); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.map-ctrl-error   { pointer-events: none; background: #fff3f3; border: 1px solid var(--flag);  border-radius: 6px; padding: 6px 12px; font-size: 0.85rem; color: var(--flag);  box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.map-ctrl-safe    { pointer-events: none; background: #f1f8f1; border: 1px solid var(--okay);  border-radius: 6px; padding: 6px 12px; font-size: 0.85rem; color: var(--okay);  box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.map-ctrl-caution { pointer-events: none; background: #fff8f0; border: 1px solid #e65100;      border-radius: 6px; padding: 6px 12px; font-size: 0.85rem; color: #e65100;      box-shadow: 0 1px 4px rgba(0,0,0,0.12); }

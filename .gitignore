@@ -427,3 +427,19 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# --- SaferRoute web app (Node + Vite + Firebase) ---
+node_modules/
+dist/
+.env.local
+.env.*.local
+
+# Never commit secrets (Gemini key, service-account JSON). See docs/12-security-compliance.md.
+*serviceAccount*.json
+.firebase/
+.secret.local
+**/.secret.local
+
+docs/superpowers/
+
+agents/

@@ -1,0 +1,17 @@
+{
+  "name": "saferroute-functions",
+  "description": "Gemini summary proxy (F-004, P1). Holds the Gemini key server-side. See docs/06-system-design.md.",
+  "private": true,
+  "engines": { "node": "20" },
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "firebase-admin": "^13.0.1",
+    "firebase-functions": "^6.1.1"
+  }
+}
