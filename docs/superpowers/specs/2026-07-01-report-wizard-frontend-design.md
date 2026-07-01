@@ -2,6 +2,14 @@
 
 Status: approved, implementing now.
 
+> **Superseded (2026-07-01, later same day):** the 4-step wizard described below was collapsed
+> back into a single-page form, and the photo requirement was dropped (photo is optional again).
+> `ReportForm.jsx` now renders location, details (condition + note), and an optional photo all at
+> once, with one Submit button and no step navigation or `ReviewStep.jsx` (removed). The
+> pin-to-segment snapping (`segmentSnap.js`/`PinMap.jsx`) and the AI location-context change are
+> unaffected — only the step structure and the photo requirement changed. See
+> `docs/03-prd.md` F-002 and BR-008 for the current, canonical statement of this behavior.
+
 ## Problem
 
 `ReportForm.jsx` is a single-page form: pick segment, pick condition, optional note, optional

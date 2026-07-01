@@ -1,4 +1,4 @@
-// Report wizard step 2/4: location (required) — pick from the segment list, or pin on the map.
+// Report form section: location (required) — pick from the segment list, or pin on the map.
 // Both paths resolve to the same segmentId (see segmentSnap.js — a pin snaps to the nearest known
 // segment; segments are point geometry, not roads, so this is the enforcement for "only on roads,
 // not places/houses"). Traces to: docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md.

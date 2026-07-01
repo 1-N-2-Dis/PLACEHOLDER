@@ -68,7 +68,7 @@ Secondary rider (trans woman): same stories; same zone and conditions.
 | F-ID  | Feature | Priority | Solves (problem) | Notes |
 |-------|---------|----------|------------------|-------|
 | F-001 | Zone safety map with crowdsourced segment flags | P0 | "Danger knowledge is scattered and invisible" (idea §1, §4) | MapLibre GL + OpenFreeMap (keyless render); seed with §7 provisional pins `[unverified]` |
-| F-002 | One-tap report of a route/segment condition (poor lighting / no crowd / recent incident) | P0 | "Lived danger is never written down" (idea §4) | Firebase Auth + Firestore; condition flags only, no crime labels (§9/§10). **Amended (F-006):** submission is now select-condition-then-Submit, with a blocking AI review step before the report is written — no longer a true instant one-tap write; see F-006. **Amended (2026-07-01, later same day):** frontend reworked into a 4-step wizard (`ReportForm.jsx`) — photo → location (segment list or map-pin, see BR-008) → condition + note → review/submit; see `docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md`. |
+| F-002 | One-tap report of a route/segment condition (poor lighting / no crowd / recent incident) | P0 | "Lived danger is never written down" (idea §4) | Firebase Auth + Firestore; condition flags only, no crime labels (§9/§10). **Amended (F-006):** submission is now select-condition-then-Submit, with a blocking AI review step before the report is written — no longer a true instant one-tap write; see F-006. **Amended (2026-07-01, later same day):** frontend reworked into a 4-step wizard (`ReportForm.jsx`) — photo → location (segment list or map-pin, see BR-008) → condition + note → review/submit; see `docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md`. **Amended again (2026-07-01, later same day):** collapsed back into a single-page form (`ReportForm.jsx`) — location, condition + note, and an optional photo all shown at once, one Submit button; no step navigation. Photo is no longer required (see BR-008 re-amendment). |
 | F-003 | Pre-trip "is my route okay tonight" check for the zone | P0 | "No way to know before setting out" (idea §1) | `RouteCheck.jsx`. **Amended (2026-07-01, later same day):** moved from a fixed side-pane section to a bottom-center map overlay, collapsed to a single toggle button by default — the checklist only shows once tapped, closable via an `X` icon. Mounted inside `ZoneMap.jsx`, not `HomePage.jsx`. **Amended again (2026-07-01, later same day):** the per-segment manual checklist is gone — `RouteCheck.jsx` now reuses the Point A/B route already set for F-005 and, on tap, calls the new `assessRoute` Cloud Function for an AI-generated written verdict (see F-008, which this now merges into). |
 | F-004 | Structured, deduplicated risk summary from free-text reports | P1 | "Crowd noise isn't trustworthy signal" (idea §5 alternatives gap) | Gemini API; innovation hook; stretch if time allows |
 | F-005 | Severity-tiered, multi-route (2-3 alternative) recommendation | P0 | "One route recommendation doesn't show the tradeoff between safety and directness" | `frontend/src/lib/routing.js` `fetchSafeRoutes`; red hard-avoid, yellow soft-avoid, green informational only; see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` |
@@ -112,6 +112,9 @@ Secondary rider (trans woman): same stories; same zone and conditions.
   must also resolve to one of the existing known segments (nearest-point snap, `frontend/src/lib/
   segmentSnap.js`, within 40m) — segments are point geometry, not road polylines, so this is how
   "pin on a road, not a place/house" is enforced; a pin never introduces an unlisted location.
+  **Re-amended (2026-07-01, later same day):** the photo requirement is dropped — a photo is
+  optional again, matching F-007's original acceptance criterion. The note remains required. The
+  map-pin-to-segment snap requirement is unaffected.
 
 ## User flows
 
@@ -124,7 +127,8 @@ UJ-001 (pre-trip check, F-003/F-001):
 UJ-002 (report + AI review, F-002/F-006/F-007):
 1. Authenticated user (BR-005) selects a segment on the map.
 2. User selects a condition flag (poor lighting / no crowd / recent incident) — condition-only
-   (BR-001) — optionally adds a note and/or a photo, then taps Submit.
+   (BR-001) — adds a required note and optionally attaches a photo, then taps Submit. All of this
+   happens on one page (no step-by-step wizard).
 3. Client uploads the (EXIF-stripped, BR-008) photo if given, then calls `submitReport`, which
    blocks on an AI review: classify severity (BR-007), check for a duplicate, check for spam.
 4. One of three outcomes: report created (with severity, map flag updates), merged as

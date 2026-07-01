@@ -1,4 +1,4 @@
-// Report wizard step 3/4: condition type + note (both required).
+// Report form section: condition type + note (both required).
 // Closed enum only — there is deliberately no free-form crime/neighborhood field (BR-001, TC-004).
 import { CONDITION_TYPES, CONDITION_META } from '../../../data/condition-types.js';
 

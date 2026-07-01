@@ -1,4 +1,4 @@
-// Report wizard step 1/4: photo (required).
+// Report form section: photo (optional).
 // Two separate file inputs, not one: a `capture` input opens the device camera directly (no
 // chooser), and a plain input opens the gallery/file browser directly. Combining both attributes
 // on one input leaves the OS's own chooser dialog in charge instead, which is what this replaces.
@@ -25,8 +25,8 @@ export default function PhotoStep({ photoFile, onChange }) {
 
   return (
     <section className="report-step">
-      <h2>Add a photo</h2>
-      <p className="muted">A photo helps others trust the report. Required to continue.</p>
+      <h2>Add a photo (optional)</h2>
+      <p className="muted">A photo helps others trust the report, but isn't required.</p>
 
       <div className="photo-pick-buttons">
         <button type="button" onClick={() => cameraInputRef.current?.click()}>
