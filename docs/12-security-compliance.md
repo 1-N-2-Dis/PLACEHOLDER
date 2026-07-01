@@ -22,48 +22,66 @@ mitigation, not just hygiene — see Threat T6 and BR-001).
 | `report.conditionType` (closed enum) | **Public** | Firestore `reports` | Observable, fixable condition only (BR-001). No crime/neighborhood label exists by design. |
 | `report.createdAt`, `report.segmentId` | **Public** | Firestore `reports` | Operational metadata. |
 | `report.uid` | **Internal — pseudonymous identifier** | Firestore `reports` | Firebase Auth UID linking a report to an account for abuse control (BR-005). **Not displayed in UI.** Anonymous-auth UID is not directly identifying, but it *links a person to the places/times they flagged* — that linkage is the sensitive part. |
-| `report.note` (optional free text) | **User-generated — potential incidental PII** | Firestore `reports` | May contain names, plate numbers, descriptions of people, "my" locations. Exists ONLY to feed F-004 (BR-006). Highest-risk field in the system. |
-| Maps API key | **Secret-in-client (by design)** | Client bundle | Browser key; protected by referrer restriction, not concealment (see Secrets). |
-| Gemini API key | **Secret (must stay server-side)** | Cloud Function env (P1) | MUST NOT ship in client bundle. |
+| `report.note` (optional free text) | **User-generated — potential incidental PII** | Firestore `reports` | May contain names, plate numbers, descriptions of people, "my" locations. Feeds F-004 (BR-006) and the F-006 classify prompt (BR-007). |
+| `report.severity` / `corroborationCount` / `lastActivityAt` | **Public** | Firestore `reports` | AI-assigned per-report triage signal (BR-007) + operational metadata; not a place/crime classification. |
+| `report.photoPath` (optional) | **User-generated image — potential PII, now the highest-risk field in the system** | Firebase Storage `reports/{uid}/...` | Bystander faces, incidental scene context; EXIF GPS/camera metadata stripped client-side before upload (BR-008), but photo *content* privacy (who/what is visible) is **not** mitigated by that — see Threat T7. Supersedes `report.note` as the highest-risk field. |
+| Maps API key | **Secret-in-client (by design)** | Client bundle | Browser key; protected by referrer restriction, not concealment (see Secrets). Superseded in this build by the ORS key (same posture — see Threat T2). |
+| Gemini API key | **Secret (must stay server-side)** | Cloud Function env | MUST NOT ship in client bundle. Backs `summarizeSegment` (P1), `submitReport` (P0 — its unavailability blocks report submission entirely by design, fail-closed, BR-007), and `assessRoute` (P0 — F-003/F-008 route assessment; fails open with an error message shown, since it's informational, not a moderation gate). |
 
 ## Authn / authz model (per network-exposed surface)
 
 Mirrors system-design §"Authentication & authorization." Each exposed surface is stated explicitly —
 a silent unauthenticated surface is a factory-gate failure.
 
-1. **Cloud Firestore (read/write reports + read segments)** — **Authz = Firestore Security Rules.**
+1. **Cloud Firestore (read/write reports + read segments)** — **Changed (F-006).**
    - **Reads: open** (`allow read: if true`). Flags are public safety info; the only non-public field
      is `uid`, which is internal but readable in MVP — see Threat T6 / open question on whether to
      strip `uid` from client reads post-July-2 `[unverified]`.
-   - **Writes (`reports` create): require `request.auth != null`** (BR-005), enforce `uid ==
-     request.auth.uid` (no spoofing), closed `conditionType` enum (BR-001), required `segmentId`/`createdAt`
-     types (BR-004), and a **closed field allowlist** `hasOnly([...])` that rejects any crime/neighborhood
-     field (BR-001). `update`/`delete` denied (immutable).
-   - **`segments`: read open, write denied** (seeded out-of-band).
-   - Without deployed rules, **Firestore is world-writable/world-readable** — rules are mandatory, a
-     pre-demo gate (see checklist).
+   - **Writes (`reports` create/update/delete): denied for all clients** —
+     `allow create, update, delete: if false`. The only writer is the `submitReport` Cloud Function,
+     via the Admin SDK, which **bypasses Rules entirely, always** (not merely "trusted more"). This
+     means Rules no longer enforce `request.auth != null` (BR-005), UID ownership, the closed
+     `conditionType` enum (BR-001), or the closed field allowlist for creates — **that enforcement
+     has moved into `submitReport`'s code**, which is now the sole point of failure for those
+     guarantees. Mitigation: only the Function's service credential can perform an Admin SDK write,
+     so a client cannot bypass the Function to write directly, regardless of Rules content.
+   - **`segments`: read open, write denied** (seeded out-of-band, unchanged).
+   - Without deployed rules, **reads would be unrestricted too** — rules remain mandatory, a
+     pre-demo gate (see checklist). **Do not deploy the new deny-create rule until `submitReport`
+     is fully verified** (see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md`).
 2. **Firebase Auth** — the identity surface. **Method `[unverified]`**: anonymous (chosen for demo speed)
    vs. Google sign-in. Anonymous yields a `uid` but gives **weak abuse control** (a user can drop the
-   anonymous identity and get a fresh `uid` at will) — documented limitation feeding Threats T3/T4.
-3. **Google Maps JS API key** — exposed in the client bundle **by design** (browser key). Only viable
-   authz is **HTTP-referrer restriction + API allowlist** in Cloud Console. Unrestricted = anyone can
-   bill the key (Threat T2).
-4. **Gemini API key (P1)** — **server-side only**, held in a Cloud Function; invoked by the
-   authenticated client. Client-side Gemini calls **leak the key** and are acceptable ONLY as a
-   knowingly-throwaway demo fallback, never for any real deployment (Threat T2).
+   anonymous identity and get a fresh `uid` at will) — documented limitation feeding Threats T3/T4,
+   unchanged by F-006 (the Function still trusts whatever `request.auth.uid` Auth provides).
+3. **Google Maps JS API key** — N/A for this build (superseded by ORS + OpenFreeMap keyless tiles).
+   The ORS key ships in the client bundle by the same necessity and is **not yet referrer-restricted**
+   — open item, same Threat T2 shape.
+4. **Gemini API key** — **server-side only**, held in a Cloud Function; invoked by the
+   authenticated client for `summarizeSegment` (P1), `submitReport` (P0, critical path — every
+   report write depends on it), and `assessRoute` (P0, F-003/F-008 — reads each on-route
+   segment's real Firestore report itself, never trusts client-supplied report content). Client-side Gemini calls **leak the key** and
+   are acceptable ONLY as a knowingly-throwaway demo fallback, never for any real deployment (Threat T2).
+5. **Firebase Storage (report photos, F-007)** — **Authz = Storage Security Rules**
+   (`backend/storage.rules`). Reads: open (same posture as reports). Writes: require
+   `request.auth != null`, path-scoped to the caller's own `reports/{uid}/` prefix (checked against
+   `request.auth.uid`), `<5MB`, `image/(jpeg|png)` only. `submitReport` independently re-validates
+   that a client-supplied `photoPath` matches the caller's own prefix before attaching it to a
+   report — defense in depth against a spoofed path referencing someone else's upload. Without
+   deployed Storage rules, uploads are world-writable — same mandatory-gate posture as Firestore.
 
 ## Threat model (STRIDE-lite)
 
-Scoped to the MVP's real attack surface. T1–T6 are the priority threats called out in the brief/system design.
+Scoped to the MVP's real attack surface. T1–T7 are the priority threats called out in the brief/system design.
 
 | # | Threat (STRIDE) | Vector | Impact | Mitigation |
 |---|-----------------|--------|--------|------------|
-| **T1** | **Tampering / Elevation — world-writable Firestore** | Default Firestore has no rules → anyone writes/reads any document | Data poisoning, junk/abusive docs, schema breakage, total trust collapse of the map | **Deploy Security Rules before any write demo** (BR-001/004/005): auth-to-write, `uid` ownership, closed enum, closed field allowlist, `segments` write-locked. Test rules pass *before* demoing writes. |
-| **T2** | **Info disclosure / DoS — API key abuse (Maps + Gemini)** | Maps browser key unrestricted; Gemini key shipped in client | Third parties run up Google billing on our keys; Gemini key theft | Maps key: **HTTP-referrer + API allowlist** in Console. Gemini key: **Cloud Function only**, never in client bundle. No secrets in repo (checklist). |
-| **T3** | **Spoofing / abuse — report spam via anonymous auth** | Anonymous auth lets a user churn `uid`s and flood reports | Flag inflation, fake "danger tonight," map made useless (ties to idea §9 technical kill-criterion: usable density) | Auth-to-write gate (BR-005) raises the floor; **anonymous = weak control, documented.** MVP has **no rate-limit** `[unverified]` — flagged as a known gap; post-July-2 consider per-uid write throttle / Google sign-in / App Check. |
-| **T4** | **Tampering — malicious / false reports (false-flag poisoning)** | A bad actor flags a safe segment as bad, or floods to bury real signal | Wrong routing advice; could defame a place/business; erodes trust | Closed condition enum (no crime labels) limits blast radius (BR-001); immutable reports + `createdAt` give an audit trail; **freshness window** decays stale/maliciously-old flags (BR-004; window value `[unverified]`). F-004 dedup (BR-006) reduces flood amplification. No reputation/verification system in MVP `[unverified]` — flagged. |
-| **T5** | **Repudiation — disputed reports** | "I never flagged that" / who flagged this? | Hard to adjudicate abuse | Every `report` carries `uid` + server `createdAt`; reports are append-only/immutable (no update/delete). Sufficient for MVP audit; not a full audit system. |
-| **T6** | **Info disclosure — incidental PII in `note` + uid linkage** | Free-text `note` contains a name/plate/description; `uid` links a person to flagged places/times | Privacy harm to third parties named in notes; deanonymization risk of reporters; sensitive in a safety context | `note` is **optional** and feeds F-004 only (BR-006); F-004 prompt is constrained (no new facts). **Data minimization**: no precise/continuous user-location tracking anywhere (see below). **Gaps `[unverified]`:** no PII redaction/scrubbing on `note`, no retention/deletion policy, `uid` not stripped from open reads — all flagged for post-July-2. Consider input hint discouraging naming individuals. |
+| **T1** | **Tampering / Elevation — world-writable Firestore** | Default Firestore has no rules → anyone writes/reads any document | Data poisoning, junk/abusive docs, schema breakage, total trust collapse of the map | **Changed (F-006):** client `create` on `reports` is denied outright by Rules; the real gate is that only `submitReport`'s Admin SDK credential can write at all, and its code enforces BR-001/004/005. **Deploy the deny-create rule only after `submitReport` is verified** (see design doc) — until then, keep the previous auth-to-write/closed-enum/field-allowlist rules as the interim gate. `segments` remains write-locked. |
+| **T2** | **Info disclosure / DoS — API key abuse (ORS + Gemini)** | ORS browser key unrestricted; Gemini key shipped in client | Third parties run up billing on our keys; Gemini key theft | ORS key: **HTTP-referrer + API allowlist**, not yet done (open item). Gemini key: **Cloud Function only**, never in client bundle — now guards a P0 path (`submitReport`), not just P1. No secrets in repo (checklist). |
+| **T3** | **Spoofing / abuse — report spam via anonymous auth** | Anonymous auth lets a user churn `uid`s and flood reports | Flag inflation, fake "danger tonight," map made useless (ties to idea §9 technical kill-criterion: usable density) | Auth-to-write gate (BR-005, now enforced in `submitReport`) raises the floor; **anonymous = weak control, documented.** F-006's spam-rejection classification adds a content-level filter on top, but is not a substitute for rate-limiting — MVP still has **no rate-limit** `[unverified]`, flagged as a known gap. |
+| **T4** | **Tampering — malicious / false reports (false-flag poisoning)** | A bad actor flags a safe segment as bad, or floods to bury real signal | Wrong routing advice; could defame a place/business; erodes trust | Closed condition enum (no crime labels) limits blast radius (BR-001); immutable reports + `createdAt` give an audit trail; **freshness window** decays stale/maliciously-old flags (BR-004; window value `[unverified]`). **F-006's fail-closed AI reject/dedupe is a new, stronger mitigation** — spam is rejected before it's ever written, and duplicates corroborate rather than flood. Still no reputation/verification system, and the AI itself could be fooled by a plausible-sounding false report — `[unverified]`, flagged. |
+| **T5** | **Repudiation — disputed reports** | "I never flagged that" / who flagged this? | Hard to adjudicate abuse | Every `report` carries `uid` + server `createdAt`; reports are append-only/immutable via client paths (no update/delete). `submitReport`'s own `corroborationCount` increments are the one exception to append-only, and are themselves audit-logged by Cloud Functions' own logging. Sufficient for MVP audit; not a full audit system. |
+| **T6** | **Info disclosure — incidental PII in `note` + uid linkage** | Free-text `note` contains a name/plate/description; `uid` links a person to flagged places/times | Privacy harm to third parties named in notes; deanonymization risk of reporters; sensitive in a safety context | `note` is **optional** and feeds F-004 and the F-006 classify prompt (BR-006/BR-007); both prompts are constrained (no new facts). **Data minimization**: no precise/continuous user-location tracking anywhere (see below). **Gaps `[unverified]`:** no PII redaction/scrubbing on `note`, no retention/deletion policy, `uid` not stripped from open reads — all flagged for post-July-2. Consider input hint discouraging naming individuals. |
+| **T7** | **Info disclosure — bystander privacy + incidental metadata in photo evidence (F-007)** | A report photo may capture a bystander's face, license plate, or other identifying scene content; the raw file could also carry EXIF GPS/camera metadata | Privacy harm to people who never consented to being photographed and published on a public safety map; potential precise-location leak via EXIF if unmitigated | **Mitigated:** EXIF GPS/camera metadata is stripped client-side before upload (`frontend/src/lib/photo.js`, canvas re-encode — BR-008), so the stored file carries no location/camera metadata even though the report itself is already segment-located. **NOT mitigated — known, accepted gap for this build:** the photo's visual content (faces, plates, identifiable scenes) is displayed as-is; there is no blurring, consent flow, or moderation for bystander privacy. This is the single largest new privacy exposure introduced by this round of work and should be the first thing revisited post-July-2 `[unverified]`. |
 
 > **Spoofing of the map itself / DoS at infra level:** N/A beyond Google defaults — **because** Hosting,
 > Firestore, and Functions run on Google-managed autoscaling infra (system design §"Scaling strategy");
@@ -118,18 +136,31 @@ This app's failure modes can *harm the people it claims to protect* — treat th
   `[unverified]` gap.
 - **Stigmatizing places/people** (idea §9 ethical core): the whole point of BR-001 is to describe *fixable
   conditions* (lighting, crowd) rather than brand a street or community as "criminal." BR-002 keeps the app
-  preventive-informational, not an enforcement/vigilante tool. The open §7 decision — whether "danger" stays
-  harassment-led (women wedge) or widens to all-crime — is a **product+ethics decision to make post-July-2
-  with real input**, not in this doc `[unverified]`.
+  preventive-informational, not an enforcement/vigilante tool. **F-006's `severity` field (BR-007) is a
+  per-report triage signal, not a re-introduction of place-classification** — it is never aggregated into a
+  place-level rating and the classify prompt explicitly forbids the model from outputting one. The open §7
+  decision — whether "danger" stays harassment-led (women wedge) or widens to all-crime — is a **product+ethics
+  decision to make post-July-2 with real input**, not in this doc `[unverified]`.
+- **Bystander privacy in photo evidence** (T7, new in F-007): a report photo can capture someone who never
+  consented to being on a public safety map. Not mitigated in this build beyond EXIF stripping — flagged as
+  the top post-July-2 priority, not glossed over.
 
 ## Secrets handling
 
-- **Gemini API key (P1):** Cloud Function environment only; referenced, never inlined; **never committed to
-  the repo** (public repo per system design). If F-004 is cut, no Gemini key ships at all.
-- **Maps API key:** present in the client bundle by necessity; security comes from **referrer + API-allowlist
-  restriction in Console**, not secrecy. Restrict it the moment it's added (Day-1 build step 2).
+- **Gemini API key:** Cloud Function environment only; referenced, never inlined; **never committed to
+  the repo** (public repo per system design). **No longer cut-safe** — `submitReport` (F-006) is P0 and
+  depends on it for every report write; if the key/quota is unavailable, report submission fails outright
+  (fail-closed, BR-007), it does not silently degrade the way F-004's summary does.
+- **ORS API key:** present in the client bundle by necessity; security comes from **referrer + API-allowlist
+  restriction**, not secrecy. **Not yet restricted** — open item, same as the original Maps-key guidance this
+  supersedes.
 - **Firebase config** (apiKey/projectId in client): not a secret in the traditional sense — it's an
-  identifier; Firestore **Security Rules** are the actual access control, not the config.
+  identifier; Security Rules (Firestore **and, as of F-007, Storage**) are the actual access control, not
+  the config.
+- **Firestore Rules no longer validate `reports` content shape on create** (F-006) — this is a documented
+  architecture change, not a regression: the validation moved into `submitReport`'s code because Rules
+  cannot express "this write came from the moderation function." Treat a bug in that Function's validation
+  as equivalent in severity to a Rules misconfiguration used to be.
 - **No secret values appear in this document, in code, or in git history.** Rotation: N/A for a 2-day demo —
   **because** keys are demo-scoped and disposable; for any real deployment, rotation + a secret manager are
   required `[unverified]`.
@@ -159,20 +190,27 @@ This app's failure modes can *harm the people it claims to protect* — treat th
 
 Hard gates — a world-writable Firestore or an unrestricted key is a demo-day liability, not a polish item.
 
-- [ ] **Firestore Security Rules deployed and tested** — auth-to-write (BR-005), `uid == request.auth.uid`,
-  closed `conditionType` enum (BR-001), required `segmentId`/`createdAt` types (BR-004), closed field
-  allowlist (rejects any crime/neighborhood key), `segments` write-locked, reports immutable. **Do not demo
-  writes until rules pass.** (Kills T1.)
-- [ ] **Maps API key restricted** in Cloud Console — HTTP-referrer (the Hosting domain) + API allowlist.
-  Done the moment the key is added (Day-1 step 2). (Kills T2.)
-- [ ] **Gemini key server-side only** (if F-004 ships) — in the Cloud Function env, **not** in the client
-  bundle. If client-side fallback is used, it is a *knowingly-throwaway* demo key, flagged aloud. (Kills T2.)
+- [ ] **`submitReport` fully verified against the emulator BEFORE deploying the new Firestore rules**
+  (create/duplicate/reject outcomes all exercised live against Gemini) — deploying
+  `allow create: if false` on `reports` before this is proven leaves F-002 entirely broken with no
+  fallback. See `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach.
+- [ ] **Firestore Security Rules deployed and tested** — `reports` create/update/delete denied for all
+  clients (F-006), `segments` write-locked. (Kills T1.)
+- [ ] **Storage Security Rules deployed and tested** (F-007) — auth-gated write, path-scoped to the
+  caller's own `reports/{uid}/` prefix, `<5MB`, `image/(jpeg|png)` only, unauthenticated/oversized/
+  wrong-type uploads rejected. (New — see Threat T7.)
+- [ ] **ORS API key restricted** — HTTP-referrer + API allowlist. Open item, not yet done. (Kills T2.)
+- [ ] **Gemini key server-side only** — in the Cloud Function env, **not** in the client bundle. **No
+  longer optional/cut-safe** — `submitReport` is P0 and every report write depends on it. If client-side
+  fallback is ever used, it is a *knowingly-throwaway* demo key, flagged aloud. (Kills T2.)
 - [ ] **No secrets in the repo** — scan committed files; no Gemini key, no service-account JSON. Firebase
   client config is fine; rules are the gate. (Public repo.)
 - [ ] **Auth method decided + wired** — anonymous (default) or Google sign-in; if anonymous, the **weak
   abuse-control limitation is stated in the demo/readme** (T3). `[unverified]` until chosen.
 - [ ] **Closed enum verified end-to-end** — UI offers only the 3 conditions; no free-text crime label exists
-  anywhere; rules reject extra fields (BR-001). (Defamation/profiling mitigation — idea §9.)
+  anywhere; `submitReport` rejects any conditionType outside the enum (BR-001). (Defamation/profiling mitigation — idea §9.)
+- [ ] **EXIF stripped from uploaded report photos** — spot-check an uploaded photo (exiftool or an online
+  viewer) has no GPS/camera metadata. (BR-008; does not cover bystander-content privacy — T7, accepted gap.)
 - [ ] **No SOS / rescue copy anywhere** (BR-002); **single zone only** (BR-003). (Avoids over-promise liability.)
 - [ ] **`note` handling sane** — optional, not rendered as a classification, not logged; ideally a UI hint
   discouraging naming individuals (T6). PII scrubbing remains a known `[unverified]` gap.
@@ -188,6 +226,13 @@ Hard gates — a world-writable Firestore or an unrestricted key is a demo-day l
 - RA 10173 and RA 11313 specific obligations — **for counsel**, not resolved here.
 - Privacy notice / consent flow — none in MVP.
 - The §7 "harassment-led vs. all-crime/all-commuters" scope decision — product+ethics call, post-July-2.
+- **Bystander-content privacy in report photos (T7)** — the top new gap from this round of work; no
+  blurring/moderation/consent flow exists. Should be the first post-July-2 privacy item addressed.
+- No automated cleanup of orphaned Storage photos for rejected reports — best-effort client-side delete
+  only (`backend/storage.rules` `allow delete`); a photo can be uploaded and then the report rejected,
+  leaving an orphaned object if the client doesn't clean up.
+- Gemini's reliability for the classify/dedupe/reject decision at blocking-UX latency is unverified
+  live in this pass — needs the developer's own timing test before the demo.
 
 ## Sections marked N/A
 

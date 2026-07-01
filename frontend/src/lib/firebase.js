@@ -8,6 +8,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,8 +22,10 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-// Functions region near PH for the F-004 Gemini proxy (backend/functions). [unverified] asia-southeast1.
+// Functions region near PH for the Gemini-backed callables (backend/functions). [unverified] asia-southeast1.
 export const functions = getFunctions(app, 'asia-southeast1');
+// Report photo evidence (F-007).
+export const storage = getStorage(app);
 
 // Local testing: point the SDK at the Firebase Emulator Suite instead of the cloud.
 // Toggled by VITE_USE_EMULATORS=true in .env.local. Must run before any Auth/Firestore use.
@@ -30,6 +33,7 @@ if (import.meta.env.VITE_USE_EMULATORS === 'true') {
   connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
   connectFirestoreEmulator(db, '127.0.0.1', 8080);
   connectFunctionsEmulator(functions, '127.0.0.1', 5001);
+  connectStorageEmulator(storage, '127.0.0.1', 9199);
   // eslint-disable-next-line no-console
-  console.info('[SaferRoute] Using Firebase emulators (Auth:9099, Firestore:8080, Functions:5001).');
+  console.info('[SaferRoute] Using Firebase emulators (Auth:9099, Firestore:8080, Functions:5001, Storage:9199).');
 }
