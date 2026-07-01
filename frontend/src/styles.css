@@ -52,12 +52,8 @@ button:not(:disabled):hover { background: #eef0fb; }
 .status-ok { color: var(--okay); font-size: 0.9rem; }
 .status-err { color: var(--flag); font-size: 0.9rem; }
 
-/* Report wizard (F-002 step flow) */
-.wizard-steps { display: flex; list-style: none; padding: 0; margin: 0 0 20px; gap: 4px; }
-.wizard-steps li { flex: 1; text-align: center; padding: 6px 4px; font-size: 0.8rem; color: var(--muted); border-bottom: 2px solid var(--line); }
-.wizard-steps li.wizard-step--active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-.wizard-steps li.wizard-step--done { color: var(--okay); border-bottom-color: var(--okay); }
-.wizard-nav { display: flex; justify-content: space-between; margin-top: 16px; }
+/* Report form (F-002, single-page) */
+.report-step { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
 .report-step h2 { margin-top: 0; }
 .photo-preview { display: block; max-width: 240px; max-height: 200px; margin-top: 10px; border-radius: 6px; object-fit: cover; }
 .photo-pick-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -67,8 +63,6 @@ button:not(:disabled):hover { background: #eef0fb; }
 .pin-map { position: relative; width: 100%; height: 100%; }
 .pin-map-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--wellused); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 .pin-map-hint { position: absolute; bottom: 8px; left: 8px; right: 8px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; color: var(--flag); margin: 0; }
-.review-summary { list-style: none; padding: 0; margin: 0 0 16px; font-size: 0.9rem; }
-.review-summary li { margin: 4px 0; }
 
 
 .segment-detail { font-size: 0.9rem; max-width: 240px; }
