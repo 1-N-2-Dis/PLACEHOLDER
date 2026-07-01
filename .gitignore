@@ -443,3 +443,6 @@ dist/
 docs/superpowers/
 
 agents/
+
+# FMD documents-factory tooling (external; not part of the product build)
+fmd/

@@ -1,12 +1,17 @@
+---
+status: draft
+schema_version: 1.1.0
+---
+
 <!--
-  idea.md — idea-forge schema v1.0.0
-  DRAFT. Not freeze-eligible: evidence floor not yet met (no first-party paid).
-  Fill via interviews after July 2; do not fake a paid tag to pass the gate.
+  idea.md — FMD input brief (schema v1.1.0). Frontmatter above is the machine-
+  readable handshake (status + schema_version); FMD reads schema_version to pin
+  section-schema compatibility. FMD consumes this brief as-is — no validation,
+  no evidence floor, no freeze gate (FMD ADR-0002). Any sources cited below are
+  optional grounding, not a gate.
 -->
 
 # Idea: Safer-route awareness for women commuting the Sta. Mesa commute zone
-
-Status: DRAFT
 
 ## 1. Problem statement
 
@@ -40,41 +45,28 @@ senior citizens and PWDs.
 
 - Women change the routes they travel specifically to avoid harassment and
   assault, and existing mapping tools do not give them the information to do it.
-  > [!evidence] Type: did | Source: arXiv-1811.01147 (route-safety study) | Date: 2018-11-03
+  (arXiv-1811.01147, route-safety study, 2018-11-03)
 - Filipino women on Metro Manila transit run continuous self-protection routines
   ("modified feminist self-defense") because the system provides no security.
-  > [!evidence] Type: did | Source: Springer-12198-023-00268-y | Date: 2023-10-31
+  (Springer-12198-023-00268-y, 2023-10-31)
 - A Quezon City woman re-routes and takes longer walks to avoid groups of men,
   and at times avoids leaving home at all.
-  > [!evidence] Type: did | Source: UN-Women-QC-SafeCities | Date: 2015-12-08
+  (UN-Women-QC-SafeCities, 2015-12-08)
 - Commuters in this zone use concrete manual workarounds: bag held in front on
   the train, boarding only half-full jeepneys, traveling in groups on Teresa St.
-  > [!evidence] Type: did | Source: reddit-HowToGetTherePH-workarounds | Date: 2024-03-01
+  (reddit-HowToGetTherePH-workarounds, 2024-03-01)
 - Women spend extra money to escape danger entirely — paying Angkas/MoveIt surge
   fares for late-night trips, and some relocate housing to avoid the commute.
-  > [!evidence] Type: did | Source: reddit-HowToGetTherePH-paid-avoidance | Date: 2023-09-01
+  (reddit-HowToGetTherePH-paid-avoidance, 2023-09-01)
 - Commuters already crowdsource danger-area knowledge by hand, asking and
   answering which Metro Manila areas to avoid after dark.
-  > [!evidence] Type: did | Source: quora-metro-manila-after-dark | Date: 2025-09-07
+  (quora-metro-manila-after-dark, 2025-09-07)
 - All transgender-woman participants in an MRT study reported experiencing
   sexual harassment in some form.
-  > [!evidence] Type: did | Source: Trans-on-Trains-MRT-study | Date: 2016-02-21
+  (Trans-on-Trains-MRT-study, 2016-02-21)
 - Filipino women report rising anxiety about walking alone at night, with
   confidence down ~11% since 2024.
-  > [!evidence] Type: said | Source: PSRC-Worldviews-2026 | Date: 2026-02-01
-
-> Note: every signal above is third-party desk research. No first-party
-> interview or paid/commitment evidence exists yet — this is why the brief
-> cannot freeze. Close it with interviews + one real commitment after July 2.
-
-### Four tests
-
-| Test | Pass/Fail | Why |
-|------|-----------|-----|
-| Real (does it actually happen?) | Pass | Multiple independent `did` sources show route-changing and paid avoidance. |
-| Large (enough people?) | Pass | ~41k female PUP students; 350k–500k female NCR rail commuters daily. |
-| Significant (do they care?) | Pass | They spend money and forego trips to avoid it — revealed, not stated. |
-| Urgent (now, not someday?) | Pass | Rainy-season night commutes now; recent 2026 anxiety data and incidents. |
+  (PSRC-Worldviews-2026, 2026-02-01)
 
 ## 4. Root cause (the WHY)
 
@@ -99,25 +91,25 @@ assume a real-time rescue that cannot physically happen on a moving vehicle.
 
 - PUP Main Campus enrolls roughly 83,000 students (2023); at gender parity that
   is about 41,000 women navigating the Sta. Mesa commute zone.
-  > [!evidence] Type: said | Source: PUP-enrollment-2023 | Date: 2023-09-01
+  (PUP-enrollment-2023, 2023-09-01)
 - NCR college enrollment includes about 363,000 women, a broader reachable base.
-  > [!evidence] Type: said | Source: CHED-AY2020-2021 | Date: 2021-06-01
+  (CHED-AY2020-2021, 2021-06-01)
 - The three rail lines carry ~1.01M trips daily (MRT-3 ~375k, LRT-2 ~149k, LRT-1
   ~486k); at ~50% female that is roughly 350k–500k women daily.
-  > [!evidence] Type: said | Source: DOTr-rail-ridership | Date: 2024-12-31
+  (DOTr-rail-ridership, 2024-12-31)
 - The segment is reachable this week in two open channels: r/HowToGetTherePH and
   the PUP campus subreddits (r/PUPians, r/SintangPaaralan).
-  > [!evidence] Type: did | Source: reddit-channels-observed | Date: 2026-06-30
+  (reddit-channels-observed, 2026-06-30)
 - Alternative "do nothing / hypervigilance": the incumbent; its failure is that
   it loads the entire cognitive and safety burden on the victim and still fails
   in packed, inescapable vehicles.
-  > [!evidence] Type: did | Source: Springer-12198-023-00268-y | Date: 2023-10-31
+  (Springer-12198-023-00268-y, 2023-10-31)
 - Alternative women-only train cars: failure is journey-myopia — they cover only
   the rail segment and leave the first/last mile unprotected.
-  > [!evidence] Type: said | Source: market-research-transit-safety | Date: 2026-06-30
+  (market-research-transit-safety, 2026-06-30)
 - Alternative ride-hailing (Grab/Angkas): failure is economic exclusion — surge
   fares are prohibitive for daily student use.
-  > [!evidence] Type: did | Source: reddit-HowToGetTherePH-paid-avoidance | Date: 2023-09-01
+  (reddit-HowToGetTherePH-paid-avoidance, 2023-09-01)
 
 Who pays (price question, reasoning — not a validated claim): the female
 commuter has weak willingness to pay for information that can't physically move
@@ -138,33 +130,34 @@ already do by hand.
 ## 7. Feature set
 
 **MVP** (each feature names the problem it solves):
-- Zone safety map with crowdsourced segment flags — solves "danger knowledge
-  is scattered and invisible" (§1, §4).
-- One-tap report of a route/segment condition (poor lighting, no crowd, recent
-  incident) — solves "lived danger is never written down" (§4).
-- Pre-trip "is my route okay tonight" check for the zone — solves "no
-  way to know before setting out" (§1).
-- Structured, deduplicated risk summary from free-text reports — solves "crowd
-  noise isn't trustworthy signal" (§5 alternatives gap).
+- **F-001** — Zone safety map with crowdsourced segment flags — solves "danger
+  knowledge is scattered and invisible" (§1, §4).
+- **F-002** — One-tap report of a route/segment condition (poor lighting, no
+  crowd, recent incident) — solves "lived danger is never written down" (§4).
+- **F-003** — Pre-trip "is my route okay tonight" check for the zone — solves
+  "no way to know before setting out" (§1).
+- **F-004** — Structured, deduplicated risk summary from free-text reports —
+  solves "crowd noise isn't trustworthy signal" (§5 alternatives gap).
 
 **Final**:
-- Expansion to additional campus commute zones with enough contributor density.
-- Inclusive-routing layer (well-lit / step-free options) for LGBTQ+, senior, and
-  PWD riders.
-- Closed-loop reporting that routes a structured complaint to the right
-  LGU/operator desk under RA 11313.
+- **F-101** — Expansion to additional campus commute zones with enough
+  contributor density.
+- **F-102** — Inclusive-routing layer (well-lit / step-free options) for
+  LGBTQ+, senior, and PWD riders.
+- **F-103** — Closed-loop reporting that routes a structured complaint to the
+  right LGU/operator desk under RA 11313.
 
 ### Initial map seed pins (PROVISIONAL — unverified, confirm post-July 2)
 
-> These are starting map content for the MVP, NOT evidence. Every pin below is a
-> lead from the Sta. Mesa hyperlocal deep-research — unverifiable permalinks and
-> synthetic dates — so none is a `[!evidence]` claim and none belongs in §3.
+> These are starting map content for the MVP, NOT confirmed facts. Every pin
+> below is a lead from the Sta. Mesa hyperlocal deep-research — unverifiable
+> permalinks and synthetic dates — so none belongs in §3 as a sourced claim.
 > Treat each as a "confirm or kill" hypothesis to test in live interviews and
 > field-walks after July 2. Conditions are described as fixable/observable
 > states (lighting, crowd, pavement) — not as neighborhood "crime zone" labels,
 > per the §9 profiling kill-criterion. Target segment is unchanged (women wedge);
 > these pins describe conditions any commuter can use, but who we build/pitch
-> for is not widened here. [unverified]
+> for is not widened here.
 
 | # | Segment | Condition to flag | Behavior observed (to confirm) |
 |---|---------|-------------------|--------------------------------|
