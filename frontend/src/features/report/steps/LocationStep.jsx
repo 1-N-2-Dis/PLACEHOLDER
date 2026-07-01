@@ -13,24 +13,24 @@ export default function LocationStep({ segments, segmentId, onSelect }) {
       <h2>Where is this?</h2>
 
       <div className="location-mode-toggle">
-        <button type="button" className={mode === 'list' ? 'condition-btn--selected' : undefined} onClick={() => setMode('list')}>
+        <button type="button" className={`condition-btn${mode === 'list' ? ' condition-btn--selected' : ''}`} onClick={() => setMode('list')}>
           Choose from list
         </button>
-        <button type="button" className={mode === 'pin' ? 'condition-btn--selected' : undefined} onClick={() => setMode('pin')}>
+        <button type="button" className={`condition-btn${mode === 'pin' ? ' condition-btn--selected' : ''}`} onClick={() => setMode('pin')}>
           Pin on map
         </button>
       </div>
 
       {mode === 'list' ? (
-        <label>
-          Segment
-          <select value={segmentId || ''} onChange={(e) => onSelect(e.target.value || null)}>
+        <div className="form-group">
+          <label className="form-label" htmlFor="report-segment">Segment</label>
+          <select id="report-segment" className="form-input" value={segmentId || ''} onChange={(e) => onSelect(e.target.value || null)}>
             <option value="">— choose a segment —</option>
             {segments.map((s) => (
               <option key={s.segmentId} value={s.segmentId}>{s.name}</option>
             ))}
           </select>
-        </label>
+        </div>
       ) : (
         <>
           <div className="pin-map-wrap">

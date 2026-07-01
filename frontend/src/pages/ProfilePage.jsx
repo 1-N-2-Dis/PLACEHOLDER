@@ -79,7 +79,7 @@ export default function ProfilePage() {
           <div>
             <div className="profile-name">{user?.name || 'Guest'}</div>
             <div className="profile-email">{user?.email || ''}</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: 2 }}>{user?.campus || ''}</div>
+            <div className="text-caption" style={{ marginTop: 2 }}>{user?.campus || ''}</div>
           </div>
         </div>
 
@@ -94,9 +94,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile info */}
-        <div className="card" style={{ marginBottom: 14 }}>
+        <div className="card mb-14">
           <div className="flex-between" style={{ marginBottom: editInfo ? 14 : 0 }}>
-            <div style={{ fontWeight: 700 }}>Profile info</div>
+            <div className="card-title">Profile info</div>
             <button className="btn btn-secondary btn-sm" onClick={() => setEditInfo(e => !e)}>
               {editInfo ? 'Cancel' : <><Edit2 size={13} /> Edit</>}
             </button>
@@ -143,18 +143,18 @@ export default function ProfilePage() {
         </div>
 
         {/* Submitted reports */}
-        <div className="card" style={{ marginBottom: 14 }}>
-          <div style={{ fontWeight: 700, marginBottom: 12 }}>Your reports</div>
+        <div className="card mb-14">
+          <div className="card-title mb-12">Your reports</div>
           {MOCK_REPORTS.length === 0 ? (
-            <div style={{ fontSize: '0.875rem', color: 'var(--muted)' }}>No reports submitted yet.</div>
+            <div className="muted">No reports submitted yet.</div>
           ) : MOCK_REPORTS.map(r => (
-            <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
-              <div style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--secondary)', flexShrink: 0 }}>
+            <div key={r.id} className="report-row">
+              <div className="report-row-icon">
                 {conditionIcon(r.type)}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>{CONDITION_LABELS[r.type]}</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--muted)' }}>{r.location} · {r.date}</div>
+              <div className="report-row-body">
+                <div className="report-row-title">{CONDITION_LABELS[r.type]}</div>
+                <div className="report-row-sub">{r.location} · {r.date}</div>
               </div>
               <span className="status-badge badge-green" style={{ flexShrink: 0 }}>{r.status}</span>
             </div>
@@ -162,9 +162,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Emergency contacts */}
-        <div className="card" style={{ marginBottom: 14 }}>
-          <div className="flex-between" style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 700 }}>Emergency contacts</div>
+        <div className="card mb-14">
+          <div className="flex-between mb-12">
+            <div className="card-title">Emergency contacts</div>
             <button className="btn btn-secondary btn-sm" onClick={() => setAddingContact(a => !a)}>
               {addingContact ? 'Cancel' : <><Plus size={13} /> Add</>}
             </button>
@@ -207,11 +207,11 @@ export default function ProfilePage() {
         </div>
 
         {/* Appearance */}
-        <div className="card" style={{ marginBottom: 14 }}>
+        <div className="card mb-14">
           <div className="flex-between">
             <div>
-              <div style={{ fontWeight: 700 }}>Appearance</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: 2 }}>{theme === 'dark' ? 'Dark mode on' : 'Light mode on'}</div>
+              <div className="card-title">Appearance</div>
+              <div className="text-caption" style={{ marginTop: 2 }}>{theme === 'dark' ? 'Dark mode on' : 'Light mode on'}</div>
             </div>
             <button className="btn btn-secondary btn-sm" onClick={toggleTheme}>
               {theme === 'dark' ? <><Sun size={14} /> Light</> : <><Moon size={14} /> Dark</>}

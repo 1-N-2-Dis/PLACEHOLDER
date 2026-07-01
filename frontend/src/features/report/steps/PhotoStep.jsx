@@ -29,10 +29,10 @@ export default function PhotoStep({ photoFile, onChange }) {
       <p className="muted">A photo helps others trust the report, but isn't required.</p>
 
       <div className="photo-pick-buttons">
-        <button type="button" onClick={() => cameraInputRef.current?.click()}>
+        <button type="button" className="btn btn-secondary btn-sm" onClick={() => cameraInputRef.current?.click()}>
           <Camera size={14} /> Take a photo
         </button>
-        <button type="button" onClick={() => galleryInputRef.current?.click()}>
+        <button type="button" className="btn btn-secondary btn-sm" onClick={() => galleryInputRef.current?.click()}>
           <Image size={14} /> Choose from gallery
         </button>
       </div>

@@ -35,11 +35,13 @@ export default function AdminReports({ reports, segments }) {
         {reports.map((r) => {
           const meta = CONDITION_META[r.conditionType];
           return (
-            <li key={r.id} className="icon-line">
-              {meta && <meta.Icon size={14} />}
-              <span>{meta?.label || r.conditionType} — {segmentNames.get(r.segmentId) || r.segmentId}</span>
-              <button type="button" onClick={() => handleDelete(r.id)} disabled={busyId === r.id}>
-                <Trash2 size={14} /> Delete
+            <li key={r.id} className="icon-line flex-between">
+              <span className="icon-line">
+                {meta && <meta.Icon size={14} />}
+                {meta?.label || r.conditionType} — {segmentNames.get(r.segmentId) || r.segmentId}
+              </span>
+              <button type="button" className="btn btn-danger btn-sm" onClick={() => handleDelete(r.id)} disabled={busyId === r.id}>
+                {busyId === r.id ? <span className="spinner" /> : <><Trash2 size={14} /> Delete</>}
               </button>
             </li>
           );

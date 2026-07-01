@@ -64,8 +64,8 @@ export default function RouteCheck({ hasRoute, onRouteSegments }) {
         <p className="muted">Set a destination on the map first, then ask here.</p>
       ) : (
         <>
-          <button type="button" disabled={busy} onClick={checkRoute}>
-            {busy ? 'Asking…' : 'Ask: is my route safe tonight?'}
+          <button type="button" className="btn btn-primary btn-sm btn-full" disabled={busy} onClick={checkRoute}>
+            {busy ? <span className="spinner" /> : 'Ask: is my route safe tonight?'}
           </button>
 
           {result && result.error && (

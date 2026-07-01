@@ -2,21 +2,7 @@
 import { useState } from 'react';
 import { CheckCircle2, AlertTriangle, AlertOctagon, Navigation, Clock, Map, Bookmark, BookmarkCheck, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-function OwlySVG({ size = 36 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <ellipse cx="36" cy="40" rx="24" ry="26" fill="#7D5CC7"/>
-      <ellipse cx="36" cy="38" rx="20" ry="22" fill="#B69AD9"/>
-      <circle cx="27" cy="34" r="9" fill="white"/><circle cx="45" cy="34" r="9" fill="white"/>
-      <circle cx="27" cy="34" r="6" fill="#4B2E83"/><circle cx="45" cy="34" r="6" fill="#4B2E83"/>
-      <circle cx="29" cy="32" r="2" fill="white"/><circle cx="47" cy="32" r="2" fill="white"/>
-      <ellipse cx="36" cy="43" rx="6" ry="4" fill="#FFC857"/>
-      <path d="M23 20 Q20 12 15 14 Q18 20 23 22Z" fill="#7D5CC7"/>
-      <path d="M49 20 Q52 12 57 14 Q54 20 49 22Z" fill="#7D5CC7"/>
-    </svg>
-  );
-}
+import Owly from '../components/Owly.jsx';
 
 const RECOMMENDED = [
   {
@@ -66,15 +52,15 @@ const SAVED_INITIAL = [
 ];
 
 function scoreColor(score) {
-  if (score >= 85) return '#2e7d32';
-  if (score >= 65) return '#f57f17';
-  return '#c62828';
+  if (score >= 85) return 'var(--sev-green-fg)';
+  if (score >= 65) return 'var(--sev-yellow-fg)';
+  return 'var(--sev-red-fg)';
 }
 
 function statusIcon(status) {
-  if (status === 'safe') return <CheckCircle2 size={15} color="#2e7d32" />;
-  if (status === 'caution') return <AlertTriangle size={15} color="#f57f17" />;
-  return <AlertOctagon size={15} color="#c62828" />;
+  if (status === 'safe') return <CheckCircle2 size={15} color="var(--sev-green-fg)" />;
+  if (status === 'caution') return <AlertTriangle size={15} color="var(--sev-yellow-fg)" />;
+  return <AlertOctagon size={15} color="var(--sev-red-fg)" />;
 }
 
 function RouteCard({ route, isSaved, onSave, onViewMap }) {
@@ -86,7 +72,7 @@ function RouteCard({ route, isSaved, onSave, onViewMap }) {
             {statusIcon(route.status)}
             {route.from} → {route.to}
           </div>
-          <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: 2 }}>{route.via}</div>
+          <div className="route-via">{route.via}</div>
         </div>
         <div className="route-score">
           <div className="route-score-num" style={{ color: scoreColor(route.score) }}>{route.score}</div>
@@ -146,34 +132,24 @@ export default function RoutesPage() {
       <div className="page-scroll-inner">
 
         {/* Header */}
-        <div style={{ marginBottom: 20 }}>
+        <div className="mb-20">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-            <OwlySVG size={36} />
+            <Owly size={40} pose="pointstheway" />
             <div>
-              <div style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: '1.15rem', color: 'var(--primary)' }}>Routes</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>Curated by Owly based on tonight's safety activity</div>
+              <div className="text-h2">Routes</div>
+              <div className="text-caption">Curated by Owly based on tonight's safety activity</div>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 0, marginBottom: 20, background: 'var(--surface)', borderRadius: 12, padding: 4 }}>
+        <div className="route-tabs">
           {[['recommended','Recommended'],['saved','Saved']].map(([id, label]) => (
             <button key={id}
-              className="btn"
-              style={{
-                flex: 1, borderRadius: 9, padding: '8px 14px', fontSize: '0.875rem',
-                background: activeTab === id ? 'var(--card)' : 'transparent',
-                color: activeTab === id ? 'var(--primary)' : 'var(--muted)',
-                boxShadow: activeTab === id ? '0 2px 8px -3px rgba(75,46,131,0.15)' : 'none',
-                fontWeight: activeTab === id ? 700 : 500,
-                border: 'none',
-              }}
+              className={`route-tab${activeTab === id ? ' active' : ''}`}
               onClick={() => setActiveTab(id)}>
               {label} {id === 'saved' && saved.length > 0 && (
-                <span style={{ background: 'var(--secondary)', color: '#fff', borderRadius: 99, padding: '1px 7px', fontSize: '0.7rem', marginLeft: 4 }}>
-                  {saved.length}
-                </span>
+                <span className="route-tab-count">{saved.length}</span>
               )}
             </button>
           ))}

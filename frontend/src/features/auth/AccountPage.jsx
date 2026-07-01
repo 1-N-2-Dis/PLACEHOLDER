@@ -77,14 +77,14 @@ export default function AccountPage() {
     return (
       <section className="report-step">
         <h2>Account</h2>
-        <div className="icon-line">
+        <div className="icon-line mb-12">
           {user.photoURL && (
             <img className="account-avatar" src={user.photoURL} alt="" referrerPolicy="no-referrer" />
           )}
           <span>Signed in as {user.displayName || user.email}{role === 'admin' ? ' (admin)' : ''}</span>
         </div>
-        <button type="button" onClick={handleSignOut} disabled={busy}>
-          <LogOut size={14} /> Sign out
+        <button type="button" className="btn btn-danger btn-full" onClick={handleSignOut} disabled={busy}>
+          {busy ? <span className="spinner" /> : <><LogOut size={14} /> Sign out</>}
         </button>
         {error && <p className="status-err">{error}</p>}
       </section>
@@ -94,49 +94,54 @@ export default function AccountPage() {
   return (
     <section className="report-step">
       <h2>{mode === 'signup' ? 'Sign up' : 'Log in'}</h2>
-      <p className="muted">
+      <p className="muted mb-12">
         You&apos;re browsing anonymously. Signing in keeps your reports linked to one account
         without sharing your identity publicly.
       </p>
 
       <form onSubmit={handleEmailSubmit}>
-        <label>
-          Email
+        <div className="form-group">
+          <label className="form-label" htmlFor="acct-email">Email</label>
           <input
+            id="acct-email"
             type="email"
+            className="form-input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@gmail.com"
             required
           />
-        </label>
-        <label>
-          Password
+        </div>
+        <div className="form-group">
+          <label className="form-label" htmlFor="acct-pw">Password</label>
           <input
+            id="acct-pw"
             type="password"
+            className="form-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={6}
             required
           />
-        </label>
-        <button type="submit" disabled={busy}>
-          {mode === 'signup' ? 'Create account' : 'Log in'}
+        </div>
+        <button type="submit" className="btn btn-primary btn-full" disabled={busy}>
+          {busy ? <span className="spinner" /> : (mode === 'signup' ? 'Create account' : 'Log in')}
         </button>
       </form>
 
       <button
         type="button"
+        className="btn btn-ghost btn-full mt-12"
         onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setError(null); }}
       >
         {mode === 'signup' ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
       </button>
 
-      <button type="button" onClick={handleGoogle} disabled={busy}>
-        <LogIn size={14} /> Sign in with Google
+      <button type="button" className="btn btn-secondary btn-full mt-12" onClick={handleGoogle} disabled={busy}>
+        {busy ? <span className="spinner" /> : <><LogIn size={14} /> Sign in with Google</>}
       </button>
 
-      {error && <p className="status-err">{error}</p>}
+      {error && <p className="status-err mt-12">{error}</p>}
     </section>
   );
 }

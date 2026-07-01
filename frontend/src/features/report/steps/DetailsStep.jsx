@@ -14,7 +14,7 @@ export default function DetailsStep({ conditionType, onConditionChange, note, on
             <button
               key={type}
               type="button"
-              className={type === conditionType ? 'condition-btn--selected' : undefined}
+              className={`condition-btn${type === conditionType ? ' condition-btn--selected' : ''}`}
               onClick={() => onConditionChange(type)}
             >
               <meta.Icon size={14} /> {meta.label}
@@ -23,15 +23,17 @@ export default function DetailsStep({ conditionType, onConditionChange, note, on
         })}
       </div>
 
-      <label>
-        Note (required)
+      <div className="form-group">
+        <label className="form-label" htmlFor="report-note">Note (required)</label>
         <textarea
+          id="report-note"
+          className="form-input"
           value={note}
           onChange={(e) => onNoteChange(e.target.value)}
           maxLength={280}
           placeholder="Describe the condition (lighting, crowd). Please don't name individuals."
         />
-      </label>
+      </div>
     </section>
   );
 }

@@ -70,8 +70,8 @@ export default function RiskSummary({ segments, selectedId, reports }) {
         <p className="muted">Select a segment to see its summary.</p>
       ) : (
         <>
-          <button type="button" onClick={requestSummary} disabled={busy}>
-            {busy ? 'Summarizing…' : 'Summarize reports'}
+          <button type="button" className="btn btn-primary btn-sm btn-full" onClick={requestSummary} disabled={busy}>
+            {busy ? <span className="spinner" /> : 'Summarize reports'}
           </button>
 
           {summary && <p className="summary-text">{summary}</p>}

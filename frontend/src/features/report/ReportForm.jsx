@@ -63,8 +63,8 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
       />
       <PhotoStep photoFile={photoFile} onChange={setPhotoFile} />
 
-      <button type="button" disabled={busy || !canSubmit} onClick={submit}>
-        {busy ? 'Reviewing…' : 'Submit report'}
+      <button type="button" className="btn btn-primary btn-full" disabled={busy || !canSubmit} onClick={submit}>
+        {busy ? <span className="spinner" /> : 'Submit report'}
       </button>
 
       {result && result.status === 'created' && (

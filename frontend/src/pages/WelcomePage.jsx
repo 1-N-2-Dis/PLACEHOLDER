@@ -2,49 +2,11 @@
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
 import { useState } from 'react';
-import { Navigation, Flag, Lightbulb, Shield, Users, Train, Footprints, ChevronRight, Moon, ArrowRight } from 'lucide-react';
+import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
-
-// ── Owly SVG ─────────────────────────────────────────────────────────────────
-function OwlySVG({ size = 80 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 320 340" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M100 60C100 30 128 10 160 10C192 10 220 30 220 60L228 200C228 250 198 280 160 280C122 280 92 250 92 200L100 60Z" fill="#7D5CC7"/>
-      <path d="M85 55C70 45 55 55 60 75C68 95 90 100 100 85" fill="#4B2E83"/>
-      <path d="M235 55C250 45 265 55 260 75C252 95 230 100 220 85" fill="#4B2E83"/>
-      <path d="M115 22C105 8 118 -5 135 5C145 12 148 25 140 34Z" fill="#4B2E83"/>
-      <path d="M205 22C215 8 202 -5 185 5C175 12 172 25 180 34Z" fill="#4B2E83"/>
-      <ellipse cx="160" cy="150" rx="62" ry="70" fill="#FFF9EF"/>
-      <circle cx="134" cy="145" r="26" fill="#FFFFFF" stroke="#4B2E83" strokeWidth="3"/>
-      <circle cx="186" cy="145" r="26" fill="#FFFFFF" stroke="#4B2E83" strokeWidth="3"/>
-      <circle cx="134" cy="148" r="12" fill="#2C1B47"/>
-      <circle cx="186" cy="148" r="12" fill="#2C1B47"/>
-      <circle cx="130" cy="143" r="4" fill="#fff"/>
-      <circle cx="182" cy="143" r="4" fill="#fff"/>
-      <path d="M155 165L160 178L165 165" fill="#FFC857" stroke="#FFC857" strokeWidth="4" strokeLinejoin="round"/>
-      <path d="M70 170C55 190 55 225 75 245C90 258 100 240 95 220L100 180Z" fill="#7D5CC7"/>
-      <path d="M250 170C265 190 265 225 245 245C230 258 220 240 225 220L220 180Z" fill="#7D5CC7"/>
-      <rect x="120" y="190" width="80" height="55" rx="16" fill="#4B2E83" opacity="0.9"/>
-      <circle cx="160" cy="210" r="13" fill="#FFF9EF"/>
-      <path d="M160 202L163 209L170 210L164 214L166 221L160 217L154 221L156 214L150 210L157 209Z" fill="#F28DBB"/>
-    </svg>
-  );
-}
-
-// ── Brand mark ───────────────────────────────────────────────────────────────
-function BrandMark({ size = 36 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="30" cy="30" r="30" fill="#4B2E83"/>
-      <path d="M18 24C18 18 23 14 30 14C37 14 42 18 42 24V32C42 38 37 42 30 42C23 42 18 38 18 32V24Z" fill="#B69AD9"/>
-      <circle cx="24" cy="26" r="4.5" fill="#FFF9EF"/>
-      <circle cx="36" cy="26" r="4.5" fill="#FFF9EF"/>
-      <circle cx="24" cy="26" r="2" fill="#2C1B47"/>
-      <circle cx="36" cy="26" r="2" fill="#2C1B47"/>
-      <path d="M28 32L30 35L32 32" stroke="#FFC857" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  );
-}
+import Owly from '../components/Owly.jsx';
+import BrandMark from '../components/BrandMark.jsx';
+import useRevealOnScroll from '../lib/useRevealOnScroll.js';
 
 // ── Static data ───────────────────────────────────────────────────────────────
 const CAMPUSES = ['PUP Main Campus', 'PUP Sta. Mesa', 'Other'];
@@ -56,19 +18,15 @@ const COMMUTE_PREFS = [
 ];
 
 const FEATURES = [
-  { Icon: Navigation, color: '#E4F5EC', iconColor: '#3FA772', title: 'Route Recommendations',   body: 'Get ranked routes from PUP to your destination, scored by safety conditions tonight.' },
-  { Icon: Flag,       color: '#FDEBF2', iconColor: '#c2185b', title: 'Community Reporting',      body: 'Flag poor lighting, empty jeepneys, or recent incidents in under 20 seconds.' },
-  { Icon: Lightbulb, color: '#FFF3D9', iconColor: '#f57f17', title: 'Safety Tips',               body: 'Zone-specific tips from riders who actually use these routes every day.' },
-  { Icon: Shield,     color: '#EFE7F8', iconColor: '#7D5CC7', title: 'Conditions-Only Data',     body: 'We describe observable states — lighting, crowds, incidents — never crime labels.' },
-  { Icon: Users,      color: '#E4F5EC', iconColor: '#3FA772', title: 'Community-Powered',        body: 'Every flag is something a real rider submitted. No guesswork, no police blotter.' },
-  { Icon: Moon,       color: '#EFE7F8', iconColor: '#4B2E83', title: 'Night Commute Focus',      body: 'Built for the hours when the commute actually feels uncertain — not just daytime.' },
-];
-
-const TEAM = [
-  { name: 'Maria Santos', role: 'Lead Developer',  initials: 'MS' },
-  { name: 'Ana Reyes',    role: 'UX Designer',     initials: 'AR' },
-  { name: 'Lea Cruz',     role: 'Community Lead',  initials: 'LC' },
-  { name: 'Sofia Lim',    role: 'Data & Safety',   initials: 'SL' },
+  { title: 'Zone Safety Map',       body: 'See every flagged segment of the Sta. Mesa zone live — tap any flag for its condition, severity, and exact report time.' },
+  { title: 'Route Recommendations', body: 'Get 2–3 ranked routes to your destination, scored by tonight\'s real reported conditions.' },
+  { title: 'AI Route Check',        body: 'Ask "Is my route okay tonight?" and get a Gemini-written verdict grounded only in real reports near your path.' },
+  { title: 'Community Reporting',   body: 'Flag poor lighting, thin crowds, or a recent incident, with a required note and an optional photo.' },
+  { title: 'Risk Summary',          body: 'A segment with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
+  { title: 'Incident Heatmap',      body: 'Toggle a density overlay of validated reports to see where risk clusters across the zone at a glance.' },
+  { title: 'Safety Tips',           body: 'Zone-specific guidance for before, during, and after your commute — plus transport-specific advice.' },
+  { title: 'Conditions-Only Data',  body: 'We describe observable states — lighting, crowds, incidents — never crime labels or place ratings.' },
+  { title: 'Emergency Contacts',    body: 'Save trusted contacts on your profile so they\'re one tap away if you ever need them.' },
 ];
 
 const ZONE_PREVIEW = [
@@ -79,24 +37,28 @@ const ZONE_PREVIEW = [
   ['SM Sta. Mesa',     'green',  'Well-lit'],
 ];
 
+// ── Brand wordmark ────────────────────────────────────────────────────────────
+function BrandWordmark() {
+  return <span className="brand-wordmark">Guid<span className="accent">Her</span></span>;
+}
+
 // ── Landing nav ───────────────────────────────────────────────────────────────
 function LandingNav({ onLogin, onSignup }) {
   return (
-    <div style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(255,249,239,0.93)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(75,46,131,0.08)' }}>
-      <div style={{ maxWidth: 1180, margin: '0 auto', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <BrandMark size={34} />
-          <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: '1.25rem', color: '#4B2E83' }}>
-            guid<span style={{ color: '#F28DBB' }}>HER</span>
-          </span>
+    <div className="landing-nav">
+      <div className="landing-nav-inner">
+        <div className="landing-nav-left">
+          <div className="landing-nav-brand">
+            <BrandMark size={34} />
+            <BrandWordmark />
+          </div>
+          <nav className="desktop-nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="#community">Community</a>
+          </nav>
         </div>
-        <nav className="desktop-nav-links">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How it works</a>
-          <a href="#community">Community</a>
-          <a href="#team">About</a>
-        </nav>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div className="landing-nav-actions">
           <button className="btn btn-secondary btn-sm" onClick={onLogin}>Log In</button>
           <button className="btn btn-primary btn-sm" onClick={onSignup}>Sign Up</button>
         </div>
@@ -129,12 +91,12 @@ function LoginView({ onBack, onDone, onSignup }) {
         <div className="auth-logo">
           <BrandMark size={44} />
           <div className="auth-logo-text" style={{ marginTop: 10 }}>
-            guid<span style={{ color: '#F28DBB' }}>HER</span>
+            Guid<span className="text-pink">Her</span>
           </div>
           <div className="auth-logo-tagline">Wise. Watchful. With you.</div>
         </div>
         <div className="owly-wrap" style={{ margin: '12px 0' }}>
-          <OwlySVG size={72} />
+          <Owly size={72} pose="welcome" />
           <p className="owly-msg">Welcome back — your route is waiting.</p>
         </div>
         <h2 className="auth-title">Log in</h2>
@@ -208,13 +170,13 @@ function SignupView({ onBack, onDone, onLogin }) {
         <div className="auth-logo">
           <BrandMark size={40} />
           <div className="auth-logo-text" style={{ marginTop: 8 }}>
-            guid<span style={{ color: '#F28DBB' }}>HER</span>
+            Guid<span className="text-pink">Her</span>
           </div>
         </div>
         {step === 1 ? (
           <>
             <div className="owly-wrap" style={{ margin: '8px 0 14px' }}>
-              <OwlySVG size={60} />
+              <Owly size={60} pose="cheering" />
               <p className="owly-msg">Let's get you set up for safer commutes.</p>
             </div>
             <h2 className="auth-title">Create account</h2>
@@ -286,46 +248,50 @@ function SignupView({ onBack, onDone, onLogin }) {
 
 // ── Full landing page ─────────────────────────────────────────────────────────
 function LandingPage({ onLogin, onSignup }) {
+  const heroRef = useRevealOnScroll();
+  const featuresRef = useRevealOnScroll();
+  const howItWorksRef = useRevealOnScroll();
+  const zonePreviewRef = useRevealOnScroll();
+  const communityRef = useRevealOnScroll();
+
   return (
     <div className="landing">
       <LandingNav onLogin={onLogin} onSignup={onSignup} />
 
       {/* ── Hero ── */}
-      <section style={{ padding: '72px 0 56px' }} id="home">
-        <div style={{ maxWidth: 1180, margin: '0 auto', padding: '0 24px' }}>
-          <div className="hero-grid">
-            <div>
-              <span className="eyebrow">Sta. Mesa commute zone · PUP</span>
-              <h1 className="hero-h1">
-                Know your route.<br /><span className="accent">Own</span> your night.
-              </h1>
-              <p className="hero-lead">
-                guidHER structures the safety knowledge PUP women already share with each other —
-                which street, which exit, which hour — into a tool you can check before you even leave.
-              </p>
-              <div className="hero-ctas">
-                <button className="btn btn-primary" onClick={onSignup}>
-                  <Users size={17} /> Join guidHER
-                </button>
-                <button className="btn btn-secondary" onClick={onLogin}>
-                  Log in to your account
-                </button>
-              </div>
-              <div className="hero-stats">
-                <div className="hero-stat"><b>412</b><span>reports this month</span></div>
-                <div className="hero-stat"><b>8</b><span>zone segments tracked</span></div>
-                <div className="hero-stat"><b>3,140</b><span>community members</span></div>
-              </div>
+      <section className="hero-section" id="home" ref={heroRef}>
+        <div className="hero-grid">
+          <div>
+            <span className="eyebrow">Sta. Mesa commute zone · PUP</span>
+            <h1 className="hero-h1">
+              Know your route.<br /><span className="accent">Own</span> your night.
+            </h1>
+            <p className="hero-lead">
+              GuidHer structures the safety knowledge PUP women already share with each other —
+              which street, which exit, which hour — into a tool you can check before you even leave.
+            </p>
+            <div className="hero-ctas">
+              <button className="btn btn-primary" onClick={onSignup}>
+                <Users size={17} /> Join GuidHer
+              </button>
+              <button className="btn btn-secondary" onClick={onLogin}>
+                Log in to your account
+              </button>
             </div>
-            <div className="hero-visual">
-              <div className="mascot-halo" />
-              <div className="mascot-card">
-                <div className="speech-bubble">Teresa St. is clear right now</div>
-                <OwlySVG size={260} />
-                <div className="owl-caption">
-                  <b>Meet Owly</b>
-                  <span>Wise, watchful, with you — your guidHER companion.</span>
-                </div>
+            <div className="hero-stats">
+              <div className="hero-stat"><b>412</b><span>reports this month</span></div>
+              <div className="hero-stat"><b>8</b><span>zone segments tracked</span></div>
+              <div className="hero-stat"><b>3,140</b><span>community members</span></div>
+            </div>
+          </div>
+          <div className="hero-visual">
+            <div className="mascot-halo" />
+            <div className="mascot-card">
+              <div className="speech-bubble">Teresa St. is clear right now</div>
+              <Owly size={260} pose="welcome" className="owly-float" />
+              <div className="owl-caption">
+                <b>Meet Owly</b>
+                <span>Wise, watchful, with you — your GuidHer companion.</span>
               </div>
             </div>
           </div>
@@ -333,21 +299,21 @@ function LandingPage({ onLogin, onSignup }) {
       </section>
 
       {/* ── Features ── */}
-      <section className="land-section land-band-tint" id="features">
+      <section className="land-section land-band-tint" id="features" ref={featuresRef}>
         <div className="land-section-inner">
           <div className="land-section-head">
-            <span className="land-tag">What guidHER does</span>
+            <span className="land-tag">What GuidHer does</span>
             <h2 className="land-h2">Everything you need for a safer commute</h2>
             <p className="land-lead">Built around what riders actually need — not a crime dashboard, not an emergency hotline. Just clear, actionable commute conditions.</p>
           </div>
-          <div className="features-grid">
-            {FEATURES.map(({ Icon, color, iconColor, title, body }) => (
-              <div key={title} className="feature-card">
-                <div className="feature-icon" style={{ background: color }}>
-                  <Icon size={22} color={iconColor} />
+          <div className="feature-index">
+            {FEATURES.map(({ title, body }) => (
+              <div key={title} className="feature-index-item">
+                <span className="owl-eyes" aria-hidden="true"><span /><span /></span>
+                <div className="feature-index-text">
+                  <div className="feature-index-title">{title}</div>
+                  <p className="feature-index-body">{body}</p>
                 </div>
-                <div className="feature-title">{title}</div>
-                <p className="feature-body">{body}</p>
               </div>
             ))}
           </div>
@@ -355,21 +321,21 @@ function LandingPage({ onLogin, onSignup }) {
       </section>
 
       {/* ── How it works ── */}
-      <section className="land-section" id="how-it-works">
+      <section className="land-section" id="how-it-works" ref={howItWorksRef}>
         <div className="land-section-inner">
           <div className="land-section-head">
             <span className="land-tag">How it works</span>
             <h2 className="land-h2">Three steps to a safer commute</h2>
-            <p className="land-lead">guidHER is built around the commute decision moment — not a realtime tracker, not an SOS tool. Just clear conditions before you leave.</p>
+            <p className="land-lead">GuidHer is built around the commute decision moment — not a realtime tracker, not an SOS tool. Just clear conditions before you leave.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
+          <div className="how-it-works-grid">
             {[
               { n: '01', title: 'Check tonight\'s conditions', body: 'See what riders flagged on each segment of the Sta. Mesa zone — lighting, crowd levels, and recent incidents.' },
               { n: '02', title: 'Pick your safest route',       body: 'Routes are ranked by condition scores. Choose the one that avoids flagged segments, or the most direct if all is clear.' },
               { n: '03', title: 'Share what you notice',        body: 'See something off on your commute? Flag it in 20 seconds. Your report helps the next rider make a better call.' },
             ].map(({ n, title, body }) => (
-              <div key={n} className="feature-card" style={{ borderTop: '3px solid var(--secondary)' }}>
-                <div style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: '2rem', fontWeight: 800, color: 'var(--lavender)', marginBottom: 12, lineHeight: 1 }}>{n}</div>
+              <div key={n} className="feature-card step-card">
+                <div className="step-number">{n}</div>
                 <div className="feature-title">{title}</div>
                 <p className="feature-body">{body}</p>
               </div>
@@ -379,9 +345,9 @@ function LandingPage({ onLogin, onSignup }) {
       </section>
 
       {/* ── Zone overview preview (no interactive map — just static data) ── */}
-      <section className="land-section land-band-tint" id="zone-preview">
+      <section className="land-section land-band-tint" id="zone-preview" ref={zonePreviewRef}>
         <div className="land-section-inner">
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 32, alignItems: 'center' }}>
+          <div className="zone-preview-grid">
             <div>
               <span className="land-tag">Zone data, tonight</span>
               <h2 className="land-h2">See what riders are saying right now</h2>
@@ -392,18 +358,18 @@ function LandingPage({ onLogin, onSignup }) {
                 <ArrowRight size={16} /> Sign up to see full conditions
               </button>
             </div>
-            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', background: 'var(--primary)', color: '#fff' }}>
-                <div style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: '0.95rem' }}>Zone overview tonight</div>
-                <div style={{ fontSize: '0.75rem', opacity: 0.75, marginTop: 2 }}>Sta. Mesa commute zone</div>
+            <div className="card zone-preview-card">
+              <div className="zone-preview-head">
+                <div className="zone-preview-title">Zone overview tonight</div>
+                <div className="zone-preview-head-sub">Sta. Mesa commute zone</div>
               </div>
               {ZONE_PREVIEW.map(([loc, level, label]) => (
-                <div key={loc} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', borderBottom: '1px solid var(--line)', fontSize: '0.875rem' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{loc}</span>
+                <div key={loc} className="zone-preview-row">
+                  <span>{loc}</span>
                   <span className={`status-badge badge-${level}`}>{label}</span>
                 </div>
               ))}
-              <div style={{ padding: '12px 20px', fontSize: '0.75rem', color: 'var(--muted)' }}>
+              <div className="zone-preview-foot">
                 Conditions only — no crime labels (BR-001)
               </div>
             </div>
@@ -412,45 +378,22 @@ function LandingPage({ onLogin, onSignup }) {
       </section>
 
       {/* ── Community CTA ── */}
-      <section className="land-section land-band-cream" id="community">
+      <section className="land-section land-band-cream" id="community" ref={communityRef}>
         <div className="land-section-inner">
           <div className="cta-banner">
             <div>
               <h3>Built by students navigating this exact commute, for the next one behind them.</h3>
-              <p>Join guidHER — your reports become someone else's peace of mind on the walk home.</p>
+              <p>Join GuidHer — your reports become someone else's peace of mind on the walk home.</p>
               <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap' }}>
                 <button className="btn btn-gold" onClick={onSignup}>
                   <Users size={16} /> Join the community
                 </button>
-                <button className="btn" style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.3)' }} onClick={onLogin}>
+                <button className="btn btn-cta-ghost" onClick={onLogin}>
                   Already a member? Log in
                 </button>
               </div>
             </div>
-            <OwlySVG size={140} />
-          </div>
-        </div>
-      </section>
-
-      {/* ── Built by / Team ── */}
-      <section className="land-section" id="team">
-        <div className="land-section-inner">
-          <div className="land-section-head">
-            <span className="land-tag">The team</span>
-            <h2 className="land-h2">Built by PUP, for PUP</h2>
-            <p className="land-lead">guidHER is a student-built prototype for the SparkFest innovation challenge. Made with care for the women who navigate Sta. Mesa every day.</p>
-          </div>
-          <div className="team-grid">
-            {TEAM.map(({ name, role, initials }) => (
-              <div key={name} className="team-card">
-                <div className="team-avatar">{initials}</div>
-                <div className="team-name">{name}</div>
-                <div className="team-role">{role}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 24, padding: '16px 20px', background: 'var(--surface)', borderRadius: 14, fontSize: '0.875rem', color: 'var(--muted)' }}>
-            Polytechnic University of the Philippines · Sta. Mesa, Manila · SparkFest 2026
+            <Owly size={140} pose="shareandhelp" />
           </div>
         </div>
       </section>
@@ -460,11 +403,9 @@ function LandingPage({ onLogin, onSignup }) {
         <div className="land-footer-inner">
           <div className="land-foot-grid">
             <div className="land-foot-brand">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div className="land-foot-brand-row">
                 <BrandMark size={30} />
-                <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: '1.2rem', color: '#4B2E83' }}>
-                  guid<span style={{ color: '#F28DBB' }}>HER</span>
-                </span>
+                <BrandWordmark />
               </div>
               <p>Wise. Watchful. With you. A safer-commute guide for women navigating the Sta. Mesa zone.</p>
             </div>
@@ -484,8 +425,7 @@ function LandingPage({ onLogin, onSignup }) {
             </div>
           </div>
           <div className="land-foot-bottom">
-            <span>© 2026 guidHER — prototype for the Sta. Mesa commute zone</span>
-            <span>Made for PUP women, by design</span>
+            <span>© 2026 GuidHer — prototype for the Sta. Mesa commute zone</span>
           </div>
         </div>
       </footer>
