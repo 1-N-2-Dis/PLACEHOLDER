@@ -1,11 +1,12 @@
-// Firestore data access for reports — shared by F-001/002/003/004.
+// Firestore read access for reports — shared by F-001/002/003/004.
 // Traces to: docs/09-data-model.md (reports collection), docs/03-prd.md (BR-001/004/005/006).
-import {
-  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp,
-} from 'firebase/firestore';
+//
+// Report WRITES no longer happen here (or anywhere client-side) — see
+// frontend/src/lib/reportIntake.js. backend/firestore.rules denies direct client
+// create/update/delete on `reports`; every report is written by the submitReport Cloud
+// Function (backend/functions/index.js) after AI review, via the Admin SDK.
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase.js';
-import { ensureSignedIn, currentUid } from './auth.js';
-import { isValidConditionType } from '../data/condition-types.js';
 
 const reportsCol = collection(db, 'reports');
 
@@ -26,22 +27,4 @@ export function latestBySegment(reports) {
     if (!map.has(r.segmentId)) map.set(r.segmentId, r);
   }
   return map;
-}
-
-// Write one report (F-002). Enforces auth (BR-005) and the closed enum (BR-001) client-side;
-// Firestore rules enforce both again server-side. note is optional and feeds F-004 only (BR-006).
-export async function addReport({ segmentId, conditionType, note }) {
-  if (!isValidConditionType(conditionType)) {
-    throw new Error(`Invalid conditionType: ${conditionType}`);
-  }
-  await ensureSignedIn();
-  const doc = {
-    segmentId,
-    conditionType,
-    createdAt: serverTimestamp(),
-    uid: currentUid(),
-  };
-  const trimmed = (note || '').trim();
-  if (trimmed) doc.note = trimmed;
-  return addDoc(reportsCol, doc);
 }

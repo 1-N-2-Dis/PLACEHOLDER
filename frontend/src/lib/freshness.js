@@ -19,8 +19,11 @@ function toMillis(createdAt) {
 }
 
 // Is a single report still within the freshness window relative to `now` (epoch millis)?
+// Uses lastActivityAt when present (bumped on every AI-detected duplicate corroboration —
+// backend/functions submitReport) so corroboration refreshes a flag's "tonight" freshness,
+// falling back to createdAt for reports predating that field.
 export function isFlaggedTonight(report, now = Date.now()) {
-  const ms = toMillis(report && report.createdAt);
+  const ms = toMillis(report && (report.lastActivityAt || report.createdAt));
   if (ms === null) return false;
   return now - ms <= FRESHNESS_WINDOW_MS;
 }

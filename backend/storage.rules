@@ -1,0 +1,25 @@
+// Firebase Storage Security Rules for SaferRoute — photo evidence (F-007).
+// Role: the access gate for report photos. Mirrors backend/firestore.rules' posture: public
+// read (photos are public safety info, same as reports), auth-gated + size/type-limited write.
+//
+// Path scheme: reports/{uid}/{timestamp}-{filename} — the uid segment lets the rule check
+// ownership without a Firestore lookup, and lets submitReport (backend/functions/index.js)
+// validate a client-supplied photoPath belongs to the caller before attaching it to a report.
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /reports/{uid}/{fileName} {
+      allow read: if true;
+
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png)');
+
+      // Best-effort client cleanup if a report is later rejected by submitReport (Threat T7 —
+      // no automated cleanup of orphaned photos exists; this is the only deletion path).
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

@@ -45,7 +45,9 @@ Security Rules pass.
   `no_crowd`, `recent_incident`. Every report carries `conditionType` + `timestamp` (BR-004).
   Enforce the schema client-side AND in Firestore Security Rules.
 - Patterns to avoid: any free-text "crime label" / neighborhood classification field; any
-  copy or UI implying rescue, SOS, or dispatch; shipping the Gemini key to the client.
+  copy or UI implying rescue, SOS, or dispatch; shipping the Gemini key to the client; **emoji
+  anywhere in the UI (icons or copy)** — use `lucide-react` components for every icon need
+  instead (condition types, severity, status badges, etc.).
 
 ## Non-negotiable product/build rules (from PRD business rules)
 - **BR-001 — Conditions only.** Reports describe fixable/observable conditions (lighting, crowd,

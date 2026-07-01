@@ -7,29 +7,73 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useState, useMemo } from 'react';
 import Map, { NavigationControl } from 'react-map-gl/maplibre';
+import { CheckCircle2, AlertTriangle, AlertOctagon } from 'lucide-react';
 import { ZONE_CENTER, ZONE_ZOOM, MAP_STYLE } from '../../lib/maps.js';
 import { segmentStatus } from '../../lib/freshness.js';
+import { nearestDistanceToRoute, YELLOW_AVOID_RADIUS_M } from '../../lib/routing.js';
 import SegmentFlag from './SegmentFlag.jsx';
 import MockLocation from './MockLocation.jsx';
 import DestinationMarker from './DestinationMarker.jsx';
 import RouteLayer from './RouteLayer.jsx';
+import RouteCheck from '../route-check/RouteCheck.jsx';
+import RiskSummary from '../risk-summary/RiskSummary.jsx';
 
 const INITIAL_A = [ZONE_CENTER.lat, ZONE_CENTER.lng];
 
-export default function ZoneMap({ segments, latest, selectedId, onSelect }) {
+// Route status -> short badge copy + icon. Kept small and flat rather than enumerating every
+// severity/highway combination (routing.js's describeStatus already collapses to these).
+const STATUS_META = {
+  safe: { copy: 'Avoids flagged areas', Icon: CheckCircle2 },
+  'caution-highway': { copy: 'Uses a major road', Icon: AlertTriangle },
+  'caution-yellow': { copy: 'Passes a caution area', Icon: AlertTriangle },
+  'caution-red': { copy: 'Passes a dangerous area', Icon: AlertOctagon },
+  'caution-red-unavoidable': { copy: 'Dangerous area could not be avoided', Icon: AlertOctagon },
+};
+
+export default function ZoneMap({ segments, latest, reports, selectedId, onSelect }) {
   const [locationA, setLocationA] = useState(INITIAL_A);
   const [locationB, setLocationB] = useState(null);
   const [settingB, setSettingB] = useState(false);
   const [routeError, setRouteError] = useState(null);
-  const [routeStatus, setRouteStatus] = useState(null); // 'safe' | 'caution-flagged' | 'caution-highway' | 'caution-both' | null
+  const [routes, setRoutes] = useState([]); // Array<{ coords, status, tier }>, safest first
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+  // Low-concern (green severity / no-report) markers can be toggled off to declutter the map —
+  // on request. Yellow/red markers (actual reported conditions) always stay visible.
+  const [showGreenDots, setShowGreenDots] = useState(true);
+  // Even with the above off, optionally keep showing whichever low-concern markers the current
+  // route actually passes through — on request, so hiding clutter doesn't hide context relevant
+  // to the path you're about to take.
+  const [showRouteMarkers, setShowRouteMarkers] = useState(true);
 
-  // Geo points of segments flagged tonight — passed to RouteLayer as avoid zones.
+  // Reports flagged tonight, with their AI severity — passed to RouteLayer as avoid zones.
+  // Missing severity (reports written before AI classification shipped) defaults to 'red',
+  // preserving today's hard-avoid behavior for those reports.
   // Memoized so RouteLayer's useEffect only re-fires when reports actually change.
-  const flaggedSegments = useMemo(
+  const flaggedReports = useMemo(
     () => segments
       .filter((seg) => segmentStatus(latest.get(seg.segmentId)) === 'flagged_tonight')
-      .map((seg) => seg.geo),
+      .map((seg) => {
+        const report = latest.get(seg.segmentId);
+        return { geo: seg.geo, severity: report?.severity || 'red' };
+      }),
     [segments, latest],
+  );
+
+  const selectedRouteCoords = routes[selectedRouteIndex]?.coords || null;
+
+  // Segments that sit near the currently selected route — shared by the marker-visibility
+  // toggle (which just needs the IDs) and RouteCheck's AI assessment (which also needs the
+  // display name, since segments aren't a Firestore collection the backend can look up itself —
+  // see docs/09-data-model.md).
+  const onRouteSegments = useMemo(() => {
+    if (!selectedRouteCoords) return [];
+    return segments.filter(
+      (seg) => nearestDistanceToRoute(selectedRouteCoords, seg.geo) <= YELLOW_AVOID_RADIUS_M,
+    );
+  }, [segments, selectedRouteCoords]);
+  const onRouteSegmentIds = useMemo(
+    () => new Set(onRouteSegments.map((s) => s.segmentId)),
+    [onRouteSegments],
   );
 
   function handleMapClick(e) {
@@ -42,7 +86,13 @@ export default function ZoneMap({ segments, latest, selectedId, onSelect }) {
     setLocationB(null);
     setSettingB(false);
     setRouteError(null);
-    setRouteStatus(null);
+    setRoutes([]);
+    setSelectedRouteIndex(0);
+  }
+
+  function handleRoutes(nextRoutes) {
+    setRoutes(nextRoutes);
+    setSelectedRouteIndex(0);
   }
 
   return (
@@ -69,9 +119,9 @@ export default function ZoneMap({ segments, latest, selectedId, onSelect }) {
           <RouteLayer
             locationA={locationA}
             locationB={locationB}
-            flaggedSegments={flaggedSegments}
+            flaggedReports={flaggedReports}
             onError={setRouteError}
-            onRouteStatus={setRouteStatus}
+            onRoutes={handleRoutes}
           />
         )}
 
@@ -86,12 +136,30 @@ export default function ZoneMap({ segments, latest, selectedId, onSelect }) {
               status={status}
               isOpen={selectedId === seg.segmentId}
               onSelect={onSelect}
+              showGreenDots={showGreenDots}
+              keepVisibleOnRoute={showRouteMarkers && onRouteSegmentIds.has(seg.segmentId)}
             />
           );
         })}
       </Map>
 
       <div className="map-controls">
+        <label className="map-ctrl-toggle">
+          <input
+            type="checkbox"
+            checked={showGreenDots}
+            onChange={(e) => setShowGreenDots(e.target.checked)}
+          />
+          Show low-concern markers
+        </label>
+        <label className="map-ctrl-toggle">
+          <input
+            type="checkbox"
+            checked={showRouteMarkers}
+            onChange={(e) => setShowRouteMarkers(e.target.checked)}
+          />
+          Always show markers on my route
+        </label>
         {!locationB && !settingB && (
           <button className="map-ctrl-btn" onClick={() => setSettingB(true)}>
             + Set destination
@@ -105,21 +173,38 @@ export default function ZoneMap({ segments, latest, selectedId, onSelect }) {
             × Clear destination
           </button>
         )}
-        {routeStatus === 'safe' && (
-          <span className="map-ctrl-safe">Safe route</span>
-        )}
-        {routeStatus === 'caution-flagged' && (
-          <span className="map-ctrl-caution">Caution: passes a flagged area</span>
-        )}
-        {routeStatus === 'caution-highway' && (
-          <span className="map-ctrl-caution">Caution: uses a major road</span>
-        )}
-        {routeStatus === 'caution-both' && (
-          <span className="map-ctrl-caution">Caution: passes a flagged area and uses a major road</span>
+        {routes.length > 0 && (
+          <div className="route-options">
+            {routes.map((route, i) => {
+              const meta = STATUS_META[route.status];
+              return (
+                <button
+                  key={route.tier}
+                  type="button"
+                  className={`route-option${i === selectedRouteIndex ? ' route-option--selected' : ''}`}
+                  onClick={() => setSelectedRouteIndex(i)}
+                >
+                  {meta && (
+                    <span className="route-option-icon">
+                      <meta.Icon size={14} />
+                    </span>
+                  )}
+                  {i === 0 ? 'Safest route' : `Alternative ${i + 1}`}
+                  {' — '}
+                  {meta ? meta.copy : route.status}
+                </button>
+              );
+            })}
+          </div>
         )}
         {routeError && (
           <span className="map-ctrl-error">{routeError}</span>
         )}
+      </div>
+
+      <div className="bottom-center-overlay">
+        <RouteCheck hasRoute={!!selectedRouteCoords} onRouteSegments={onRouteSegments} />
+        <RiskSummary segments={segments} selectedId={selectedId} reports={reports} />
       </div>
     </div>
   );

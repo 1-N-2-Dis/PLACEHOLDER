@@ -26,9 +26,14 @@
 - F-002 authenticated one-tap condition report → Firestore → map.
 - F-003 pre-trip per-segment route check (type + freshness).
 - F-004 (P1) Gemini dedup/structure summary, no added facts.
-- Security: Firestore rules (auth-to-write BR-005, closed enum / no crime-label BR-001), Maps key
+- F-005 severity-tiered, multi-route (2-3 alternative) recommendation.
+- F-006 AI report classification + moderation (blocking): create/duplicate-merge/reject.
+- F-007 photo evidence on reports (upload, EXIF strip, marker + popup).
+- F-008 AI-assessed "is my route safe tonight?" for the recommended route (`assessRoute`).
+- Security: Firestore rules (client `create` on `reports` denied — F-006; closed enum / no
+  crime-label BR-001 now enforced in `submitReport`'s code), Storage rules (F-007), ORS key
   referrer-restriction, Gemini key server-side only.
-- Negative/edge: empty zone, stale flags, offline.
+- Negative/edge: empty zone, stale flags, offline, red-segment-unavoidable, AI rejection.
 
 ### Out of scope
 - Real-time rescue / SOS / dispatch (BR-002 — explicitly not built; verified absent, not tested as a feature).
@@ -40,8 +45,10 @@
 - **One collapsed demo/prod environment** on Firebase Hosting (system design: single environment,
   `[unverified]` no staging). Firestore + Auth in one Firebase project; Cloud Function (P1) in a
   single region (`asia-*` `[unverified]`).
-- **Test data:** the 8 provisional seed segment pins (idea §7), all `[unverified]` demo content,
-  not evidence. Add hand-crafted reports for dedup/freshness tests.
+- **Test data:** 6 provisional seed segment pins (idea §7, originally 8 — two removed on request
+  2026-07-01) plus 81 `WELL_USED_SEGMENTS` (well-used streets around PUP, several as multiple
+  points along the real street geometry, sourced from OpenStreetMap via Overpass) —
+  all `[unverified]` demo content, not evidence. Add hand-crafted reports for dedup/freshness tests.
 - **Secrets handling:** reference only, never inline. Maps key lives in client bundle but MUST be
   referrer-restricted; Gemini key MUST live only in the Cloud Function. Tests assert this, never print key values.
 - **Freshness window value** for "tonight" is `[unverified]` — a value must be chosen at build step 6
@@ -54,19 +61,28 @@
 | ID  | Feature / Rule | Test case ID(s) | Type | Status |
 |-----|----------------|-----------------|------|--------|
 | F-001 | Zone map + seeded flags + tap detail | TC-001, TC-002 | e2e (manual) | todo |
-| F-002 | Authed one-tap condition report → Firestore → map | TC-003, TC-004 | e2e (manual) | todo |
+| F-002 | Authed report + AI review → Firestore → map | TC-003, TC-004, TC-017 | e2e (manual) | todo |
 | F-003 | Pre-trip per-segment route check (type + freshness) | TC-005, TC-009, TC-010 | e2e (manual) | todo |
 | F-004 | Gemini dedup/structure summary (P1) | TC-006 | e2e (manual) | todo |
+| F-005 | Severity-tiered multi-route recommendation | TC-018, TC-019, TC-020 | e2e (manual) | todo |
+| F-006 | AI classify/dedupe/reject (create/duplicate/reject) | TC-017, TC-021, TC-022 | e2e (manual, live Gemini) | todo |
+| F-007 | Photo evidence (upload, EXIF strip, marker + popup) | TC-023, TC-024, TC-025 | e2e (manual) | todo |
+| F-008 | AI-assessed route safety verdict (`assessRoute`) | TC-020, TC-020b, TC-026 | e2e (manual, live Gemini) | todo |
 | BR-001 | Condition-only; no crime-label field/storage | TC-004, TC-008 | e2e + security | todo |
 | BR-002 | No SOS/rescue/dispatch promise in UI/copy | TC-012 | manual review | todo |
 | BR-003 | Single PUP Sta. Mesa zone only | TC-013 | manual review | todo |
 | BR-004 | Flag carries condition type + timestamp (freshness) | TC-002, TC-009 | e2e (manual) | todo |
-| BR-005 | Report write requires authenticated user | TC-007 | security | todo |
+| BR-005 | Report write requires authenticated user (now via `submitReport`) | TC-007 | security | todo |
 | BR-006 | Summary derived only from reports; adds no facts | TC-006 | e2e (manual) | todo |
+| BR-007 | Severity is per-report, never a place/crime classification | TC-021 | manual review + e2e | todo |
+| BR-008 | Photo EXIF stripped before upload | TC-024 | manual (metadata inspection) | todo |
 
-Security-specific TCs: TC-007 (auth-to-write), TC-008 (reject non-enum/crime-label field),
-TC-014 (Maps key referrer-restricted), TC-015 (Gemini key never in client bundle).
-Negative/edge TCs: TC-009 (stale flags), TC-010 (freshness boundary), TC-011 (empty zone), TC-016 (offline).
+Security-specific TCs: TC-007 (client `create` on `reports` rejected outright — F-006), TC-008
+(reject non-enum/crime-label field, now inside `submitReport`'s validation), TC-014 (ORS key
+referrer-restricted), TC-015 (Gemini key never in client bundle), TC-027 (Storage rules reject
+oversized/wrong-type/unauthenticated uploads).
+Negative/edge TCs: TC-009 (stale flags), TC-010 (freshness boundary), TC-011 (empty zone),
+TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/false report).
 
 **Orphan check:** none. Every F-### and BR-### has ≥1 TC; every TC maps to ≥1 F-###/BR-###.
 
@@ -84,17 +100,20 @@ Negative/edge TCs: TC-009 (stale flags), TC-010 (freshness boundary), TC-011 (em
 - **Steps:** Tap a flagged segment.
 - **Expected:** Detail shows condition type {poor lighting | no crowd | recent incident} and a timestamp.
 
-### TC-003 — Authed user files one-tap report; persists; appears on map ⭐DEMO-CRITICAL
-- **Covers:** F-002
-- **Preconditions:** User authenticated (BR-005); map loaded.
-- **Steps:** Select a segment; tap one condition flag.
-- **Expected:** Report {segmentId, conditionType, timestamp, uid} written to Firestore; map flag updates live (no reload).
+### TC-003 — Authed user submits a report; AI-reviewed; persists; appears on map ⭐DEMO-CRITICAL
+- **Covers:** F-002, F-006
+- **Preconditions:** User authenticated (BR-005); map loaded; live Gemini access.
+- **Steps:** Select a segment; select one condition flag; tap Submit.
+- **Expected:** Blocking spinner while `submitReport` runs; on success, report
+  {segmentId, conditionType, severity, corroborationCount, createdAt, lastActivityAt, uid} written
+  to Firestore (NOT by the client directly — via the Cloud Function); map flag updates live (no reload).
 
-### TC-004 — Report form has NO free-form crime-label field
-- **Covers:** F-002, BR-001
+### TC-004 — Report form has NO free-form crime-label field, and severity is never user-selectable
+- **Covers:** F-002, F-006, BR-001, BR-007
 - **Preconditions:** Report form open.
 - **Steps:** Inspect all inputs in the report UI.
-- **Expected:** Only the closed condition enum is selectable; no free-text "crime"/neighborhood-classification field exists.
+- **Expected:** Only the closed condition enum is selectable; no free-text "crime"/neighborhood-classification
+  field exists; there is no severity selector anywhere in the form (severity is AI-assigned only).
 
 ### TC-005 — Route check returns per-segment okay vs flagged ⭐DEMO-CRITICAL
 - **Covers:** F-003
@@ -108,17 +127,23 @@ Negative/edge TCs: TC-009 (stale flags), TC-010 (freshness boundary), TC-011 (em
 - **Steps:** Request the structured summary for that segment.
 - **Expected:** One structured summary; overlapping reports merged; every claim traces to an input note — no incident/fact absent from inputs. If F-004 cut, UJ-003 degrades to raw flag list (mark N/A and verify the fallback).
 
-### TC-007 — Firestore rules reject unauthenticated write
-- **Covers:** BR-005
-- **Preconditions:** Rules deployed; emulator or signed-out client.
-- **Steps:** Attempt to write a report with `request.auth == null`.
-- **Expected:** Write rejected (permission denied).
+### TC-007 — Firestore rules reject ANY direct client write to `reports` ⭐DEMO-CRITICAL
+- **Covers:** BR-005 (superseded semantics — see note)
+- **Preconditions:** New `firestore.rules` deployed (only after `submitReport` is verified — see
+  the design doc's Testing approach); emulator or live project.
+- **Steps:** From the browser console (signed in or signed out), attempt a direct
+  `addDoc(collection(db,'reports'), {...})` write, bypassing `submitReport` entirely.
+- **Expected:** Write rejected (permission denied) regardless of auth state or payload shape — the
+  only path that can write a report is the Cloud Function. This replaces the original
+  TC-007/TC-008 (which tested auth-gating and enum-validation on a *direct* client write; that
+  validation now lives in `submitReport`'s code — see TC-017/TC-021 for its coverage).
 
-### TC-008 — Firestore rules reject non-enum / crime-label field
-- **Covers:** BR-001
-- **Preconditions:** Authenticated client; rules deployed.
-- **Steps:** Attempt writes with (a) `conditionType` outside the enum, (b) an extra crime/classification field.
-- **Expected:** Both rejected by security rules (not just client validation).
+### TC-008 — `submitReport` rejects non-enum conditionType / oversized note
+- **Covers:** BR-001, F-006
+- **Preconditions:** Authenticated client; `submitReport` deployed.
+- **Steps:** Call `submitReport` with (a) `conditionType` outside the closed enum, (b) a `note`
+  over 280 chars, (c) a `photoPath` not under the caller's own `reports/{uid}/` prefix.
+- **Expected:** All three rejected with `invalid-argument`, nothing written to Firestore.
 
 ### TC-009 — Stale flag treated as not "tonight"
 - **Covers:** F-003, BR-004 (edge)
@@ -163,24 +188,129 @@ Negative/edge TCs: TC-009 (stale flags), TC-010 (freshness boundary), TC-011 (em
 - **Steps:** Load app, go offline, browse map / attempt a report.
 - **Expected:** Cached flags still viewable; writes queue or fail gracefully with a clear state — no crash.
 
+### TC-017 — `submitReport` creates a report with AI-assigned severity ⭐DEMO-CRITICAL
+- **Covers:** F-002, F-006
+- **Preconditions:** Live Gemini access; emulator or live project.
+- **Steps:** Submit a fresh, plausible report (e.g. "poor_lighting", note "streetlight out near the corner").
+- **Expected:** `{ status: 'created', reportId, severity }` returned, severity ∈ {green,yellow,red};
+  the new doc has `corroborationCount: 1` and `lastActivityAt == createdAt`.
+
+### TC-018 — Multi-route recommendation renders 1-3 ranked green alternatives ⭐DEMO-CRITICAL
+- **Covers:** F-005
+- **Preconditions:** Live ORS access; zone has a mix of severities (or none, for the trivial case).
+- **Steps:** Set a destination that has no flagged segments nearby; then one with only yellow
+  nearby; then one with a red segment on the direct path.
+- **Expected:** No-flag case → 1 route. Yellow-nearby → up to 2 routes, both green, second at
+  lower opacity. Red-on-path (with a street-level detour available) → the safest route avoids it
+  entirely; an "Alternative" option may still cross it, labeled accordingly, still rendered green
+  (never orange) per the opacity-only distinction.
+
+### TC-019 — Red segment genuinely unavoidable (edge)
+- **Covers:** F-005 (edge)
+- **Preconditions:** A destination reachable only by crossing a red-severity area (no street-level detour).
+- **Steps:** Request a route to that destination.
+- **Expected:** The route is still returned (not a hard failure), tagged `caution-red-unavoidable`.
+
+### TC-020 — `assessRoute` returns an AI verdict grounded in real on-route reports ⭐DEMO-CRITICAL
+- **Covers:** F-003, F-008
+- **Preconditions:** A destination is set, routes have resolved (TC-018), at least one segment
+  near the selected route has an active (within 24h) report.
+- **Steps:** Tap "Is my route okay tonight?" to expand `RouteCheck.jsx`; tap "Ask: is my route
+  safe tonight?"; switch to a different route alternative and ask again.
+- **Expected:** A blocking "Asking…" state, then a written Gemini assessment referencing only the
+  segment(s) actually reported — no invented incidents, no crime-category label, no rescue/
+  dispatch language (BR-002/BR-006/BR-007). Asking again after switching alternatives reflects
+  the newly selected route's own nearby segments, not the previous one's.
+
+### TC-020b — `assessRoute` skips Gemini when nothing is active nearby
+- **Covers:** F-003, F-008 (cut-safe path)
+- **Preconditions:** A route with no active reports on any nearby segment.
+- **Steps:** Ask "is my route safe tonight?" for that route.
+- **Expected:** `{ assessment: null, consideredCount: 0 }` returned; confirm via network panel
+  that Gemini was never called for this case; UI shows "looks okay based on current reports."
+
+### TC-021 — `submitReport` merges a near-duplicate as corroboration
+- **Covers:** F-006, BR-007
+- **Preconditions:** An existing report on a segment, created within the last 6h (`DUPLICATE_WINDOW_MS`).
+- **Steps:** Submit a second report on the same segment describing essentially the same condition.
+- **Expected:** `{ status: 'duplicate', reportId, corroborationCount }` returned; the *existing*
+  doc's `corroborationCount` increments and `lastActivityAt` refreshes; no new document is created.
+
+### TC-022 — `submitReport` rejects an obviously spam/false report
+- **Covers:** F-006
+- **Preconditions:** Live Gemini access.
+- **Steps:** Submit a report with a nonsensical/joke note (e.g. gibberish, or a note describing
+  something unrelated to a safety condition).
+- **Expected:** `{ status: 'rejected', reason }` returned; confirm via the Firestore emulator UI
+  that **no document was written**.
+
+### TC-023 — Photo evidence marker + popup ⭐DEMO-CRITICAL
+- **Covers:** F-007
+- **Preconditions:** A report submitted with a photo (TC-017 + a photo file).
+- **Steps:** Locate the segment's marker on the map; observe the camera-icon badge; tap it.
+- **Expected:** Marker shows a small camera badge; popup shows the photo, condition + severity,
+  and the exact report timestamp (BR-004).
+
+### TC-024 — Uploaded photo has no EXIF GPS/camera metadata
+- **Covers:** F-007, BR-008
+- **Preconditions:** A photo with GPS EXIF data (e.g. taken on a phone with location on).
+- **Steps:** Submit a report with that photo; download the **uploaded** Storage object; inspect
+  with exiftool or an online EXIF viewer.
+- **Expected:** No GPS tag, no camera-model metadata present in the uploaded file (present in the
+  original — confirms the client-side strip, not just an assumption).
+
+### TC-025 — Rejected report does not leave a visible photo
+- **Covers:** F-006, F-007 (edge)
+- **Preconditions:** A report with a photo that Gemini will reject as spam (TC-022 + a photo).
+- **Steps:** Submit; observe the outcome.
+- **Expected:** No report document is created, so no marker/popup ever shows the photo — confirm
+  the Storage object itself may still exist (known accepted gap — no automated cleanup, see
+  `docs/12-security-compliance.md` Open items) but is not linked from anywhere in the UI.
+
+### TC-026 — RouteCheck.jsx shows the right empty state with no destination set
+- **Covers:** F-003, F-008 (edge)
+- **Preconditions:** No destination set on the map.
+- **Steps:** Expand "Is my route okay tonight?".
+- **Expected:** "Set a destination on the map first, then ask here." — no Ask button shown, no
+  Cloud Function call made.
+
+### TC-027 — Storage rules reject invalid uploads
+- **Covers:** F-007, Security
+- **Preconditions:** Storage rules deployed (emulator or live).
+- **Steps:** Attempt uploads that are (a) unauthenticated, (b) >5MB, (c) a non-image content type
+  (e.g. `application/pdf`), (d) under a different user's `reports/{otherUid}/` prefix.
+- **Expected:** All four rejected by Storage Security Rules.
+
 ## Acceptance criteria
 
 Pulled verbatim-in-intent from PRD: F-001 (map + seeded flags, tap shows type+timestamp), F-002
-(authed one-tap enum report persists + appears, no crime-label field), F-003 (per-segment status,
-okay vs flagged tonight), F-004 (single dedup summary, no added facts). A feature passes when its
-mapped TCs pass.
+(authed report + AI review persists + appears, no crime-label field), F-003 (per-segment status,
+okay vs flagged tonight), F-004 (single dedup summary, no added facts), F-005 (1-3 ranked green
+route alternatives, red avoided unless unreachable), F-006 (exactly one of
+created/duplicate/rejected, never an unmoderated write), F-007 (photo marker + popup, EXIF
+stripped), F-008 (`assessRoute` returns a grounded verdict, or "looks okay" with no Gemini call
+when nothing is active). A feature passes when its mapped TCs pass.
 
 ## Regression plan
 
-Before each demo rehearsal, re-run the 3 P0 journeys (TC-001/002/003/005) plus the two gate
-security checks (TC-007, TC-008). Re-run TC-014/TC-015 after any key/deploy change.
+Before each demo rehearsal, re-run the P0 journeys — **TC-001, TC-002, TC-003, TC-005, TC-017,
+TC-018, TC-020** — plus the security gates **TC-007, TC-008, TC-027**. Re-run TC-014/TC-015 after
+any key/deploy change. Re-run TC-020b and TC-026 whenever `RouteCheck.jsx`/`ZoneMap.jsx` changes.
 
 ## Exit criteria
 
-- **Demo-critical (must pass for July 2 elimination):** the 3 P0 journeys — **TC-001, TC-002,
-  TC-003, TC-005** (covering UJ-001/002/003 P0 paths) — plus security gates **TC-007** and
-  **TC-008** must pass (a world-writable Firestore or stored crime label is a disqualifier).
+- **Demo-critical (must pass for July 2 elimination):** the P0 journeys — **TC-001, TC-002,
+  TC-003, TC-005, TC-017, TC-018, TC-020** (covering UJ-001/002/003/004 P0 paths) — plus security
+  gates **TC-007, TC-008, TC-027** must pass (a client-writable `reports` collection, a stored
+  crime label, or a world-writable Storage bucket is each a disqualifier).
+- **Sequencing gate (per the design doc's build order):** do not attempt TC-007 (which requires
+  the new deny-create Firestore rules deployed) until TC-017/TC-021/TC-022 (live `submitReport`
+  round-trip, all three outcomes) have already passed against the emulator. Deploying the rule
+  change before that leaves F-002 broken with no fallback.
 - F-004 / TC-006 is **not** demo-critical; if cut, verify the raw-flag-list fallback instead.
+- F-007 (photo evidence, TC-023/024/025/027) is P0 but the least architecturally risky of the new
+  work — if genuinely out of time, cutting it only means text-only reports, not a broken build;
+  F-005/F-006 (TC-017/018/020) are the load-bearing pair and should not be shipped partially.
 - Scale/load/cost testing: **N/A — because** single-zone, single-environment hackathon demo on
   Google-managed autoscaling infra (system design §Scaling). Availability/latency/freshness targets
   are `[unverified]`, deferred post-July 2.

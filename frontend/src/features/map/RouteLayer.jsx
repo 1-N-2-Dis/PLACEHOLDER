@@ -1,50 +1,65 @@
-// Safety-aware route between Point A and Point B.
-// Tries to avoid both flagged segments and highway-class legs (the "yellow roads"); falls back to
-// using one or both when ORS finds no street-level alternative. See src/lib/routing.js for the
-// avoidance cascade.
+// Severity-aware, multi-route line rendering between Point A and Point B.
+// Fetches up to 3 ranked route candidates (safest first — see src/lib/routing.js's tiered
+// cascade) and renders each as its own line, all in the same "safe" green, opacity stepped by
+// rank so the safest route reads as the recommendation and the rest as lower-emphasis
+// alternatives (not a caution color — a route only appears here at all if it's one of the
+// ranked candidates ORS could produce).
 import { useEffect, useState } from 'react';
 import { Source, Layer } from 'react-map-gl/maplibre';
-import { fetchSafeRoute } from '../../lib/routing.js';
+import { fetchSafeRoutes } from '../../lib/routing.js';
 
-export default function RouteLayer({ locationA, locationB, flaggedSegments = [], onError, onRouteStatus }) {
-  const [route, setRoute] = useState(null); // { coords, status }
+// Rank 0 (safest) drawn fully opaque; each further alternative fades out. Capped at 3 ranks —
+// fetchSafeRoutes never returns more.
+const OPACITY_BY_RANK = [0.9, 0.45, 0.25];
+
+export default function RouteLayer({ locationA, locationB, flaggedReports = [], onError, onRoutes }) {
+  const [routes, setRoutes] = useState(null); // Array<{ coords, status, tier }> | null
 
   useEffect(() => {
-    if (!locationA || !locationB) { setRoute(null); onRouteStatus?.(null); return; }
+    if (!locationA || !locationB) { setRoutes(null); onRoutes?.([]); return; }
 
     let cancelled = false;
     const timer = setTimeout(() => {
-      fetchSafeRoute(locationA, locationB, flaggedSegments)
+      fetchSafeRoutes(locationA, locationB, flaggedReports)
         .then((r) => {
           if (!cancelled) {
-            setRoute(r);
+            setRoutes(r);
             onError?.(null);
-            onRouteStatus?.(r.status);
+            onRoutes?.(r);
           }
         })
         .catch((err) => {
           console.error('Route fetch failed:', err.message);
-          if (!cancelled) { onError?.(err.message); onRouteStatus?.(null); }
+          if (!cancelled) { setRoutes(null); onError?.(err.message); onRoutes?.([]); }
         });
     }, 400);
 
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [locationA, locationB, flaggedSegments]);
+  }, [locationA, locationB, flaggedReports]);
 
-  if (!route) return null;
+  if (!routes || !routes.length) return null;
 
+  // Draw lowest-rank first, safest last, so the safest (highest-opacity) line renders on top.
   return (
-    <Source type="geojson" data={{ type: 'Feature', geometry: { type: 'LineString', coordinates: route.coords } }}>
-      <Layer
-        type="line"
-        layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-        paint={{
-          // Green = safe (no flagged segments, no highway legs). Orange = any caution-* state.
-          'line-color': route.status === 'safe' ? '#2e7d32' : '#e65100',
-          'line-width': 4,
-          'line-opacity': 0.8,
-        }}
-      />
-    </Source>
+    <>
+      {routes.map((route, rank) => (
+        <Source
+          key={route.tier}
+          id={`route-alt-${rank}`}
+          type="geojson"
+          data={{ type: 'Feature', geometry: { type: 'LineString', coordinates: route.coords } }}
+        >
+          <Layer
+            type="line"
+            layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+            paint={{
+              'line-color': '#2e7d32',
+              'line-width': 4,
+              'line-opacity': OPACITY_BY_RANK[rank] ?? 0.25,
+            }}
+          />
+        </Source>
+      )).reverse()}
+    </>
   );
 }

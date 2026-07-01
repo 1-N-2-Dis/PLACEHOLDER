@@ -9,14 +9,19 @@
 //   - Summary adds NO facts not present in the input reports (BR-006) — enforced by the backend prompt.
 //   - CUT-SAFE: on empty/error, degrade to the raw flag list (TC-006 fallback).
 //   - The Gemini key is NEVER in the client — the Cloud Function holds it (Threat T2).
+//
+// Presentation: collapsed to a single toggle button until clicked (mounted as a bottom-center
+// map overlay by ZoneMap.jsx, alongside RouteCheck.jsx) — matches the same pattern.
 import { useState } from 'react';
 import { httpsCallable } from 'firebase/functions';
+import { X } from 'lucide-react';
 import { functions } from '../../lib/firebase.js';
 import { CONDITION_META } from '../../data/condition-types.js';
 
 const summarizeSegment = httpsCallable(functions, 'summarizeSegment');
 
 export default function RiskSummary({ segments, selectedId, reports }) {
+  const [expanded, setExpanded] = useState(false);
   const [summary, setSummary] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -39,44 +44,60 @@ export default function RiskSummary({ segments, selectedId, reports }) {
     }
   }
 
-  if (!segment) {
+  if (!expanded) {
     return (
-      <section className="risk-summary">
-        <h2>Risk summary</h2>
-        <p className="muted">Select a segment to see its summary.</p>
-      </section>
+      <button type="button" className="overlay-toggle-btn" onClick={() => setExpanded(true)}>
+        Risk summary
+      </button>
     );
   }
 
   return (
-    <section className="risk-summary">
-      <h2>Risk summary — {segment.name}</h2>
-      <button type="button" onClick={requestSummary} disabled={busy}>
-        {busy ? 'Summarizing…' : 'Summarize reports'}
-      </button>
+    <section className="risk-summary overlay-card">
+      <div className="overlay-card-header">
+        <h2>{segment ? `Risk summary — ${segment.name}` : 'Risk summary'}</h2>
+        <button
+          type="button"
+          className="overlay-card-close"
+          onClick={() => setExpanded(false)}
+          aria-label="Close"
+        >
+          <X size={16} />
+        </button>
+      </div>
 
-      {summary && <p className="summary-text">{summary}</p>}
+      {!segment ? (
+        <p className="muted">Select a segment to see its summary.</p>
+      ) : (
+        <>
+          <button type="button" onClick={requestSummary} disabled={busy}>
+            {busy ? 'Summarizing…' : 'Summarize reports'}
+          </button>
 
-      {/* Cut-safe fallback: raw flag list when the summary is empty or the call failed (TC-006). */}
-      {(error || (summary === null && !busy)) && (
-        <div className="summary-fallback">
-          {error && <p className="status-err">Summary unavailable — showing raw reports.</p>}
-          {segReports.length === 0 ? (
-            <p className="muted">No reports for this segment yet.</p>
-          ) : (
-            <ul>
-              {segReports.map((r) => {
-                const meta = CONDITION_META[r.conditionType];
-                return (
-                  <li key={r.id}>
-                    {meta ? `${meta.icon} ${meta.label}` : r.conditionType}
-                    {r.note ? ` — “${r.note}”` : ''}
-                  </li>
-                );
-              })}
-            </ul>
+          {summary && <p className="summary-text">{summary}</p>}
+
+          {/* Cut-safe fallback: raw flag list when the summary is empty or the call failed (TC-006). */}
+          {(error || (summary === null && !busy)) && (
+            <div className="summary-fallback">
+              {error && <p className="status-err">Summary unavailable — showing raw reports.</p>}
+              {segReports.length === 0 ? (
+                <p className="muted">No reports for this segment yet.</p>
+              ) : (
+                <ul>
+                  {segReports.map((r) => {
+                    const meta = CONDITION_META[r.conditionType];
+                    return (
+                      <li key={r.id} className="icon-line">
+                        {meta ? <><meta.Icon size={14} /> {meta.label}</> : r.conditionType}
+                        {r.note ? ` — “${r.note}”` : ''}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
     </section>
   );

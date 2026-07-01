@@ -3,14 +3,14 @@
 // Traces to: docs/03-prd.md (UJ-001/002/003), docs/06-system-design.md.
 import { useEffect, useState, useMemo } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { SEED_SEGMENTS } from './data/seed-segments.js';
+import { SEED_SEGMENTS, WELL_USED_SEGMENTS } from './data/seed-segments.js';
 import { subscribeReports, latestBySegment } from './lib/reports.js';
 import AppHeader from './components/AppHeader.jsx';
 import HomePage from './pages/HomePage.jsx';
 import ReportPage from './pages/ReportPage.jsx';
 
 export default function App() {
-  const segments = SEED_SEGMENTS;
+  const segments = [...SEED_SEGMENTS, ...WELL_USED_SEGMENTS];
   const [reports, setReports] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
 

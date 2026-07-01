@@ -68,9 +68,13 @@ Secondary rider (trans woman): same stories; same zone and conditions.
 | F-ID  | Feature | Priority | Solves (problem) | Notes |
 |-------|---------|----------|------------------|-------|
 | F-001 | Zone safety map with crowdsourced segment flags | P0 | "Danger knowledge is scattered and invisible" (idea §1, §4) | Google Maps Platform; seed with §7 provisional pins `[unverified]` |
-| F-002 | One-tap report of a route/segment condition (poor lighting / no crowd / recent incident) | P0 | "Lived danger is never written down" (idea §4) | Firebase Auth + Firestore; condition flags only, no crime labels (§9/§10) |
-| F-003 | Pre-trip "is my route okay tonight" check for the zone | P0 | "No way to know before setting out" (idea §1) | Google Maps Platform route/segment lookup |
+| F-002 | One-tap report of a route/segment condition (poor lighting / no crowd / recent incident) | P0 | "Lived danger is never written down" (idea §4) | Firebase Auth + Firestore; condition flags only, no crime labels (§9/§10). **Amended (F-006):** submission is now select-condition-then-Submit, with a blocking AI review step before the report is written — no longer a true instant one-tap write; see F-006. **Amended (2026-07-01, later same day):** frontend reworked into a 4-step wizard (`ReportForm.jsx`) — photo → location (segment list or map-pin, see BR-008) → condition + note → review/submit; see `docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md`. |
+| F-003 | Pre-trip "is my route okay tonight" check for the zone | P0 | "No way to know before setting out" (idea §1) | `RouteCheck.jsx`. **Amended (2026-07-01, later same day):** moved from a fixed side-pane section to a bottom-center map overlay, collapsed to a single toggle button by default — the checklist only shows once tapped, closable via an `X` icon. Mounted inside `ZoneMap.jsx`, not `HomePage.jsx`. **Amended again (2026-07-01, later same day):** the per-segment manual checklist is gone — `RouteCheck.jsx` now reuses the Point A/B route already set for F-005 and, on tap, calls the new `assessRoute` Cloud Function for an AI-generated written verdict (see F-008, which this now merges into). |
 | F-004 | Structured, deduplicated risk summary from free-text reports | P1 | "Crowd noise isn't trustworthy signal" (idea §5 alternatives gap) | Gemini API; innovation hook; stretch if time allows |
+| F-005 | Severity-tiered, multi-route (2-3 alternative) recommendation | P0 | "One route recommendation doesn't show the tradeoff between safety and directness" | `frontend/src/lib/routing.js` `fetchSafeRoutes`; red hard-avoid, yellow soft-avoid, green informational only; see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` |
+| F-006 | AI report classification + moderation | P0 | "Not every report is equally urgent, and crowd noise/false reports need filtering before they reach the map" | `backend/functions/index.js` `submitReport`; Gemini classifies severity, flags duplicates for corroboration-merge, rejects spam; report writes move server-side (see BR-005 amendment) |
+| F-007 | Photo evidence on reports | P0 | "A text-only report is harder to trust/act on than one with visual evidence" | Firebase Storage, EXIF-stripped client-side; see BR-008 |
+| F-008 | AI-assessed "is my route safe tonight?" for the recommended route | P0 | "The pre-trip check was disconnected from the actual route being taken, and a raw flag list isn't the same as an answer" | **Revised (2026-07-01, later same day):** the earlier rule-based, always-on `RouteSafetyPanel.jsx` is removed. `RouteCheck.jsx` (F-003) now covers both: user taps "Is my route okay tonight?", then explicitly asks; `backend/functions/index.js` `assessRoute` reads each nearby segment's real Firestore report and returns a Gemini-written safety verdict, constrained the same way F-006 is (no invented facts, no crime-labels, no rescue/dispatch promise). |
 
 ## Business rules
 
@@ -85,8 +89,27 @@ Secondary rider (trans woman): same stories; same zone and conditions.
   freshness can be computed for the pre-trip check (F-003 depends on this).
 - **BR-005** — Report submission requires an authenticated user (Firebase Auth) to enable
   basic abuse control. Auth method `[unverified]` — choose lightweight (e.g., anonymous/Google sign-in) for the hackathon.
+  **Amended (F-006):** writes now happen exclusively via the `submitReport` Cloud Function (Admin
+  SDK), not a direct client write — `backend/firestore.rules` denies client `create` on `reports`
+  outright. `request.auth` is still required (enforced in the callable), preserving BR-005's
+  intent; the Function's code is now BR-001/BR-004's enforcement point for report shape.
 - **BR-006** — The F-004 summary must be derived only from submitted reports (no invented
   incidents); it deduplicates and structures, it does not add facts.
+- **BR-007** — A report's AI-assigned `severity` (F-006) is a per-report triage signal derived
+  only from that report's own submitted content. It is **not** a neighborhood, place, or crime
+  classification, is never aggregated into a place-level rating, and does not weaken BR-001 —
+  the constrained classify prompt (`backend/functions/index.js`) explicitly instructs the model
+  never to output or infer a crime-category/neighborhood/place label.
+- **BR-008** — Photo evidence (F-007) must have EXIF metadata (GPS, camera info) stripped
+  client-side before upload (`frontend/src/lib/photo.js`). Bystander-privacy risk in the photo's
+  visual content itself is a known, **unmitigated** gap for this build — not solved by EXIF
+  stripping (see `docs/12-security-compliance.md` Threat T7).
+  **Amended (2026-07-01, later same day):** in the report wizard's UI flow, a photo (and a note)
+  is now required to submit — a stronger evidence bar than F-007's own acceptance criterion, which
+  is unaffected (it only governs EXIF-stripping *when* a photo exists). A user's tapped map pin
+  must also resolve to one of the existing known segments (nearest-point snap, `frontend/src/lib/
+  segmentSnap.js`, within 40m) — segments are point geometry, not road polylines, so this is how
+  "pin on a road, not a place/house" is enforced; a pin never introduces an unlisted location.
 
 ## User flows
 
@@ -96,14 +119,29 @@ UJ-001 (pre-trip check, F-003/F-001):
 3. System returns per-segment condition status for tonight (flag type + freshness, BR-004).
 4. User decides: proceed, re-route, or pay for a ride.
 
-UJ-002 (one-tap report, F-002):
+UJ-002 (report + AI review, F-002/F-006/F-007):
 1. Authenticated user (BR-005) selects a segment on the map.
-2. User taps a condition flag (poor lighting / no crowd / recent incident) — condition-only (BR-001).
-3. Report saved to Firestore with type + timestamp; map flag updates.
+2. User selects a condition flag (poor lighting / no crowd / recent incident) — condition-only
+   (BR-001) — optionally adds a note and/or a photo, then taps Submit.
+3. Client uploads the (EXIF-stripped, BR-008) photo if given, then calls `submitReport`, which
+   blocks on an AI review: classify severity (BR-007), check for a duplicate, check for spam.
+4. One of three outcomes: report created (with severity, map flag updates), merged as
+   corroboration onto an existing report (`corroborationCount` bumped), or rejected (nothing
+   written, reason shown to the user).
 
 UJ-003 (risk picture, F-001/F-004):
 1. User views zone map with flags.
 2. System shows a structured, deduplicated risk summary generated by Gemini from free-text/report data (F-004, BR-006).
+
+UJ-004 (multi-route recommendation + AI route check, F-005/F-003/F-008):
+1. User sets a destination on the zone map.
+2. System fetches 2-3 severity-ranked route alternatives (F-005); the safest renders full-opacity
+   green, alternates lower-opacity green.
+3. User taps "Is my route okay tonight?" (bottom-center map overlay, `RouteCheck.jsx`) and then
+   explicitly asks — no auto-run. The client sends the segments near the selected route (name +
+   ID only) to `assessRoute`; the Function reads each one's real Firestore report and returns a
+   short Gemini-written verdict, or "looks okay" if nothing active was found (no Gemini call made
+   in that case). Same "no rescue/dispatch, no invented facts" constraints as F-006 (BR-002/BR-006/BR-007).
 
 ## Acceptance criteria
 
@@ -111,10 +149,23 @@ UJ-003 (risk picture, F-001/F-004):
   seeded segment flags; tapping a flagged segment shows its condition type and timestamp.
 - **F-002:** An authenticated user can flag a selected segment with one of {poor lighting, no
   crowd, recent incident} in one tap; the report persists to Firestore and appears on the map; no free-form crime-label field exists (BR-001).
-- **F-003:** Given a route in the zone, the system returns each segment's current condition
-  status (flag type + freshness), distinguishing "okay" from "flagged tonight."
+- **F-003:** Given a selected route, tapping "Ask: is my route safe tonight?" returns either an
+  AI-written verdict (grounded only in real reports on segments near the route) or a plain "looks
+  okay" state when nothing active was found — never a fabricated incident.
 - **F-004:** Given multiple overlapping free-text reports for a segment, Gemini returns a
   single structured summary that deduplicates them and adds no facts not present in the inputs (BR-006).
+- **F-005:** Given a destination, the system returns 1-3 route candidates, safest first; red
+  segments are avoided unless truly unreachable otherwise (in which case the route is labeled
+  accordingly); all recommended routes render green, opacity descending by rank.
+- **F-006:** Given a report submission, `submitReport` returns exactly one of created (with a
+  severity in `{green,yellow,red}`), duplicate (existing report's `corroborationCount`
+  incremented), or rejected (nothing written) — never an unmoderated write (BR-007).
+- **F-007:** A report with a photo shows a distinct marker on the map; tapping it shows the
+  photo, the report's condition/severity, and its exact timestamp; the stored photo has no EXIF
+  GPS/camera metadata (BR-008).
+- **F-008:** `assessRoute` reads each on-route segment's real, current Firestore report (never
+  trusts client-supplied report content) and only calls Gemini when at least one active report
+  exists along the route.
 
 ## Non-goals
 

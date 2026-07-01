@@ -1,36 +1,74 @@
-// F-002 one-tap condition report (P0).
-// Role: let an authenticated user flag a selected segment with one condition, in one tap.
-// Traces to: docs/03-prd.md F-002, docs/06-system-design.md (UJ-002 data flow).
+// F-002/F-006/F-007 four-step report wizard (P0).
+// Role: let an authenticated user flag a location with one condition, backed by a required photo
+// and note; the report is classified/deduped/rejected by AI (backend/functions submitReport)
+// before it's ever written. Traces to: docs/03-prd.md F-002/F-006/F-007, docs/superpowers/specs/
+// 2026-07-01-report-wizard-frontend-design.md.
 //
-// Flow: pick a segment → tap one condition from the closed enum → optional note → write to Firestore.
-// The map updates live via the App's onSnapshot subscription.
+// Steps: photo -> location (list or map pin, both resolve to a segmentId) -> details (condition +
+// note) -> review/submit -> blocking AI review -> one of: filed (with severity), merged as
+// corroboration, or not filed.
 //
 // HARD CONSTRAINTS:
 //   - Only the closed enum is selectable. NO free-form crime/neighborhood field exists (BR-001, TC-004).
-//   - `note` is optional and feeds F-004 only (BR-006); the hint discourages naming people (T6).
-//   - Write requires auth (BR-005); rules enforce this again server-side.
+//   - Photo and note are now required (BR-008 amendment) — a stronger evidence bar than the
+//     original one-tap flow.
+//   - Write requires auth (BR-005); the Cloud Function is the sole enforcement point now (BR-001).
 import { useState } from 'react';
-import { CONDITION_TYPES, CONDITION_META } from '../../data/condition-types.js';
-import { addReport } from '../../lib/reports.js';
+import { submitReportForReview } from '../../lib/reportIntake.js';
+import PhotoStep from './steps/PhotoStep.jsx';
+import LocationStep from './steps/LocationStep.jsx';
+import DetailsStep from './steps/DetailsStep.jsx';
+import ReviewStep from './steps/ReviewStep.jsx';
+
+const STEPS = ['photo', 'location', 'details', 'review'];
+const STEP_LABELS = { photo: 'Photo', location: 'Location', details: 'Details', review: 'Review' };
+
+function canAdvance(step, { photoFile, selectedId, conditionType, note }) {
+  if (step === 'photo') return !!photoFile;
+  if (step === 'location') return !!selectedId;
+  if (step === 'details') return !!conditionType && note.trim().length > 0;
+  return true;
+}
 
 export default function ReportForm({ segments, selectedId, onSelect }) {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [conditionType, setConditionType] = useState(null);
   const [note, setNote] = useState('');
+  const [photoFile, setPhotoFile] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState(null); // { ok: boolean, msg: string }
+  const [result, setResult] = useState(null); // { status: 'created'|'duplicate'|'rejected', ... } | { status: 'error', msg }
 
-  async function fileReport(conditionType) {
-    if (!selectedId) {
-      setStatus({ ok: false, msg: 'Pick a segment first.' });
-      return;
-    }
+  const step = STEPS[stepIndex];
+  const fields = { photoFile, selectedId, conditionType, note };
+
+  function goNext() {
+    if (!canAdvance(step, fields)) return;
+    setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
+  }
+
+  function goBack() {
+    setResult(null);
+    setStepIndex((i) => Math.max(i - 1, 0));
+  }
+
+  async function submit() {
     setBusy(true);
-    setStatus(null);
+    setResult(null);
     try {
-      await addReport({ segmentId: selectedId, conditionType, note });
-      setNote('');
-      setStatus({ ok: true, msg: 'Report filed. Thanks — others can see it now.' });
+      const segmentName = segments.find((s) => s.segmentId === selectedId)?.name;
+      const outcome = await submitReportForReview({
+        segmentId: selectedId, segmentName, conditionType, note, photoFile,
+      });
+      setResult(outcome);
+      if (outcome.status !== 'rejected') {
+        setNote('');
+        setConditionType(null);
+        setPhotoFile(null);
+        onSelect(null);
+        setStepIndex(0);
+      }
     } catch (err) {
-      setStatus({ ok: false, msg: `Could not file report: ${err.message}` });
+      setResult({ status: 'error', msg: `Could not submit report: ${err.message}` });
     } finally {
       setBusy(false);
     }
@@ -40,43 +78,48 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
     <section className="report-form">
       <h2>Report a condition</h2>
 
-      <label>
-        Segment
-        <select value={selectedId || ''} onChange={(e) => onSelect(e.target.value || null)}>
-          <option value="">— choose a segment —</option>
-          {segments.map((s) => (
-            <option key={s.segmentId} value={s.segmentId}>{s.name}</option>
-          ))}
-        </select>
-      </label>
-
-      {/* Closed enum only — there is deliberately no free-form crime/neighborhood field (BR-001, TC-004). */}
-      <div className="condition-buttons">
-        {CONDITION_TYPES.map((type) => (
-          <button
-            key={type}
-            type="button"
-            disabled={busy || !selectedId}
-            onClick={() => fileReport(type)}
-          >
-            {CONDITION_META[type].icon} {CONDITION_META[type].label}
-          </button>
+      <ol className="wizard-steps">
+        {STEPS.map((s, i) => (
+          <li key={s} className={i === stepIndex ? 'wizard-step--active' : i < stepIndex ? 'wizard-step--done' : undefined}>
+            {STEP_LABELS[s]}
+          </li>
         ))}
-      </div>
+      </ol>
 
-      <label>
-        Note (optional)
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          maxLength={280}
-          placeholder="Describe the condition (lighting, crowd). Please don't name individuals."
-        />
-      </label>
-
-      {status && (
-        <p className={status.ok ? 'status-ok' : 'status-err'}>{status.msg}</p>
+      {step === 'photo' && (
+        <PhotoStep photoFile={photoFile} onChange={setPhotoFile} />
       )}
+      {step === 'location' && (
+        <LocationStep segments={segments} segmentId={selectedId} onSelect={onSelect} />
+      )}
+      {step === 'details' && (
+        <DetailsStep
+          conditionType={conditionType}
+          onConditionChange={setConditionType}
+          note={note}
+          onNoteChange={setNote}
+        />
+      )}
+      {step === 'review' && (
+        <ReviewStep
+          segmentName={segments.find((s) => s.segmentId === selectedId)?.name}
+          conditionType={conditionType}
+          note={note}
+          photoFile={photoFile}
+          busy={busy}
+          result={result}
+          onSubmit={submit}
+        />
+      )}
+
+      <div className="wizard-nav">
+        {stepIndex > 0 && (
+          <button type="button" disabled={busy} onClick={goBack}>Back</button>
+        )}
+        {step !== 'review' && (
+          <button type="button" disabled={!canAdvance(step, fields)} onClick={goNext}>Next</button>
+        )}
+      </div>
     </section>
   );
 }
