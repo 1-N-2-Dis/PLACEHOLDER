@@ -31,9 +31,10 @@ const STATUS_META = {
   'caution-red-unavoidable': { copy: 'Dangerous area could not be avoided', Icon: AlertOctagon },
 };
 
-export default function ZoneMap({ segments, latest, reports, selectedId, onSelect }) {
+export default function ZoneMap({ segments, latest, reports, selectedId, onSelect, initialDestination = null, destinationLabel = null }) {
   const [locationA, setLocationA] = useState(INITIAL_A);
-  const [locationB, setLocationB] = useState(null);
+  // Pre-place Point B if navigated from Routes page
+  const [locationB, setLocationB] = useState(initialDestination);
   const [settingB, setSettingB] = useState(false);
   const [routeError, setRouteError] = useState(null);
   const [routes, setRoutes] = useState([]); // Array<{ coords, status, tier }>, safest first
@@ -140,6 +141,11 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
       </Map>
 
       <div className="map-controls">
+        {destinationLabel && locationB && (
+          <span className="map-ctrl-safe" style={{ fontWeight: 600 }}>
+            Destination: {destinationLabel}
+          </span>
+        )}
         <button
           className={`map-ctrl-btn${showHeatmap ? ' map-ctrl-btn--active' : ''}`}
           onClick={() => setShowHeatmap((v) => !v)}
