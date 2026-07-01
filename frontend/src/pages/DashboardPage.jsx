@@ -1,6 +1,7 @@
 // guidHER Dashboard — cards, quick actions, zone overview, activity feed.
 import { CheckCircle2, AlertTriangle, AlertOctagon, Flag, Navigation, Lightbulb, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 import { useAuth } from '../lib/authContext.jsx';
 import { ZONE_OVERVIEW } from '../lib/mockData.js';
 import Owly from '../components/Owly.jsx';
@@ -29,16 +30,17 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const firstName = user?.name?.split(' ')[0] || 'Commuter';
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 5 ? 'Goodnight' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : hour < 21 ? 'Good evening' : 'Goodnight';
 
   return (
     <div className="page-scroll">
+      <GradientBlobs opacity={0.35} variant="dashboard" />
       <div className="page-scroll-inner">
 
         {/* Greeting */}
         <div className="greeting mb-20">
-          <div className="greeting-name">{greeting}, {firstName}.</div>
-          <div className="greeting-sub">Here is tonight's commute picture for the Sta. Mesa zone.</div>
+          <div className="text-h1" style={{ margin: 0, fontSize: '2.2rem', color: 'var(--ink)' }}>{greeting}, {firstName}.</div>
+          <div className="text-body" style={{ color: 'var(--muted)', marginTop: 8, fontSize: '1.05rem', lineHeight: 1.4 }}>Here is tonight's commute picture for the Sta. Mesa zone.</div>
         </div>
 
         {/* Dashboard cards */}
@@ -69,18 +71,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick actions */}
-        <div className="flex-wrap-gap mb-24">
-          <button className="btn btn-primary btn-sm" onClick={() => navigate('/report')}>
-            <Flag size={15} /> Report a Condition
-          </button>
-          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/routes')}>
-            <Navigation size={15} /> Find Route
-          </button>
-          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/tips')}>
-            <Lightbulb size={15} /> Safety Tips
-          </button>
-        </div>
 
         {/* Zone overview */}
         <div className="mb-24">
@@ -100,11 +90,19 @@ export default function DashboardPage() {
 
         {/* Owly tip */}
         <div className="owly-tip-card mb-24">
-          <Owly size={52} pose="looks-out" />
           <div className="owly-tip-text">
             <div className="label">Owly says</div>
             <div className="tip">Always check tonight's conditions before you leave. A 30-second look can make all the difference on your walk home.</div>
           </div>
+          <Owly 
+            size={105} 
+            pose="looks-out" 
+            className="owly-flipped"
+            style={{ 
+              filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.3))',
+              margin: '-24px -12px -24px 0' 
+            }} 
+          />
         </div>
 
         {/* Activity feed */}

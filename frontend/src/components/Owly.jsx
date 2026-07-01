@@ -26,7 +26,7 @@ const POSES = {
   walkinghome: walkingHome,
 };
 
-export default function Owly({ size = 100, className = '', pose = 'welcome' }) {
+export default function Owly({ size = 100, className = '', pose = 'welcome', style = {} }) {
   const src = POSES[pose] || welcome;
   return (
     <img
@@ -35,7 +35,7 @@ export default function Owly({ size = 100, className = '', pose = 'welcome' }) {
       height={size}
       className={className}
       alt="Owly, GuidHer safety companion"
-      style={{ objectFit: 'contain' }}
+      style={{ objectFit: 'contain', ...style }}
     />
   );
 }

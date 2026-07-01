@@ -1,6 +1,7 @@
 // guidHER Profile — user info, saved routes, submitted reports, emergency contacts, theme.
 import { useState } from 'react';
-import { Moon, Sun, Train, Footprints, MapPin, LogOut, ChevronRight, Moon as MoonIcon, Phone, Plus, Trash2, Edit2, Check, AlertTriangle, Lightbulb, AlertOctagon } from 'lucide-react';
+import { Moon, Sun, Train, Footprints, MapPin, LogOut, ChevronRight, Moon as MoonIcon, Phone, Plus, Trash2, Edit2, Check, AlertTriangle, Lightbulb, AlertOctagon, User } from 'lucide-react';
+import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 import { useAuth } from '../lib/authContext.jsx';
 import { useTheme } from '../lib/theme.jsx';
 
@@ -71,15 +72,17 @@ export default function ProfilePage() {
 
   return (
     <div className="page-scroll">
+      <GradientBlobs opacity={0.3} variant="profile" />
       <div className="page-scroll-inner">
 
         {/* Header */}
         <div className="profile-header">
-          <div className="profile-avatar">{initials(user?.name)}</div>
+          <div className="profile-avatar">
+            <User size={36} strokeWidth={2.5} />
+          </div>
           <div>
             <div className="profile-name">{user?.name || 'Guest'}</div>
             <div className="profile-email">{user?.email || ''}</div>
-            <div className="text-caption" style={{ marginTop: 2 }}>{user?.campus || ''}</div>
           </div>
         </div>
 
@@ -161,50 +164,7 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Emergency contacts */}
-        <div className="card mb-14">
-          <div className="flex-between mb-12">
-            <div className="card-title">Emergency contacts</div>
-            <button className="btn btn-secondary btn-sm" onClick={() => setAddingContact(a => !a)}>
-              {addingContact ? 'Cancel' : <><Plus size={13} /> Add</>}
-            </button>
-          </div>
-          {addingContact && (
-            <div style={{ background: 'var(--surface)', borderRadius: 12, padding: 14, marginBottom: 14 }}>
-              {[['Name','name','text','e.g. Mom'],['Relationship','relationship','text','e.g. Parent'],['Phone','phone','tel','+63 9XX XXX XXXX']].map(([lbl,k,t,ph]) => (
-                <div className="form-group" key={k} style={{ marginBottom: 10 }}>
-                  <label className="form-label">{lbl}</label>
-                  <input type={t} className="form-input" placeholder={ph}
-                    value={newContact[k]} onChange={e => setNewContact(c => ({ ...c, [k]: e.target.value }))} />
-                </div>
-              ))}
-              <button className="btn btn-primary btn-sm" onClick={addContact}>
-                <Check size={14} /> Save contact
-              </button>
-            </div>
-          )}
-          {contacts.length === 0 && !addingContact && (
-            <div style={{ fontSize: '0.875rem', color: 'var(--muted)' }}>No contacts added yet.</div>
-          )}
-          {contacts.map(c => (
-            <div key={c.id} className="contact-item">
-              <div className="contact-avatar">{c.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2)}</div>
-              <div style={{ flex: 1 }}>
-                <div className="contact-name">{c.name}</div>
-                <div className="contact-rel">{c.relationship}</div>
-                <div className="contact-phone">{c.phone}</div>
-              </div>
-              <div className="contact-actions">
-                <a href={`tel:${c.phone}`} className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }}>
-                  <Phone size={14} />
-                </a>
-                <button className="btn btn-danger btn-sm" style={{ padding: '6px 8px' }} onClick={() => removeContact(c.id)}>
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+
 
         {/* Appearance */}
         <div className="card mb-14">
