@@ -2,7 +2,7 @@
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
 import { useState, useEffect } from 'react';
-import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall } from 'lucide-react';
+import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
 import Owly from '../components/Owly.jsx';
 import BrandMark from '../components/BrandMark.jsx';
@@ -91,9 +91,35 @@ function LoginView({ onBack, onDone, onSignup }) {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [typedMsg, setTypedMsg] = useState('');
+
+  useEffect(() => {
+    const msg = "Your route is waiting.";
+    let typeTimer;
+
+    const startTyping = () => {
+      let i = 0;
+      setTypedMsg('');
+      clearInterval(typeTimer);
+      typeTimer = setInterval(() => {
+        setTypedMsg(msg.slice(0, i + 1));
+        i++;
+        if (i >= msg.length) clearInterval(typeTimer);
+      }, 60);
+    };
+
+    startTyping();
+    const resetTimer = setInterval(startTyping, 8000);
+
+    return () => {
+      clearInterval(typeTimer);
+      clearInterval(resetTimer);
+    };
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -107,28 +133,41 @@ function LoginView({ onBack, onDone, onSignup }) {
   return (
     <div className="auth-screen">
       <div className="auth-card">
-        <div className="auth-logo">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '-12px', marginBottom: '4px' }}>
           <BrandMark size={44} />
-          <div className="auth-logo-text" style={{ marginTop: 10 }}>
+          <h2 className="auth-title" style={{ margin: 0, fontSize: '1.2rem' }}>Log in</h2>
+        </div>
+        <div className="auth-logo" style={{ marginTop: '-12px' }}>
+          <div className="auth-logo-text">
             Guid<span className="text-pink">Her</span>
           </div>
           <div className="auth-logo-tagline">Wise. Watchful. With you.</div>
         </div>
-        <div className="owly-wrap" style={{ margin: '12px 0' }}>
-          <Owly size={72} pose="welcome" />
-          <p className="owly-msg">Welcome back! Your route is waiting.</p>
+        <div className="owly-wrap" style={{ marginTop: '-24px', marginBottom: '16px' }}>
+          <Owly size={150} pose="welcome" className="owly-shadow" />
+          <p className="owly-msg">
+            Welcome back! {typedMsg}<span className="cursor-blink">|</span>
+          </p>
         </div>
-        <h2 className="auth-title">Log in</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label" htmlFor="l-email">Email</label>
             <input id="l-email" type="email" className="form-input" placeholder="you@email.com"
               value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
           </div>
-          <div className="form-group">
+          <div className="form-group" style={{ position: 'relative' }}>
             <label className="form-label" htmlFor="l-pw">Password</label>
-            <input id="l-pw" type="password" className="form-input" placeholder="••••••••"
-              value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
+            <input id="l-pw" type={showPassword ? "text" : "password"} className="form-input" placeholder="••••••••"
+              value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password"
+              style={{ paddingRight: '40px' }} />
+            <button 
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{ position: 'absolute', right: '12px', top: '34px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', padding: 0 }}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, fontSize: '0.875rem' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
@@ -158,6 +197,33 @@ function SignupView({ onBack, onDone, onLogin }) {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '', campus: 'PUP Main Campus', commutePrefs: [] });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [typedMsg, setTypedMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    const msg = "Let's get you set up for safer commutes.";
+    let typeTimer;
+
+    const startTyping = () => {
+      let i = 0;
+      setTypedMsg('');
+      clearInterval(typeTimer);
+      typeTimer = setInterval(() => {
+        setTypedMsg(msg.slice(0, i + 1));
+        i++;
+        if (i >= msg.length) clearInterval(typeTimer);
+      }, 60);
+    };
+
+    startTyping();
+    const resetTimer = setInterval(startTyping, 15000);
+
+    return () => {
+      clearInterval(typeTimer);
+      clearInterval(resetTimer);
+    };
+  }, []);
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })); }
   function togglePref(id) {
@@ -186,19 +252,24 @@ function SignupView({ onBack, onDone, onLogin }) {
   return (
     <div className="auth-screen">
       <div className="auth-card">
-        <div className="auth-logo">
-          <BrandMark size={40} />
-          <div className="auth-logo-text" style={{ marginTop: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '-12px', marginBottom: '4px' }}>
+          <BrandMark size={44} />
+          {step === 1 && <h2 className="auth-title" style={{ margin: 0, fontSize: '1.2rem' }}>Create account</h2>}
+        </div>
+        <div className="auth-logo" style={{ marginTop: '-12px' }}>
+          <div className="auth-logo-text">
             Guid<span className="text-pink">Her</span>
           </div>
+          <div className="auth-logo-tagline">Wise. Watchful. With you.</div>
         </div>
         {step === 1 ? (
           <>
-            <div className="owly-wrap" style={{ margin: '8px 0 14px' }}>
-              <Owly size={60} pose="cheering" />
-              <p className="owly-msg">Let's get you set up for safer commutes.</p>
+            <div className="owly-wrap" style={{ marginTop: '-24px', marginBottom: '16px' }}>
+              <Owly size={150} pose="cheering" className="owly-shadow" />
+              <p className="owly-msg" style={{ marginTop: '-8px' }}>
+                {typedMsg}<span className="cursor-blink">|</span>
+              </p>
             </div>
-            <h2 className="auth-title">Create account</h2>
             <form onSubmit={nextStep}>
               <div className="form-group">
                 <label className="form-label" htmlFor="su-name">Full name</label>
@@ -207,24 +278,32 @@ function SignupView({ onBack, onDone, onLogin }) {
               </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="su-email">Email</label>
-                <input id="su-email" type="email" className="form-input" placeholder="you@pup.edu.ph"
+                <input id="su-email" type="email" className="form-input" placeholder="santos@gmail.com"
                   value={form.email} onChange={e => set('email', e.target.value)} />
               </div>
               <div className="form-group">
-                <label className="form-label" htmlFor="su-pw">Password</label>
-                <input id="su-pw" type="password" className="form-input" placeholder="Min. 6 characters"
-                  value={form.password} onChange={e => set('password', e.target.value)} />
+                <label className="form-label" htmlFor="su-password">Password</label>
+                <div style={{ position: 'relative' }}>
+                  <input id="su-password" type={showPassword ? "text" : "password"} className="form-input" placeholder="Create password"
+                    value={form.password} onChange={e => set('password', e.target.value)} style={{ paddingRight: '40px' }} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: 0, display: 'flex' }}
+                    title={showPassword ? "Hide password" : "Show password"}>
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="su-confirm">Confirm password</label>
-                <input id="su-confirm" type="password" className="form-input" placeholder="Repeat password"
-                  value={form.confirm} onChange={e => set('confirm', e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="su-campus">Campus</label>
-                <select id="su-campus" className="form-input" value={form.campus} onChange={e => set('campus', e.target.value)}>
-                  {CAMPUSES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <div style={{ position: 'relative' }}>
+                  <input id="su-confirm" type={showConfirm ? "text" : "password"} className="form-input" placeholder="Repeat password"
+                    value={form.confirm} onChange={e => set('confirm', e.target.value)} style={{ paddingRight: '40px' }} />
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: 0, display: 'flex' }}
+                    title={showConfirm ? "Hide password" : "Show password"}>
+                    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               {err && <p className="status-err" style={{ marginBottom: 12 }}>{err}</p>}
               <button type="submit" className="btn btn-primary btn-full">
@@ -460,6 +539,17 @@ function LandingPage({ onLogin, onSignup }) {
 export default function WelcomePage({ onEnter }) {
   const [view, setView] = useState('landing');
   const { login } = useAuth();
+
+  useEffect(() => {
+    function handleMouseMove(e) {
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      document.documentElement.style.setProperty('--mouse-x', `${-x}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${-y}px`);
+    }
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   async function handleGuest() {
     await login({ email: 'guest@guidher.app' });

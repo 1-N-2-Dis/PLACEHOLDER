@@ -24,7 +24,7 @@ export default function DetailsStep({ conditionType, onConditionChange, note, on
       </div>
 
       <div className="form-group">
-        <label className="form-label" htmlFor="report-note">Note (required)</label>
+        <label className="form-label" htmlFor="report-note">Note <span style={{ color: 'var(--flag)' }}>(required)</span></label>
         <textarea
           id="report-note"
           className="form-input"
@@ -32,6 +32,7 @@ export default function DetailsStep({ conditionType, onConditionChange, note, on
           onChange={(e) => onNoteChange(e.target.value)}
           maxLength={280}
           placeholder="Describe the condition (lighting, crowd). Please don't name individuals."
+          style={{ resize: 'none', minHeight: '80px' }}
         />
       </div>
     </section>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lightbulb, AlertTriangle, AlertOctagon, Users } from 'lucide-react';
 import ReportForm from '../features/report/ReportForm.jsx';
+import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 
 const REPORT_TYPES = [
   { id: 'poor_lighting',   label: 'Poor lighting',      Icon: Lightbulb,    variant: 'lighting' },
@@ -22,18 +23,20 @@ export default function ReportPage({ segments, selectedId, onSelect }) {
 
   return (
     <div className="page-scroll">
-      <div className="report-page-inner">
-
-        <button className="btn btn-ghost btn-sm back-link" onClick={() => navigate(-1)}>
-          <ArrowLeft size={16} /> Back
-        </button>
+      <GradientBlobs opacity={0.4} variant="report" />
+      <div className="page-scroll-inner">
 
         {/* Header */}
         <div className="mb-20">
-          <div className="text-h1" style={{ marginBottom: 4 }}>
-            Community Reporting
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <div className="text-h1" style={{ margin: 0, fontSize: '2.2rem', color: 'var(--ink)' }}>
+              Community Reporting
+            </div>
+            <button className="btn btn-ghost btn-sm back-link" onClick={() => navigate(-1)} style={{ margin: 0 }}>
+              <ArrowLeft size={16} /> Back
+            </button>
           </div>
-          <div className="text-body" style={{ color: 'var(--muted)' }}>
+          <div className="text-body" style={{ color: 'var(--muted)', marginTop: 8, fontSize: '1.05rem', lineHeight: 1.4 }}>
             Share &amp; protect — your experience can help another commuter.
           </div>
         </div>

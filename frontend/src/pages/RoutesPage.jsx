@@ -1,5 +1,6 @@
 // guidHER Routes — recommended + saved route cards (F-005, mock data).
 import { useState } from 'react';
+import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 import { CheckCircle2, AlertTriangle, AlertOctagon, Navigation, Clock, Map, Bookmark, BookmarkCheck, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Owly from '../components/Owly.jsx';
@@ -129,16 +130,17 @@ export default function RoutesPage() {
 
   return (
     <div className="page-scroll">
+      <GradientBlobs opacity={0.35} variant="routes" />
       <div className="page-scroll-inner">
 
         {/* Header */}
         <div className="mb-20">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-            <Owly size={40} pose="pointstheway" />
-            <div>
-              <div className="text-h2">Routes</div>
-              <div className="text-caption">Curated by Owly based on tonight's safety activity</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ paddingRight: 16 }}>
+              <div className="text-h1" style={{ margin: 0, fontSize: '2.2rem', color: 'var(--ink)' }}>Routes</div>
+              <div className="text-body" style={{ color: 'var(--muted)', marginTop: 8, fontSize: '1.05rem', lineHeight: 1.4 }}>Curated by Owly based on tonight's safety activity</div>
             </div>
+            <Owly size={88} pose="pointstheway" className="owly-flipped" style={{ filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.25))' }} />
           </div>
         </div>
 

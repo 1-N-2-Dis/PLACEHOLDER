@@ -52,7 +52,7 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
 
   return (
     <section className="report-form">
-      <h2>Report a condition</h2>
+      <h2 style={{ textAlign: 'center', marginBottom: 8 }}>Report a condition</h2>
 
       <LocationStep segments={segments} segmentId={selectedId} onSelect={onSelect} />
       <DetailsStep
