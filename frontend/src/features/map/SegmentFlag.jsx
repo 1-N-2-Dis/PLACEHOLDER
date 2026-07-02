@@ -76,7 +76,7 @@ export default function SegmentFlag({
           anchor="bottom"
           offset={12}
           closeButton
-          closeOnClick={false}
+          closeOnClick={true}
           onClose={() => { setShowPopup(false); onSelect(null); }}
         >
           <div className="segment-detail">

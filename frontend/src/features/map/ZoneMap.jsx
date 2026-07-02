@@ -147,25 +147,27 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
             Destination: {destinationLabel}
           </span>
         )}
-        <button
-          className={`map-ctrl-btn${showHeatmap ? ' map-ctrl-btn--active' : ''}`}
-          onClick={() => setShowHeatmap((v) => !v)}
-        >
-          {showHeatmap ? 'Hide' : 'Show'} incident heatmap
-        </button>
-        {!locationB && !settingB && (
-          <button className="map-ctrl-btn" onClick={() => setSettingB(true)}>
-            + Set destination
+        <div className="map-controls-row">
+          <button
+            className={`map-ctrl-btn${showHeatmap ? ' map-ctrl-btn--active' : ''}`}
+            onClick={() => setShowHeatmap((v) => !v)}
+          >
+            {showHeatmap ? 'Hide' : 'Show'} incident heatmap
           </button>
-        )}
-        {settingB && (
-          <span className="map-ctrl-hint">Click on the map to place Point B</span>
-        )}
-        {locationB && (
-          <button className="map-ctrl-btn map-ctrl-clear" onClick={clearDestination}>
-            × Clear destination
-          </button>
-        )}
+          {!locationB && !settingB && (
+            <button className="map-ctrl-btn" onClick={() => setSettingB(true)}>
+              + Set destination
+            </button>
+          )}
+          {settingB && (
+            <span className="map-ctrl-hint">Click on the map to place Point B</span>
+          )}
+          {locationB && (
+            <button className="map-ctrl-btn map-ctrl-clear" onClick={clearDestination}>
+              × Clear destination
+            </button>
+          )}
+        </div>
         {routes.length > 0 && (
           <div className="route-options">
             {routes.map((route, i) => {
