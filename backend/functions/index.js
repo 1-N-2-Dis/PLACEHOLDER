@@ -8,6 +8,10 @@
 //
 // CUT-SAFE: if F-004 is dropped, this function simply isn't deployed and the client falls back
 // to the raw flag list (UJ-003 degraded path).
+//
+// PS: all Gemini-backed features (submitReport moderation, summarizeSegment, assessRoute) are
+// currently disabled for demo purposes, so the app responds instantly instead of waiting on the
+// model. See AI_FEATURES_ENABLED below.
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import { initializeApp } from 'firebase-admin/app';
@@ -38,6 +42,12 @@ const REJECT_REASONS = {
   mismatch: 'The title and note don\'t seem to describe the selected condition type. Please pick the matching condition or reword your report.',
   crime_label: 'Reports describe observable conditions (lighting, crowds, a recent incident) — not labels for people or places. Please reword your report.',
 };
+
+// PS: demo flag — set to false to skip every Gemini call (submitReport's classify/dedupe/reject,
+// summarizeSegment, assessRoute) and fall straight through to each function's existing cut-safe
+// fallback path instead. Flip back to true to restore all AI features.
+const AI_FEATURES_ENABLED = false;
+const DEFAULT_SEVERITY_WHEN_AI_DISABLED = 'yellow';
 
 // How close in time a new report must be to an existing one on the same segment to be eligible
 // for AI duplicate-merge. Tighter than the 24h "tonight" freshness window (frontend/src/lib/
@@ -95,6 +105,12 @@ export const summarizeSegment = onCall(
     // Cut-safe: nothing to summarize → tell the client to use its raw-flag fallback.
     if (notes.length === 0) {
       return { summary: null, count: 0 };
+    }
+
+    // PS: skipped for demo purposes while AI_FEATURES_ENABLED is false — the client falls back
+    // to its raw flag list instead of a Gemini summary.
+    if (!AI_FEATURES_ENABLED) {
+      return { summary: null, count: notes.length };
     }
 
     const segmentName = snap.docs[0].get('segmentId'); // name lives on segments; id is enough context here.
@@ -254,33 +270,39 @@ export const submitReport = onCall(
     }));
 
     // Step 3 — Gemini classify/dedupe/reject call, structured JSON output.
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      generationConfig: { responseMimeType: 'application/json', responseSchema: CLASSIFY_SCHEMA },
-    });
-
+    // PS: skipped for demo purposes while AI_FEATURES_ENABLED is false — every report is
+    // accepted as-is with a default severity, no spam/mismatch/crime_label/duplicate checks.
     let decision;
-    try {
-      const prompt = buildClassifyPrompt(conditionType, trimmedTitle, trimmedNote, existingReports, segmentName);
-      const result = await model.generateContent(prompt);
-      decision = JSON.parse(result.response.text());
-    } catch (err) {
-      // Never log raw note contents (potential PII, Threat T6). Log only a safe message.
-      console.error('Gemini classify failed:', err.message);
-      throw new HttpsError('internal', 'Could not review this report right now. Please try again.');
-    }
+    if (!AI_FEATURES_ENABLED) {
+      decision = { severity: DEFAULT_SEVERITY_WHEN_AI_DISABLED, verdict: 'valid', duplicateOfIndex: 0 };
+    } else {
+      const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash',
+        generationConfig: { responseMimeType: 'application/json', responseSchema: CLASSIFY_SCHEMA },
+      });
 
-    if (
-      !decision
-      || !SEVERITY_VALUES.includes(decision.severity)
-      || !VERDICTS.includes(decision.verdict)
-      || !Number.isInteger(decision.duplicateOfIndex)
-      || decision.duplicateOfIndex < 0
-      || decision.duplicateOfIndex > recentDocs.length
-    ) {
-      console.error('Gemini classify returned an invalid shape.');
-      throw new HttpsError('internal', 'Could not review this report right now. Please try again.');
+      try {
+        const prompt = buildClassifyPrompt(conditionType, trimmedTitle, trimmedNote, existingReports, segmentName);
+        const result = await model.generateContent(prompt);
+        decision = JSON.parse(result.response.text());
+      } catch (err) {
+        // Never log raw note contents (potential PII, Threat T6). Log only a safe message.
+        console.error('Gemini classify failed:', err.message);
+        throw new HttpsError('internal', 'Could not review this report right now. Please try again.');
+      }
+
+      if (
+        !decision
+        || !SEVERITY_VALUES.includes(decision.severity)
+        || !VERDICTS.includes(decision.verdict)
+        || !Number.isInteger(decision.duplicateOfIndex)
+        || decision.duplicateOfIndex < 0
+        || decision.duplicateOfIndex > recentDocs.length
+      ) {
+        console.error('Gemini classify returned an invalid shape.');
+        throw new HttpsError('internal', 'Could not review this report right now. Please try again.');
+      }
     }
 
     // Step 4 — act on the decision. Any non-valid verdict rejects with canned copy (BR-006);
@@ -402,6 +424,12 @@ export const assessRoute = onCall(
     // Cut-safe: nothing active along the route → skip the Gemini call entirely.
     if (activeReports.length === 0) {
       return { assessment: null, consideredCount: 0 };
+    }
+
+    // PS: skipped for demo purposes while AI_FEATURES_ENABLED is false — the client falls back
+    // to its "no flagged conditions" cut-safe message instead of a Gemini assessment.
+    if (!AI_FEATURES_ENABLED) {
+      return { assessment: null, consideredCount: activeReports.length };
     }
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
