@@ -1,9 +1,10 @@
-// Nearest-segment snapping for map-pin report locations.
-// Role: segments are point geometry (see data/seed-segments.js), not road polylines, so "only
-// pin on roads, not places/houses" is enforced by snapping a tap to the nearest known segment
-// point and rejecting taps too far from any of them (see docs/superpowers/specs/
-// 2026-07-01-report-wizard-frontend-design.md). A snapped pin always resolves to an existing
-// segmentId — it never introduces a new, unlisted location.
+// Distance helpers for map-pin report locations.
+// Role: shared haversine + snap threshold for lib/osmRoads.js, which snaps a tap onto the
+// nearest real road rendered from the basemap's vector tiles (the old nearest-seed-point
+// snapping this file used to implement was retired with the tile-based road coverage change).
+// "Only pin on roads, not places/houses" is enforced by rejecting taps farther than
+// MAX_SNAP_METERS from any road line (see docs/superpowers/specs/
+// 2026-07-01-report-wizard-frontend-design.md).
 const EARTH_RADIUS_M = 6371000;
 
 export const MAX_SNAP_METERS = 40;
@@ -17,16 +18,4 @@ export function haversineMeters(a, b) {
 
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h));
-}
-
-// Returns { segment, distanceMeters } for the closest segment to tapPoint, or null if segments is empty.
-export function findNearestSegment(segments, tapPoint) {
-  let best = null;
-  for (const segment of segments) {
-    const distanceMeters = haversineMeters(segment.geo, tapPoint);
-    if (!best || distanceMeters < best.distanceMeters) {
-      best = { segment, distanceMeters };
-    }
-  }
-  return best;
 }

@@ -88,6 +88,18 @@ F-001 (render flags) and F-003 (route → segment matching).
 
 > No crime/neighborhood-classification field exists on `segment` (BR-001).
 
+> **Added (2026-07-02): dynamic road segmentIds.** The report wizard's "Pin on map" mode now
+> snaps onto any real road within 20 km of the zone center, using the road geometry already in
+> the basemap's vector tiles (`frontend/src/lib/osmRoads.js`). Such pins don't reference a seeded
+> segment: they use a **self-describing segmentId** of the form
+> `seg_osm_<lat>_<lng>_<slug>` (e.g. `seg_osm_14.6021_121.0089_pureza-street`), with coordinates
+> quantized to 4 decimals (~11 m) so re-reports of the same spot share an id and `submitReport`'s
+> dedupe/corroboration-by-segmentId keeps working. The backend treats the id as an opaque string
+> (no schema change, nothing new persisted); the frontend parses `{ geo, name }` back out of the
+> id (`parseRoadSegmentId`) and synthesizes an in-memory segment per such report (`App.jsx`), so
+> flags/heatmap/routing see them like seeded segments. No `segments/{segmentId}` document exists
+> for these ids.
+
 ### report (`reports/{reportId}`)
 
 Written by `submitReport` (F-006, `backend/server/index.js` — Express on Render, ADR-0002) — **not** a direct client write;

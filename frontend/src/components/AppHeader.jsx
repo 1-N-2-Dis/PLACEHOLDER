@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { Sun, Moon, User } from 'lucide-react';
 import { useTheme } from '../lib/theme.jsx';
 import { useAuth } from '../lib/authContext.jsx';
+import { useAuthUser } from '../lib/useAuthUser.js';
 import BrandMark from './BrandMark.jsx';
 
 function BrandWordmark() {
@@ -21,7 +22,12 @@ const NAV_LINKS = [
 export default function AppHeader() {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
+  // Separate from the mock-auth `user` above: this reflects the real Firebase Auth session
+  // (see lib/useAuthUser.js) that backend/firestore.rules' isAdmin() check relies on. Sign in at
+  // /login with the seeded admin account (backend/scripts/seed-auth-users.mjs) to see this link.
+  const { role } = useAuthUser();
   const navigate = useNavigate();
+  const navLinks = role === 'admin' ? [...NAV_LINKS, { to: '/admin', label: 'Admin' }] : NAV_LINKS;
 
   return (
     <header className="app-nav">
@@ -35,7 +41,7 @@ export default function AppHeader() {
       </button>
 
       <nav className="desktop-nav-links" aria-label="Main navigation">
-        {NAV_LINKS.map(({ to, label }) => (
+        {navLinks.map(({ to, label }) => (
           <NavLink key={to} to={to} className={({ isActive }) => isActive ? 'active' : ''}>
             {label}
           </NavLink>

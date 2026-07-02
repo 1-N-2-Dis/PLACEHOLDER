@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { SEED_SEGMENTS, WELL_USED_SEGMENTS } from './data/seed-segments.js';
 import { subscribeReports, latestBySegment } from './lib/reports.js';
+import { parseRoadSegmentId } from './lib/osmRoads.js';
 import { useAuth } from './lib/authContext.jsx';
 import AppHeader from './components/AppHeader.jsx';
 import BottomNav from './components/BottomNav.jsx';
@@ -28,6 +29,23 @@ function AuthenticatedApp() {
   useEffect(() => subscribeReports(setReports), []);
   const latest = useMemo(() => latestBySegment(reports), [reports]);
 
+  // Reports pinned on arbitrary roads carry a dynamic seg_osm_* id that encodes their location
+  // and road name (lib/osmRoads.js) — synthesize a segment for each so SegmentFlag, the heatmap,
+  // RiskSummary/RouteCheck, and route avoidance all see them like any seeded segment.
+  const allSegments = useMemo(() => {
+    const known = new Set(segments.map((s) => s.segmentId));
+    const dynamic = [];
+    for (const r of reports) {
+      if (known.has(r.segmentId)) continue;
+      const parsed = parseRoadSegmentId(r.segmentId);
+      if (parsed) {
+        dynamic.push({ segmentId: r.segmentId, name: parsed.name, geo: parsed.geo });
+        known.add(r.segmentId);
+      }
+    }
+    return [...segments, ...dynamic];
+  }, [reports]);
+
   return (
     <div className="app">
       <AppHeader />
@@ -35,14 +53,14 @@ function AuthenticatedApp() {
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/map" element={
-            <MapPage segments={segments} latest={latest} reports={reports} selectedId={selectedId} onSelect={setSelectedId} />
+            <MapPage segments={allSegments} latest={latest} reports={reports} selectedId={selectedId} onSelect={setSelectedId} />
           } />
           <Route path="/routes"    element={<RoutesPage />} />
           <Route path="/report"    element={<ReportPage segments={segments} selectedId={selectedId} onSelect={setSelectedId} />} />
           <Route path="/tips"      element={<SafetyTipsPage />} />
           <Route path="/profile"   element={<ProfilePage />} />
           <Route path="/login"     element={<AccountPage />} />
-          <Route path="/admin"     element={<AdminPage reports={reports} segments={segments} />} />
+          <Route path="/admin"     element={<AdminPage reports={reports} segments={allSegments} />} />
           <Route path="/"   element={<Navigate to="/dashboard" replace />} />
           <Route path="*"   element={<Navigate to="/dashboard" replace />} />
         </Routes>

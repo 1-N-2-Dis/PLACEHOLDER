@@ -1,10 +1,13 @@
 // Report form section: location (required) — pick from the segment list, or pin on the map.
-// Both paths resolve to the same segmentId (see segmentSnap.js — a pin snaps to the nearest known
-// segment; segments are point geometry, not roads, so this is the enforcement for "only on roads,
-// not places/houses"). Traces to: docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md.
+// Both paths resolve to a segmentId. List mode uses the seeded segments; pin mode snaps onto any
+// real road within the coverage radius and produces a dynamic seg_osm_* id that encodes the
+// snapped location + road name (see lib/osmRoads.js — this is the enforcement for "only on
+// roads, not places/houses"). Traces to: docs/superpowers/specs/
+// 2026-07-01-report-wizard-frontend-design.md.
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, MapPin } from 'lucide-react';
 import PinMap from '../PinMap.jsx';
+import { parseRoadSegmentId } from '../../../lib/osmRoads.js';
 
 function CustomDropdown({ segments, value, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -108,14 +111,17 @@ export default function LocationStep({ segments, segmentId, onSelect }) {
       ) : (
         <>
           <div className="pin-map-wrap">
-            <PinMap segments={segments} onSnap={(segment) => onSelect(segment.segmentId)} />
+            <PinMap onSnap={(segment) => onSelect(segment.segmentId)} />
           </div>
-          <p className="muted">Tap a spot near a mapped street to place your pin.</p>
+          <p className="muted">Tap a road to place your pin.</p>
         </>
       )}
 
       {segmentId && mode === 'pin' && (
-        <p className="status-ok">Selected: {segments.find((s) => s.segmentId === segmentId)?.name}</p>
+        <p className="status-ok">
+          Selected: {segments.find((s) => s.segmentId === segmentId)?.name
+            ?? parseRoadSegmentId(segmentId)?.name}
+        </p>
       )}
     </section>
   );

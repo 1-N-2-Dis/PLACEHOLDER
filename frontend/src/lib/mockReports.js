@@ -3,11 +3,10 @@ import { CONDITION_TYPES } from '../data/condition-types.js';
 
 const KEY = 'guidher_reports';
 const NOW = Date.now();
-const DEMO = [
-  { id:'d1', segmentId:'seg_legarda_estero', conditionType:'poor_lighting', severity:'yellow', note:'Street lighting along the estero walkway is very dim after 8 PM.', uid:'demo', corroborationCount:3, createdAt: NOW-2*3600*1000, lastActivityAt: NOW-1800*1000, photoPath:null },
-  { id:'d2', segmentId:'seg_pureza_approaches', conditionType:'no_crowd', severity:'yellow', note:'Station underpass very empty tonight, feels uncomfortable alone.', uid:'demo', corroborationCount:2, createdAt: NOW-3600*1000, lastActivityAt: NOW-2700*1000, photoPath:null },
-  { id:'d3', segmentId:'seg_recto_legarda', conditionType:'recent_incident', severity:'red', note:'Witnessed suspicious activity near the corner store.', uid:'demo', corroborationCount:5, createdAt: NOW-3*3600*1000, lastActivityAt: NOW-1200*1000, photoPath:null },
-];
+// No demo markers by default. To add one, push an entry here with a segmentId from
+// SEED_SEGMENTS (see ../data/seed-segments.js), a conditionType from poor_lighting/no_crowd/
+// recent_incident (see ../data/condition-types.js), and a severity of green/yellow/red.
+export const DEMO = [];
 
 const load = () => { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch { return null; } };
 const save = (d) => localStorage.setItem(KEY, JSON.stringify(d));

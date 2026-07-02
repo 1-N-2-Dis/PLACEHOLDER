@@ -6,10 +6,11 @@ import { useMemo } from 'react';
 import { Marker } from 'react-map-gl/maplibre';
 import { SEVERITY_META } from '../../data/severity-types.js';
 import { buildIncidentMarkers, HEAT_COUNT_CAP } from '../../lib/heatmap.js';
+import { DEMO as mockReports } from '../../lib/mockReports.js';
 
 export default function ReportHeatmap({ reports, segments, visible }) {
   const markers = useMemo(
-    () => buildIncidentMarkers(reports, segments),
+    () => buildIncidentMarkers([...reports, ...mockReports], segments),
     [reports, segments],
   );
 
