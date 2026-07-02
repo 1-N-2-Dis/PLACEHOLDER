@@ -1,16 +1,17 @@
 // F-002/F-006/F-007 single-page report form (P0).
-// Role: let an authenticated user flag a location with one condition and a required note, with an
-// optional photo, in a single quick pass; the report is classified/deduped/rejected by AI
-// (backend/functions submitReport) before it's ever written. Traces to: docs/03-prd.md
-// F-002/F-006/F-007, docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md.
+// Role: let an authenticated user flag a location with one condition, a required title, and a
+// required note, with an optional photo, in a single quick pass; the report is validated/
+// classified/deduped/rejected by AI (backend/functions submitReport) before it's ever written.
+// Traces to: docs/03-prd.md F-002/F-006/F-007,
+// docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md.
 //
 // Sections (all on one page, no step navigation): location (list or map pin, both resolve to a
-// segmentId) -> details (condition + note) -> photo (optional) -> submit -> blocking AI review ->
-// one of: filed (with severity), merged as corroboration, or not filed.
+// segmentId) -> details (condition + title + note) -> photo (optional) -> submit -> blocking AI
+// review -> one of: filed (with severity), merged as corroboration, or not filed (with reason).
 //
 // HARD CONSTRAINTS:
 //   - Only the closed enum is selectable. NO free-form crime/neighborhood field exists (BR-001, TC-004).
-//   - Location, condition, and note are required to submit; photo is optional (BR-008).
+//   - Location, condition, title, and note are required to submit; photo is optional (BR-008).
 //   - Write requires auth (BR-005); the Cloud Function is the sole enforcement point now (BR-001).
 import { useState } from 'react';
 import { submitReportForReview } from '../../lib/reportIntake.js';
@@ -20,12 +21,13 @@ import PhotoStep from './steps/PhotoStep.jsx';
 
 export default function ReportForm({ segments, selectedId, onSelect }) {
   const [conditionType, setConditionType] = useState(null);
+  const [title, setTitle] = useState('');
   const [note, setNote] = useState('');
   const [photoFile, setPhotoFile] = useState(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null); // { status: 'created'|'duplicate'|'rejected', ... } | { status: 'error', msg }
 
-  const canSubmit = !!selectedId && !!conditionType && note.trim().length > 0;
+  const canSubmit = !!selectedId && !!conditionType && title.trim().length > 0 && note.trim().length > 0;
 
   async function submit() {
     if (!canSubmit) return;
@@ -34,10 +36,11 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
     try {
       const segmentName = segments.find((s) => s.segmentId === selectedId)?.name;
       const outcome = await submitReportForReview({
-        segmentId: selectedId, segmentName, conditionType, note, photoFile,
+        segmentId: selectedId, segmentName, conditionType, title, note, photoFile,
       });
       setResult(outcome);
       if (outcome.status !== 'rejected') {
+        setTitle('');
         setNote('');
         setConditionType(null);
         setPhotoFile(null);
@@ -58,6 +61,8 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
       <DetailsStep
         conditionType={conditionType}
         onConditionChange={setConditionType}
+        title={title}
+        onTitleChange={setTitle}
         note={note}
         onNoteChange={setNote}
       />

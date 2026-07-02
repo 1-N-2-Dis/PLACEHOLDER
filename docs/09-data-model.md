@@ -104,6 +104,7 @@ F-004 (notes → Gemini).
 | `createdAt` | timestamp | No | server time | **Required** (BR-004). Server timestamp; the report's true original submit time. |
 | `lastActivityAt` | timestamp | No | server time | **Required (F-006).** Set at create and refreshed on every corroboration; drives "tonight"/freshness (`frontend/src/lib/freshness.js`) instead of `createdAt` alone. |
 | `uid` | string | No | — | **Required** (BR-005). Firebase Auth UID of the authenticated reporter, taken from `request.auth.uid` inside `submitReport` (never client-supplied). |
+| `title` | string | No | — | **Required (F-006).** Short free-text headline, max 60 chars. Validated by `submitReport`'s Gemini classify (title + note must coherently describe the `conditionType`; crime-label/people-classification text is rejected — BR-001). Legacy docs written before this field may lack it; readers render it only when present. |
 | `note` | string | **Yes (optional)** | — | Optional free text. Feeds F-004's Gemini summary (BR-006) and `submitReport`'s classify prompt (BR-007). Not a condition/crime label; not rendered as a classification. |
 | `photoPath` | string | **Yes (optional)** | — | **Optional (F-007).** Firebase Storage object path (`reports/{uid}/...`); resolved to a display URL at render time, not stored as a URL. EXIF-stripped client-side before upload (BR-008). |
 
@@ -158,6 +159,7 @@ Not a Firestore collection — Firebase Storage objects, referenced by a report'
   "createdAt": "2025-06-30T19:42:11Z",
   "lastActivityAt": "2025-06-30T19:42:11Z",
   "uid": "Xy7aB...firebaseAuthUid",
+  "title": "Streetlights out near the corner",
   "note": "Two streetlights out near the corner since last week.",
   "photoPath": "reports/Xy7aB.../1751312531000-photo.jpg"
 }
@@ -172,7 +174,8 @@ Not a Firestore collection — Firebase Storage objects, referenced by a report'
   "corroborationCount": 1,
   "createdAt": "2025-06-30T20:05:00Z",
   "lastActivityAt": "2025-06-30T20:05:00Z",
-  "uid": "Xy7aB...firebaseAuthUid"
+  "uid": "Xy7aB...firebaseAuthUid",
+  "title": "Very quiet stretch tonight"
 }
 ```
 
@@ -185,6 +188,7 @@ why this moved out of Rules):**
 - Write requires `request.auth != null`; `uid` is taken from `request.auth.uid`, never accepted from the caller.
 - `reports` must contain `segmentId` (string) and `createdAt`/`lastActivityAt` (timestamp) (BR-004).
 - No crime-label / neighborhood-classification key permitted on any document (BR-001).
+- `title` is required (string, ≤60 chars); the F-006 classify verdict rejects titles/notes that don't describe the selected condition, or that read as crime/people labels (BR-001) — rejected reports are never stored.
 - `note` is optional and free-text; feeds the F-006 classify prompt (BR-007) and F-004's summary (BR-006), never a classification.
 - `photoPath`, if present, must be a Storage path under the caller's own `reports/{uid}/` prefix (checked against `request.auth.uid`, not the client-claimed `uid`).
 
@@ -228,11 +232,14 @@ match /segments/{id} {
 > linking (`/login`) that preserves the `uid`; either state yields a `request.auth.uid` that
 > `submitReport` relies on.
 
-**Do not deploy this rule change until `submitReport` is fully verified against the emulator** —
-see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach.
-Until then, keep the previous direct-write rules (closed enum + field allowlist + UID ownership,
-as before) so F-002 has a working fallback. **This is the actual state of `backend/firestore.rules`
-today** — the deny-all sketch above is the target end-state, not what's deployed.
+**Verification gate: passed (2026-07-02).** `submitReport` was exercised live against the
+emulator suite (create / duplicate-merge / spam-reject / closed-enum rejection all confirmed —
+see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach),
+and `backend/firestore.rules` now matches the deny-all sketch above (a rules-evaluated direct
+client create returns `PERMISSION_DENIED` in the emulator while `submitReport` still writes via
+the Admin SDK). **The updated rules file is not yet deployed** — deploying
+`firebase deploy --only firestore:rules` remains a pre-demo checklist item
+(security doc §pre-demo checklist).
 
 **F-009 addition (already in `backend/firestore.rules`, independent of the migration above):**
 `allow delete: if isAdmin()` on `reports` (moderation stays remove-only — `update` is still
@@ -265,6 +272,7 @@ How the data model supports computing it once the value is chosen:
 | `report.conditionType` | Public | MVP: no deletion policy `[unverified]` | Observable condition only (BR-001). |
 | `report.createdAt` / `segmentId` | Public | MVP: none defined `[unverified]` | Operational metadata. |
 | `report.uid` | Internal (pseudonymous identifier) | MVP: none defined `[unverified]` | Firebase Auth UID; links report to an account for abuse control (BR-005). Not displayed in UI. |
+| `report.title` | User-generated free text (potential incidental PII) | MVP: none defined `[unverified]` | Same treatment as `note`: short free text (≤60 chars), displayed in the map popup, feeds the F-006 classify prompt. Retention/redaction policy **`[unverified]`**. |
 | `report.note` | User-generated free text (potential incidental PII) | MVP: none defined `[unverified]` | Free text may contain incidental personal detail; feeds F-004 and the F-006 classify prompt (BR-006/BR-007). Retention/redaction policy **`[unverified]`** — must be set post-July 2. |
 | `report.severity` / `corroborationCount` / `lastActivityAt` | Public | MVP: none defined `[unverified]` | AI-assigned triage signal + operational metadata (BR-007); not a place/crime classification. |
 | `report.photoPath` | User-generated image (potential PII — bystander faces; EXIF stripped) | MVP: none defined `[unverified]` | See Threat T7, `docs/12-security-compliance.md`. EXIF GPS/camera metadata stripped client-side (BR-008); bystander-face privacy in the photo content itself is **not** mitigated — known gap. |

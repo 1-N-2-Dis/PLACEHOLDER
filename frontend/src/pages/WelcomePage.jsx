@@ -23,7 +23,7 @@ const FEATURES = [
   { icon: Bot,         title: 'AI Route Check',        body: 'Ask "Is my route okay tonight?" and get a Gemini-written verdict grounded only in real reports near your path.' },
   { icon: Flag,        title: 'Community Reporting',   body: 'Flag poor lighting, thin crowds, or a recent incident, with a required note and an optional photo.' },
   { icon: ShieldAlert, title: 'Risk Summary',          body: 'A segment with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
-  { icon: Layers,      title: 'Incident Heatmap',      body: 'Toggle a density overlay of validated reports to see where risk clusters across the zone at a glance.' },
+  { icon: Layers,      title: 'Incident Heatmap',      body: 'Toggle glowing incident markers for validated reports to see where risk clusters across the zone at a glance.' },
   { icon: BookOpen,    title: 'Safety Tips',           body: 'Zone-specific guidance for before, during, and after your commute, including transport-specific advice.' },
   { icon: Fingerprint, title: 'Conditions-Only Data',  body: 'We describe observable states like lighting, crowds, and incidents. We never use crime labels or place ratings.' },
   { icon: PhoneCall,   title: 'Emergency Contacts',    body: 'Save trusted contacts on your profile so they\'re one tap away if you ever need them.' },
@@ -486,7 +486,7 @@ function LandingPage({ onLogin, onSignup }) {
             <div>
               <h3>Built by students navigating this exact commute, for the next one behind them.</h3>
               <p>Join GuidHer. Your reports become someone else's peace of mind on the walk home.</p>
-              <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap' }}>
+              <div className="cta-actions">
                 <button className="btn btn-gold" onClick={onSignup}>
                   <Users size={16} /> Join the community
                 </button>
@@ -495,7 +495,9 @@ function LandingPage({ onLogin, onSignup }) {
                 </button>
               </div>
             </div>
-            <Owly size={320} pose="shareandhelp" className="owly-flipped" />
+            <div className="cta-owly">
+              <Owly size={320} pose="shareandhelp" className="owly-flipped" />
+            </div>
           </div>
         </div>
       </section>

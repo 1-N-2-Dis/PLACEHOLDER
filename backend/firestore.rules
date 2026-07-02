@@ -16,22 +16,14 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // reports — public read; authed, schema-validated, immutable create. Admins may delete
-    // (F-009 moderation) but never edit report content — moderation is remove-only.
+    // reports — public read; clients cannot write at all (F-006): the only writer is the
+    // submitReport Cloud Function via the Admin SDK, which bypasses these rules — BR-005 auth,
+    // the BR-001 closed enum, and the field allowlist are enforced in that function's code now.
+    // Admins may delete (F-009 moderation) but never edit report content — moderation is
+    // remove-only.
     match /reports/{id} {
       allow read: if true;
-
-      allow create: if request.auth != null                                   // BR-005 auth-to-write
-        && request.resource.data.uid == request.auth.uid                       // no spoofing another reporter
-        && request.resource.data.conditionType in
-             ['poor_lighting', 'no_crowd', 'recent_incident']                  // BR-001 closed enum
-        && request.resource.data.segmentId is string                          // BR-004 required field/type
-        && request.resource.data.createdAt is timestamp                       // BR-004 required field/type
-        && request.resource.data.keys().hasOnly(
-             ['segmentId', 'conditionType', 'createdAt', 'uid', 'note'])       // BR-001 closed field allowlist
-        && (!('note' in request.resource.data) || request.resource.data.note is string);
-
-      allow update: if false;                                                  // reports are immutable
+      allow create, update: if false;                                          // server-only, via submitReport
       allow delete: if isAdmin();                                              // F-009 moderation
     }
 

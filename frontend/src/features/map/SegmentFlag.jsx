@@ -44,14 +44,8 @@ export default function SegmentFlag({
     return () => { cancelled = true; };
   }, [showPopup, report?.photoPath]);
 
-  // Low-concern (green severity / no-report) markers only render when the segment sits on the
-  // currently selected route (`isOnRoute`, computed by ZoneMap.jsx from the route's path via
-  // nearestDistanceToRoute) — on request, so a purple circle only ever appears if the user's
-  // path actually has to step foot on that road. With no route selected, `isOnRoute` is always
-  // false, so no low-concern markers render at all. Yellow/red markers (actual reported
-  // conditions) are never hidden by this rule. Placed after all hooks above so hook call order
-  // stays constant across renders (Rules of Hooks).
-  if (severity === 'green' && !isOnRoute) return null;
+  // Low-concern (green severity / no-report) markers are no longer shown to avoid cluttering the UI.
+  if (severity === 'green') return null;
 
   return (
     <>
@@ -89,6 +83,7 @@ export default function SegmentFlag({
             <strong>{segment.name}</strong>
             {report && meta ? (
               <>
+                {report.title && <div className="report-title">{report.title}</div>}
                 <div className="icon-line"><meta.Icon size={14} /> {meta.label}{flagged ? ' · flagged tonight' : ' · not tonight'}</div>
                 <div className="severity-line" style={{ color: severityMeta.color }}>
                   <severityMeta.Icon size={14} /> {severityMeta.label}

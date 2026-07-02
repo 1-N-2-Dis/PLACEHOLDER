@@ -203,10 +203,12 @@ This app's failure modes can *harm the people it claims to protect* — treat th
 
 Hard gates — a world-writable Firestore or an unrestricted key is a demo-day liability, not a polish item.
 
-- [ ] **`submitReport` fully verified against the emulator BEFORE deploying the new Firestore rules**
-  (create/duplicate/reject outcomes all exercised live against Gemini) — deploying
-  `allow create: if false` on `reports` before this is proven leaves F-002 entirely broken with no
-  fallback. See `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach.
+- [x] **`submitReport` fully verified against the emulator BEFORE deploying the new Firestore rules**
+  (create/duplicate/reject outcomes all exercised live against Gemini, 2026-07-02; the deny-client-write
+  rules are now in `backend/firestore.rules` and the emulator confirms a direct client create is
+  `PERMISSION_DENIED` while `submitReport` still writes) — deploying
+  `allow create: if false` on `reports` before this was proven would have left F-002 entirely broken with
+  no fallback. See `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach.
 - [ ] **Firestore Security Rules deployed and tested** — `reports` create/update/delete denied for all
   clients (F-006), `segments` write-locked. (Kills T1.)
 - [ ] **Storage Security Rules deployed and tested** (F-007) — auth-gated write, path-scoped to the

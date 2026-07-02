@@ -64,7 +64,7 @@ upload, auth-gated), `Web App → ORS` (multi-route, severity-tiered).
 | **Cloud Firestore** | Store + serve segment reports with type + timestamp (BR-004); serve seed pins | Report documents, segment metadata | Written only by `submitReport` (Admin SDK) as of F-006 — see Security Rules |
 | **Firestore Security Rules** | Authz gate: reads open; `reports` writes now denied entirely for clients (F-006) — enforcement moved to `submitReport`'s code | Access policy | Auth |
 | **MapLibre GL + OpenFreeMap** | Map tiles, segment overlays (F-001) | Map render + geometry | None — OpenFreeMap is keyless |
-| **Report heatmap layer (F-010)** | Client-side density visualization of validated (yellow/red severity) reports | Rendering only — no data ownership | Cloud Firestore (`reports`, already-subscribed), segment `geo` (seed data), MapLibre native heatmap layer type |
+| **Report heatmap layer (F-010)** | Client-side visualization of validated (yellow/red severity) reports as glowing lucide severity-icon markers | Rendering only — no data ownership | Cloud Firestore (`reports`, already-subscribed), segment `geo` (seed data), react-map-gl markers + lucide-react icons |
 | **OpenRouteService (ORS)** | Severity-tiered, multi-route (2-3 alternatives) point-to-point routing (F-005) — red hard-avoid, yellow soft-avoid, green informational only | Route geometry | API key (ships in client bundle; not yet referrer-restricted — open item, see Security must-dos in `AGENTS.md`) |
 | **Gemini API — `summarizeSegment`** | Dedup + structure free-text reports into a summary; adds no facts (BR-006) | Summary text only | Report data from Firestore |
 | **Gemini API — `submitReport`** | **Critical path (F-006), not P1.** Classifies report severity, detects duplicates for corroboration-merge, rejects spam — blocking, fail-closed | The only path that writes a `reports` doc | Report submission data, recent reports on the segment |
@@ -111,13 +111,15 @@ single-route cascade):**
 **UJ-002 — Report + AI review (F-002/F-006/F-007, supersedes the original direct-write flow):**
 1. User authenticates (BR-005); anonymous or Google sign-in.
 2. User selects a segment, selects one condition flag {poor lighting, no crowd, recent incident}
-   — no free-text crime label exists in the form (BR-001) — optionally adds a note and/or photo,
-   then taps Submit.
+   — no free-text crime label exists in the form (BR-001) — adds a required title + note,
+   optionally a photo, then taps Submit.
 3. Client EXIF-strips + uploads any photo to Storage (BR-008), then calls `submitReport`
    (blocking — the client shows a spinner). The Function validates the request, fetches recent
    reports on the segment, and calls Gemini for a structured `{severity, duplicateOfIndex,
-   isSpam}` decision (BR-007) — fail-closed: any Gemini error rejects the report rather than
-   writing it unmoderated.
+   verdict}` decision (BR-007) — verdict is `valid`, `spam`, `mismatch` (title/note don't
+   describe the selected condition), or `crime_label` (BR-001); any non-valid verdict rejects
+   with canned copy. Fail-closed: any Gemini error rejects the report rather than writing it
+   unmoderated.
 4. Function acts: writes a new report doc (Admin SDK — the only path that can), or increments
    `corroborationCount`/`lastActivityAt` on an existing report (duplicate merge), or returns a
    rejection with nothing written. Map flag updates from the live Firestore read once a doc
@@ -133,10 +135,10 @@ single-route cascade):**
 > Light only — full schema is the data-model doc's (`09`) job.
 
 - **segment**: `{ segmentId, name, geo (point or polyline) }` — seeded from idea §7's 8 provisional pins, all `[unverified]` demo content (not evidence).
-- **report**: `{ reportId, segmentId, conditionType (enum: poor_lighting | no_crowd | recent_incident), severity (enum: green | yellow | red, AI-assigned — F-006), corroborationCount, createdAt, lastActivityAt (timestamps), uid, note? (optional free text), photoPath? (optional Storage path — F-007) }`.
+- **report**: `{ reportId, segmentId, conditionType (enum: poor_lighting | no_crowd | recent_incident), severity (enum: green | yellow | red, AI-assigned — F-006), corroborationCount, createdAt, lastActivityAt (timestamps), uid, title (required short free text, ≤60 chars, F-006-validated), note? (optional free text), photoPath? (optional Storage path — F-007) }`.
 - Derived: a segment's "tonight" status = newest report (by `lastActivityAt || createdAt`) within the freshness window. **Freshness window value is `[unverified]`** — not specified in idea/PRD; a 24h constant is in place (`frontend/src/lib/freshness.js`), open for revisit.
 - **Hard rule:** no field for neighborhood/crime classification anywhere in the schema (BR-001). Enum is closed; enforced in `submitReport`'s code (moved out of Security Rules as of F-006 — see `docs/09-data-model.md`). `severity` is a distinct, per-report triage field, not a variant of this prohibition (BR-007).
-- **F-010 heatmap (client-side only, no schema/backend change):** `frontend/src/lib/heatmap.js` joins each report with `severity in {yellow, red}` to its segment's `geo`, builds a GeoJSON `FeatureCollection`, and renders it via a MapLibre `type: heatmap` style layer (`ReportHeatmap.jsx`). Reuses the existing 24h freshness window (`freshness.js`) so the heatmap reflects current, not historical, conditions. No new Firestore query, index, or Cloud Function — it's a client-side reduction over the already-subscribed `reports` array.
+- **F-010 heatmap (client-side only, no schema/backend change):** `frontend/src/lib/heatmap.js` joins each report with `severity in {yellow, red}` to its segment's `geo` and collapses them to one marker per segment (worst severity wins; qualifying-report count kept, capped). `ReportHeatmap.jsx` renders each as a non-interactive map marker showing the lucide severity icon with a glow halo in the severity color, sized by the report count. Reuses the existing 24h freshness window (`freshness.js`) so the heatmap reflects current, not historical, conditions. No new Firestore query, index, or Cloud Function — it's a client-side reduction over the already-subscribed `reports` array.
 
 ## Key technology choices + rationale
 

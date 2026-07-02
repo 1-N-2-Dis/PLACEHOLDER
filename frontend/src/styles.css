@@ -347,6 +347,7 @@ textarea.form-input { min-height: 80px; resize: vertical; }
 
 /* ── Segment / report detail ── */
 .segment-detail { font-size: 0.875rem; max-width: 240px; color: var(--ink); }
+.segment-detail .report-title { font-weight: 700; margin: 2px 0 4px; }
 .segment-detail .note { margin-top: 6px; font-style: italic; color: var(--muted); }
 .icon-line { display: flex; align-items: center; gap: 6px; }
 .severity-line { display: flex; align-items: center; gap: 6px; font-weight: 600; }
@@ -364,6 +365,27 @@ textarea.form-input { min-height: 80px; resize: vertical; }
 .seg-dot--yellow { background: #f9a825; }
 .seg-dot--red { background: #c62828; }
 .seg-dot-photo-badge { position: absolute; top: -6px; right: -8px; font-size: 10px; line-height: 1; }
+
+/* ── Incident heatmap markers (F-010) ── */
+/* Visual-only layer: never intercepts clicks meant for the seg-dot at the same spot. */
+.heat-marker {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: rgba(255,255,255,0.92);
+  pointer-events: none;
+  animation: heat-pulse 3s ease-in-out infinite;
+}
+.heat-marker--yellow {
+  color: #f9a825;
+  box-shadow: 0 0 0 3px rgba(249,168,37,0.45), 0 0 18px 8px rgba(249,168,37,0.55);
+}
+.heat-marker--red {
+  color: #c62828;
+  box-shadow: 0 0 0 3px rgba(198,40,40,0.45), 0 0 18px 8px rgba(198,40,40,0.55);
+}
+@keyframes heat-pulse {
+  0%, 100% { filter: brightness(1); transform: scale(1); }
+  50% { filter: brightness(1.15); transform: scale(1.08); }
+}
 .map-controls { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: row; gap: 8px; align-items: center; pointer-events: none; }
 .map-ctrl-btn { pointer-events: auto; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 14px; font: inherit; font-size: 0.85rem; cursor: pointer; color: var(--primary); box-shadow: 0 1px 6px rgba(0,0,0,0.1); }
 .map-ctrl-btn:hover { background: var(--surface); }
@@ -657,6 +679,9 @@ textarea.form-input { min-height: 80px; resize: vertical; }
   max-width: 420px; position: relative;
 }
 .cta-banner p { color: rgba(255,255,255,0.78); margin-top: 10px; font-size: 0.92rem; max-width: 400px; position: relative; }
+.cta-actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.cta-owly { /* wrapper */ }
+.cta-owly img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 .btn-gold { background: var(--gold); color: var(--primary); font-weight: 700; position: relative; }
 .btn-gold:hover { background: #ffb833; }
 
@@ -831,8 +856,14 @@ textarea.form-input { min-height: 80px; resize: vertical; }
   .hero-ctas { justify-content: center; }
   .hero-stats { justify-content: center; }
   .how-it-works-grid { grid-template-columns: repeat(2, 1fr); }
+  .zone-preview-grid { grid-template-columns: 1fr; }
   .cta-banner { flex-direction: column; text-align: center; }
-  .land-foot-grid { flex-direction: column; }
+  .cta-actions { justify-content: center; }
+  .land-foot-grid { flex-direction: column; align-items: center; text-align: center; }
+  .land-foot-brand-row { justify-content: center; }
+  .land-foot-brand p { max-width: 100%; }
+  .land-foot-cols { flex-direction: column; align-items: center; gap: 32px; width: 100%; }
+  .land-foot-bottom { justify-content: center; text-align: center; }
   .hero-visual { display: none; }
 }
 @media (max-width: 640px) {
@@ -840,7 +871,6 @@ textarea.form-input { min-height: 80px; resize: vertical; }
   .dash-cards { grid-template-columns: 1fr; }
   .report-type-grid { grid-template-columns: 1fr; }
   .cta-banner { padding: 32px 24px; }
-  .land-foot-cols { gap: 28px; }
 }
 
 /* ── Desktop nav links ── */

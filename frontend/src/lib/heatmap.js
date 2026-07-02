@@ -1,15 +1,20 @@
 // Community heatmap of "condition validated" reports (F-010).
-// Role: build a GeoJSON FeatureCollection of validated reports for the ZoneMap heatmap layer.
+// Role: build the per-segment incident markers the ZoneMap heatmap layer renders as glowing
+// severity icons.
 // Traces to: docs/03-prd.md F-010, docs/09-data-model.md (no stored `validated` field).
 //
 // "Validated" = severity is yellow or red (AI-assigned, F-006, BR-007) — never green, never
-// user-selectable. Plots every qualifying report within the freshness window (not just the
-// latest per segment) so repeated recent reports on one segment read as denser.
+// user-selectable. Reports are collapsed to one marker per segment: worst severity wins, and the
+// qualifying report count scales the marker's glow so corroborated segments read as "hotter".
 import { isFlaggedTonight } from './freshness.js';
 
-export function buildValidatedHeatmapGeoJSON(reports, segments, now = Date.now()) {
+// One heavily corroborated segment shouldn't swamp the layer — same cap spirit as the old
+// density-weight cap.
+export const HEAT_COUNT_CAP = 5;
+
+export function buildIncidentMarkers(reports, segments, now = Date.now()) {
   const segmentById = new Map(segments.map((s) => [s.segmentId, s]));
-  const features = [];
+  const bySegment = new Map(); // segmentId -> { segmentId, lng, lat, severity, count }
 
   for (const report of reports) {
     if (report.severity !== 'yellow' && report.severity !== 'red') continue;
@@ -18,17 +23,20 @@ export function buildValidatedHeatmapGeoJSON(reports, segments, now = Date.now()
     const segment = segmentById.get(report.segmentId);
     if (!segment?.geo) continue;
 
-    features.push({
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: [segment.geo.lng, segment.geo.lat] },
-      properties: {
+    const existing = bySegment.get(report.segmentId);
+    if (existing) {
+      existing.count = Math.min(existing.count + 1, HEAT_COUNT_CAP);
+      if (report.severity === 'red') existing.severity = 'red';
+    } else {
+      bySegment.set(report.segmentId, {
+        segmentId: report.segmentId,
+        lng: segment.geo.lng,
+        lat: segment.geo.lat,
         severity: report.severity,
-        // Red counts more than yellow; corroboration adds density (capped so one heavily
-        // corroborated report can't swamp the whole layer).
-        weight: (report.severity === 'red' ? 1 : 0.6) * Math.min(report.corroborationCount || 1, 5),
-      },
-    });
+        count: 1,
+      });
+    }
   }
 
-  return { type: 'FeatureCollection', features };
+  return [...bySegment.values()];
 }

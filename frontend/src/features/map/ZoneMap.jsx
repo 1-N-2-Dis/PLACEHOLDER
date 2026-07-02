@@ -118,6 +118,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
             flaggedReports={flaggedReports}
             onError={setRouteError}
             onRoutes={handleRoutes}
+            selectedIndex={selectedRouteIndex}
           />
         )}
 

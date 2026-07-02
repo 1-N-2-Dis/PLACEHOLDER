@@ -92,7 +92,7 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 
 ### TC-001 — Map renders zone with seeded flags ⭐DEMO-CRITICAL
 - **Covers:** F-001
-- **Preconditions:** App deployed; MapLibre GL + OpenFreeMap render loads (keyless); ORS key set; Firestore/seed data loaded with the demo segment pins (see `frontend/src/data/seed-segments.js`).
+- **Preconditions:** App deployed; MapLibre GL + OpenFreeMap render loads (keyless); ORS key set; Firestore/seed data loaded with the demo segment pins (see `frontend/src/data/seed-segments.js`) and demo reports (`backend/scripts/seed-reports.mjs`, `npm run seed:reports`).
 - **Steps:** Open app; let zone map load.
 - **Expected:** Sta. Mesa zone renders via MapLibre GL + OpenFreeMap; ≥ the seeded segment flags are visible.
 
@@ -105,10 +105,11 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 ### TC-003 — Authed user submits a report; AI-reviewed; persists; appears on map ⭐DEMO-CRITICAL
 - **Covers:** F-002, F-006
 - **Preconditions:** User authenticated (BR-005); map loaded; live Gemini access.
-- **Steps:** Select a segment; select one condition flag; tap Submit.
+- **Steps:** Select a segment; select one condition flag; enter a coherent title + note; tap Submit.
 - **Expected:** Blocking spinner while `submitReport` runs; on success, report
-  {segmentId, conditionType, severity, corroborationCount, createdAt, lastActivityAt, uid} written
-  to Firestore (NOT by the client directly — via the Cloud Function); map flag updates live (no reload).
+  {segmentId, conditionType, title, severity, corroborationCount, createdAt, lastActivityAt, uid}
+  written to Firestore (NOT by the client directly — via the Cloud Function); map flag updates
+  live (no reload); tapping the flag shows the title in the popup.
 
 ### TC-004 — Report form has NO free-form crime-label field, and severity is never user-selectable
 - **Covers:** F-002, F-006, BR-001, BR-007
@@ -140,12 +141,13 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
   TC-007/TC-008 (which tested auth-gating and enum-validation on a *direct* client write; that
   validation now lives in `submitReport`'s code — see TC-017/TC-021 for its coverage).
 
-### TC-008 — `submitReport` rejects non-enum conditionType / oversized note
+### TC-008 — `submitReport` rejects non-enum conditionType / oversized note / bad title
 - **Covers:** BR-001, F-006
 - **Preconditions:** Authenticated client; `submitReport` deployed.
 - **Steps:** Call `submitReport` with (a) `conditionType` outside the closed enum, (b) a `note`
-  over 280 chars, (c) a `photoPath` not under the caller's own `reports/{uid}/` prefix.
-- **Expected:** All three rejected with `invalid-argument`, nothing written to Firestore.
+  over 280 chars, (c) a `photoPath` not under the caller's own `reports/{uid}/` prefix, (d) a
+  missing/empty `title`, (e) a `title` over 60 chars.
+- **Expected:** All five rejected with `invalid-argument`, nothing written to Firestore.
 
 ### TC-009 — Stale flag treated as not "tonight"
 - **Covers:** F-003, BR-004 (edge)
@@ -238,13 +240,16 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Expected:** `{ status: 'duplicate', reportId, corroborationCount }` returned; the *existing*
   doc's `corroborationCount` increments and `lastActivityAt` refreshes; no new document is created.
 
-### TC-022 — `submitReport` rejects an obviously spam/false report
-- **Covers:** F-006
+### TC-022 — `submitReport` rejects invalid reports (spam / mismatch / crime-label)
+- **Covers:** F-006, BR-001
 - **Preconditions:** Live Gemini access.
-- **Steps:** Submit a report with a nonsensical/joke note (e.g. gibberish, or a note describing
-  something unrelated to a safety condition).
-- **Expected:** `{ status: 'rejected', reason }` returned; confirm via the Firestore emulator UI
-  that **no document was written**.
+- **Steps:** Submit three reports: (a) a nonsensical/joke title + note (gibberish); (b) a title +
+  note that describe a different condition than the selected `conditionType` (e.g. text about
+  broken streetlights with `no_crowd` selected); (c) a title that labels people or the place as
+  criminal (e.g. "Holdup gang territory").
+- **Expected:** Each returns `{ status: 'rejected', reason, verdict }` with the matching verdict
+  (`spam` / `mismatch` / `crime_label`) and its canned user-facing reason shown in the form;
+  confirm via the Firestore emulator UI that **no document was written** for any of them.
 
 ### TC-023 — Photo evidence marker + popup ⭐DEMO-CRITICAL
 - **Covers:** F-007
@@ -307,8 +312,10 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Preconditions:** At least one green-severity report and one yellow/red-severity report exist
   within the freshness window.
 - **Steps:** Toggle "Show incident heatmap" on the zone map.
-- **Expected:** Heatmap density appears only near segments with yellow/red reports; a segment with
-  only a green report contributes no heatmap density; toggling off removes the layer.
+- **Expected:** Glowing severity-icon markers appear only on segments with yellow/red reports
+  (red icon when any qualifying report on the segment is red); a segment with only a green report
+  gets no heatmap marker; toggling off removes the layer (markers are hidden until toggled on);
+  heatmap markers never block clicking the segment's flag dot.
 
 ## Acceptance criteria
 

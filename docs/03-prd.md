@@ -68,14 +68,14 @@ Secondary rider (trans woman): same stories; same zone and conditions.
 | F-ID  | Feature | Priority | Solves (problem) | Notes |
 |-------|---------|----------|------------------|-------|
 | F-001 | Zone safety map with crowdsourced segment flags | P0 | "Danger knowledge is scattered and invisible" (idea §1, §4) | MapLibre GL + OpenFreeMap (keyless render); seed with §7 provisional pins `[unverified]` |
-| F-002 | One-tap report of a route/segment condition (poor lighting / no crowd / recent incident) | P0 | "Lived danger is never written down" (idea §4) | Firebase Auth + Firestore; condition flags only, no crime labels (§9/§10). **Amended (F-006):** submission is now select-condition-then-Submit, with a blocking AI review step before the report is written — no longer a true instant one-tap write; see F-006. **Amended (2026-07-01, later same day):** frontend reworked into a 4-step wizard (`ReportForm.jsx`) — photo → location (segment list or map-pin, see BR-008) → condition + note → review/submit; see `docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md`. **Amended again (2026-07-01, later same day):** collapsed back into a single-page form (`ReportForm.jsx`) — location, condition + note, and an optional photo all shown at once, one Submit button; no step navigation. Photo is no longer required (see BR-008 re-amendment). |
+| F-002 | One-tap report of a route/segment condition (poor lighting / no crowd / recent incident) | P0 | "Lived danger is never written down" (idea §4) | Firebase Auth + Firestore; condition flags only, no crime labels (§9/§10). **Amended (F-006):** submission is now select-condition-then-Submit, with a blocking AI review step before the report is written — no longer a true instant one-tap write; see F-006. **Amended (2026-07-01, later same day):** frontend reworked into a 4-step wizard (`ReportForm.jsx`) — photo → location (segment list or map-pin, see BR-008) → condition + note → review/submit; see `docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md`. **Amended again (2026-07-01, later same day):** collapsed back into a single-page form (`ReportForm.jsx`) — location, condition + note, and an optional photo all shown at once, one Submit button; no step navigation. Photo is no longer required (see BR-008 re-amendment). **Amended (2026-07-02):** the form gains a required short `title` (≤60 chars, headline for the condition); title + note are validated for coherence with the selected condition by F-006 before the report is filed. |
 | F-003 | Pre-trip "is my route okay tonight" check for the zone | P0 | "No way to know before setting out" (idea §1) | `RouteCheck.jsx`. **Amended (2026-07-01, later same day):** moved from a fixed side-pane section to a bottom-center map overlay, collapsed to a single toggle button by default — the checklist only shows once tapped, closable via an `X` icon. Mounted inside `ZoneMap.jsx`, not `HomePage.jsx`. **Amended again (2026-07-01, later same day):** the per-segment manual checklist is gone — `RouteCheck.jsx` now reuses the Point A/B route already set for F-005 and, on tap, calls the new `assessRoute` Cloud Function for an AI-generated written verdict (see F-008, which this now merges into). |
 | F-004 | Structured, deduplicated risk summary from free-text reports | P1 | "Crowd noise isn't trustworthy signal" (idea §5 alternatives gap) | Gemini API; innovation hook; stretch if time allows |
 | F-005 | Severity-tiered, multi-route (2-3 alternative) recommendation | P0 | "One route recommendation doesn't show the tradeoff between safety and directness" | `frontend/src/lib/routing.js` `fetchSafeRoutes`; red hard-avoid, yellow soft-avoid, green informational only; see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` |
-| F-006 | AI report classification + moderation | P0 | "Not every report is equally urgent, and crowd noise/false reports need filtering before they reach the map" | `backend/functions/index.js` `submitReport`; Gemini classifies severity, flags duplicates for corroboration-merge, rejects spam; report writes move server-side (see BR-005 amendment) |
+| F-006 | AI report classification + moderation | P0 | "Not every report is equally urgent, and crowd noise/false reports need filtering before they reach the map" | `backend/functions/index.js` `submitReport`; Gemini classifies severity, flags duplicates for corroboration-merge, and returns a validity verdict (`valid`/`spam`/`mismatch`/`crime_label`) — mismatched title/note vs. condition, crime-label text (BR-001), and spam are all rejected with a canned user-facing reason (never Gemini-written copy, BR-006), nothing stored; report writes move server-side (see BR-005 amendment) |
 | F-007 | Photo evidence on reports | P0 | "A text-only report is harder to trust/act on than one with visual evidence" | Firebase Storage, EXIF-stripped client-side; see BR-008 |
 | F-008 | AI-assessed "is my route safe tonight?" for the recommended route | P0 | "The pre-trip check was disconnected from the actual route being taken, and a raw flag list isn't the same as an answer" | **Revised (2026-07-01, later same day):** the earlier rule-based, always-on `RouteSafetyPanel.jsx` is removed. `RouteCheck.jsx` (F-003) now covers both: user taps "Is my route okay tonight?", then explicitly asks; `backend/functions/index.js` `assessRoute` reads each nearby segment's real Firestore report and returns a Gemini-written safety verdict, constrained the same way F-006 is (no invented facts, no crime-labels, no rescue/dispatch promise). |
-| F-010 | Community heatmap layer of validated (yellow/red severity) reports | P1 | "A raw list of pins doesn't show where risk clusters at a glance" | Client-side only, `frontend/src/features/map/ReportHeatmap.jsx`; MapLibre native `type: heatmap` layer over a GeoJSON source built from Firestore reports joined to segment `geo`; "validated" = `severity in {yellow, red}` (AI-assigned, F-006) — no new field, no backend change |
+| F-010 | Community heatmap layer of validated (yellow/red severity) reports | P1 | "A raw list of pins doesn't show where risk clusters at a glance" | Client-side only, `frontend/src/features/map/ReportHeatmap.jsx`; one glowing lucide severity-icon marker per flagged segment (AlertTriangle/yellow, AlertOctagon/red, halo in the severity color, glow scaled by report count) built from Firestore reports joined to segment `geo`; "validated" = `severity in {yellow, red}` (AI-assigned, F-006) — no new field, no backend change |
 
 ## Business rules
 
@@ -127,10 +127,11 @@ UJ-001 (pre-trip check, F-003/F-001):
 UJ-002 (report + AI review, F-002/F-006/F-007):
 1. Authenticated user (BR-005) selects a segment on the map.
 2. User selects a condition flag (poor lighting / no crowd / recent incident) — condition-only
-   (BR-001) — adds a required note and optionally attaches a photo, then taps Submit. All of this
-   happens on one page (no step-by-step wizard).
+   (BR-001) — adds a required title and note, and optionally attaches a photo, then taps Submit.
+   All of this happens on one page (no step-by-step wizard).
 3. Client uploads the (EXIF-stripped, BR-008) photo if given, then calls `submitReport`, which
-   blocks on an AI review: classify severity (BR-007), check for a duplicate, check for spam.
+   blocks on an AI review: classify severity (BR-007), check for a duplicate, and validate the
+   title + note (coherent with the condition; no spam; no crime-label text — BR-001).
 4. One of three outcomes: report created (with severity, map flag updates), merged as
    corroboration onto an existing report (`corroborationCount` bumped), or rejected (nothing
    written, reason shown to the user).
@@ -154,7 +155,9 @@ UJ-004 (multi-route recommendation + AI route check, F-005/F-003/F-008):
 - **F-001:** Map renders the Sta. Mesa zone via MapLibre GL + OpenFreeMap and displays at least the
   seeded segment flags; tapping a flagged segment shows its condition type and timestamp.
 - **F-002:** An authenticated user can flag a selected segment with one of {poor lighting, no
-  crowd, recent incident} in one tap; the report persists to Firestore and appears on the map; no free-form crime-label field exists (BR-001).
+  crowd, recent incident}, a required title (≤60 chars), and a required note; the report persists
+  to Firestore and appears on the map only after F-006 validation; no free-form crime-label field
+  exists (BR-001).
 - **F-003:** Given a selected route, tapping "Ask: is my route safe tonight?" returns either an
   AI-written verdict (grounded only in real reports on segments near the route) or a plain "looks
   okay" state when nothing active was found — never a fabricated incident.
@@ -165,7 +168,8 @@ UJ-004 (multi-route recommendation + AI route check, F-005/F-003/F-008):
   accordingly); all recommended routes render green, opacity descending by rank.
 - **F-006:** Given a report submission, `submitReport` returns exactly one of created (with a
   severity in `{green,yellow,red}`), duplicate (existing report's `corroborationCount`
-  incremented), or rejected (nothing written) — never an unmoderated write (BR-007).
+  incremented), or rejected (nothing written, with a user-facing reason for the verdict —
+  spam, title/note–condition mismatch, or crime-label text) — never an unmoderated write (BR-007).
 - **F-007:** A report with a photo shows a distinct marker on the map; tapping it shows the
   photo, the report's condition/severity, and its exact timestamp; the stored photo has no EXIF
   GPS/camera metadata (BR-008).
@@ -179,9 +183,10 @@ UJ-004 (multi-route recommendation + AI route check, F-005/F-003/F-008):
   `backend/scripts/seed-auth-users.mjs`, never client-assignable) can view all reports at `/admin`
   and delete any of them (remove-only moderation, no edit).
 - **F-010:** Given at least one report with `severity` yellow or red within the freshness window,
-  toggling "Show incident heatmap" renders a density layer weighted toward red/high-corroboration
-  reports; toggling off removes it; green-severity reports never contribute (BR-007 preserved —
-  no new place/neighborhood classification is introduced by aggregation).
+  toggling "Show incident heatmap" renders one glowing severity-icon marker per flagged segment
+  (red beats yellow; more corroborating reports = a larger, stronger glow); toggling off removes
+  the layer (markers stay hidden until toggled on); green-severity reports never contribute
+  (BR-007 preserved — no new place/neighborhood classification is introduced by aggregation).
 
 ## Non-goals
 

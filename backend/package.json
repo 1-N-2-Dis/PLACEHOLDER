@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "seed": "node scripts/seed-segments.mjs",
-    "seed:users": "node scripts/seed-auth-users.mjs"
+    "seed:users": "node scripts/seed-auth-users.mjs",
+    "seed:reports": "node scripts/seed-reports.mjs"
   },
   "dependencies": {
     "firebase-admin": "^13.0.1"

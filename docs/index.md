@@ -1,7 +1,7 @@
 # Documentation Index — SaferRoute Sta. Mesa
 
 **Maintained by:** SaferRoute team (SparkFest 2026)
-**Last updated:** 2026-07-01
+**Last updated:** 2026-07-02
 **FMD schema:** 3.1.0
 
 <!--
@@ -24,11 +24,11 @@ until the loser is reconciled.
 | What we build (features `F-###`, journeys `UJ-###`, business rules `BR-###`) | [PRD](03-prd.md) | stable IDs; F-001..F-008, UJ-001..004, BR-001..008 |
 | How it's built (architecture, components, **map/routing stack**, server-side writes) | [System Design](06-system-design.md) | owns MapLibre/OpenFreeMap + ORS + the `submitReport`/`assessRoute` design |
 | Data schema · entities · Storage objects · Firestore rules shape | [Data Model](09-data-model.md) | segment/report fields, `severity`/`photoPath`, indexes |
-| Tests · traceability (every `F-###` → ≥1 test) | [QA Test Plan](11-qa-test-plan.md) | TC-001..TC-027; the traceability home |
+| Tests · traceability (every `F-###` → ≥1 test) | [QA Test Plan](11-qa-test-plan.md) | TC-001..TC-030; the traceability home |
 | Security · auth/authz · secrets · compliance · privacy | [Security & Compliance](12-security-compliance.md) | 5 network surfaces incl. Firebase Storage (F-007); threats T1–T7 |
 | Evidence · research leads (`said/did/paid`, tiered) | [Evidence Register](evidence-register.md) | desk research + seed-pin hypotheses; not validation |
 | Significant decisions (the *why*) | [ADRs](adr/) | append-only; supersede, never edit. Map stack = ADR-0001 |
-| Routing cascade / report-wizard / login-account detail | `docs/superpowers/specs/*` | teammate-owned specs — **not gitignored, just not yet committed (see §3), links dangle until committed** |
+| Routing cascade / report-wizard / login-account detail | `docs/superpowers/specs/*` | teammate-owned specs — committed as of 2026-07-02, links resolve |
 
 **The rule:** a fact lives in its canonical doc; everything else links to it. Do not restate a
 fact owned elsewhere. Example: the map/routing stack is owned by **System Design** — the PRD,
@@ -63,11 +63,9 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
 
 ## 3. Known consistency gaps (flagged, not silently carried)
 
-- **Untracked spec files (not actually gitignored):** `06-system-design.md`, the PRD, and
-  `ADR-0001` link to `docs/superpowers/specs/2026-07-01-*.md` (routing cascade, report wizard,
-  login/account page). `docs/superpowers/` is **not** in `.gitignore` (verified — no matching entry
-  in the root `.gitignore`); the earlier claim here was wrong. The specs are just uncommitted so
-  far. **Decision for the team:** commit those specs (they own the routing/wizard/login detail) so
-  the links resolve.
+- **Resolved (2026-07-02) — spec files now committed:** the `docs/superpowers/specs/2026-07-01-*.md`
+  files (routing cascade, report wizard, login/account page) that `06-system-design.md`, the PRD,
+  and `ADR-0001` link to are tracked in git; the links resolve. (History of this item: first
+  wrongly called gitignored, then correctly called uncommitted, now committed.)
 - **`segments` is a static frontend module, not a Firestore collection** — the Data Model documents
   this drift explicitly (see its ERD note); reconcile the schema framing post-July-2.

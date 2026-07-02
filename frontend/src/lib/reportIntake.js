@@ -17,7 +17,7 @@ const submitReportCallable = httpsCallable(functions, 'submitReport');
 // Returns one of:
 //   { status: 'created', reportId, severity }
 //   { status: 'duplicate', reportId, corroborationCount }
-//   { status: 'rejected', reason }
+//   { status: 'rejected', reason, verdict }  (verdict: spam | mismatch | crime_label)
 // Throws if the call itself fails (network/auth/server error) — distinct from a 'rejected'
 // result, which is a successful call that the AI declined to file.
 //
@@ -29,13 +29,17 @@ const submitReportCallable = httpsCallable(functions, 'submitReport');
 // the report wizard offers) — passed through so the AI classify prompt has location context for
 // its real/fake judgment, without the backend needing its own Firestore lookup (see
 // docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md).
-export async function submitReportForReview({ segmentId, segmentName, conditionType, note, photoFile }) {
+export async function submitReportForReview({ segmentId, segmentName, conditionType, title, note, photoFile }) {
   if (!isValidConditionType(conditionType)) {
     throw new Error(`Invalid conditionType: ${conditionType}`);
   }
+  const trimmedTitle = (title || '').trim();
+  if (!trimmedTitle) {
+    throw new Error('title is required.');
+  }
   const user = await ensureSignedIn();
   const trimmedNote = (note || '').trim();
-  const payload = { segmentId, conditionType };
+  const payload = { segmentId, conditionType, title: trimmedTitle };
   if (trimmedNote) payload.note = trimmedNote;
   if (segmentName) payload.segmentName = segmentName;
 

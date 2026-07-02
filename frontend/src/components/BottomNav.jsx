@@ -1,5 +1,5 @@
-// guidHER bottom navigation — Home · Map · Routes · Reports · Profile
-import { Home, Map, Navigation, Flag, User } from 'lucide-react';
+// guidHER bottom navigation — Home · Map · Routes · Reports · Tips
+import { Home, Map, Navigation, Flag, BookOpen } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const TABS = [
@@ -7,7 +7,7 @@ const TABS = [
   { path: '/map',       label: 'Map',     Icon: Map },
   { path: '/routes',    label: 'Routes',  Icon: Navigation },
   { path: '/report',    label: 'Reports', Icon: Flag },
-  { path: '/profile',   label: 'Profile', Icon: User },
+  { path: '/tips',      label: 'Tips',    Icon: BookOpen },
 ];
 
 export default function BottomNav() {

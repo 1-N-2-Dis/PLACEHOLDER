@@ -26,7 +26,18 @@ const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY');
 const CONDITION_TYPES = ['poor_lighting', 'no_crowd', 'recent_incident'];
 const SEVERITY_VALUES = ['green', 'yellow', 'red'];
 const NOTE_MAX_LEN = 280;
+const TITLE_MAX_LEN = 60;
 const SEGMENT_NAME_MAX_LEN = 120;
+
+// Closed validity verdicts for the classify decision. Anything but 'valid' rejects the report
+// with the matching canned copy below (BR-006: the model picks a verdict, it never writes the
+// user-facing reason itself).
+const VERDICTS = ['valid', 'spam', 'mismatch', 'crime_label'];
+const REJECT_REASONS = {
+  spam: 'This looks like spam or a joke submission, so it was not filed.',
+  mismatch: 'The title and note don\'t seem to describe the selected condition type. Please pick the matching condition or reword your report.',
+  crime_label: 'Reports describe observable conditions (lighting, crowds, a recent incident) — not labels for people or places. Please reword your report.',
+};
 
 // How close in time a new report must be to an existing one on the same segment to be eligible
 // for AI duplicate-merge. Tighter than the 24h "tonight" freshness window (frontend/src/lib/
@@ -114,26 +125,31 @@ const CLASSIFY_SCHEMA = {
       type: SchemaType.INTEGER,
       description: 'Index (1-based) into the "Existing reports" list this duplicates, or 0 if not a duplicate of any listed report.',
     },
-    isSpam: { type: SchemaType.BOOLEAN },
+    verdict: {
+      type: SchemaType.STRING,
+      format: 'enum',
+      enum: VERDICTS,
+      description: 'valid = coherent condition report; spam = gibberish, joke, or implausible; mismatch = title+note do not describe the selected condition type; crime_label = title or note labels people or the place as criminal/dangerous-by-reputation instead of describing an observable, fixable condition.',
+    },
   },
-  required: ['severity', 'duplicateOfIndex', 'isSpam'],
+  required: ['severity', 'duplicateOfIndex', 'verdict'],
 };
 
 // Constrained prompt: classify severity from observable/fixable-condition language ONLY (BR-001
 // spirit extended to this new field — severity is a per-report triage signal, never a place or
 // crime classification), decide if this looks like a duplicate of one of the listed recent
-// reports on the same segment, and flag obvious spam/false reports. Never invents an incident
-// beyond what's in the new submission (BR-006 spirit).
+// reports on the same segment, and pick a validity verdict (valid/spam/mismatch/crime_label —
+// see VERDICTS). Never invents an incident beyond what's in the new submission (BR-006 spirit).
 //
 // segmentName (optional) is the reporter's own client-known display name for the location (see
-// docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md) — passed through so isSpam
-// can also weigh whether the condition is a plausible claim for that named street, not just
-// whether the note text alone reads as spam. Omitted entirely from the prompt if absent; this
-// never blocks submission.
-function buildClassifyPrompt(conditionType, note, existingReports, segmentName) {
+// docs/superpowers/specs/2026-07-01-report-wizard-frontend-design.md) — passed through so the
+// spam verdict can also weigh whether the condition is a plausible claim for that named street,
+// not just whether the text alone reads as spam. Omitted entirely from the prompt if absent;
+// this never blocks submission.
+function buildClassifyPrompt(conditionType, title, note, existingReports, segmentName) {
   const existingList = existingReports.length
     ? existingReports
-        .map((r, i) => `${i + 1}. [${r.conditionType}] ${r.note || '(no note)'} — reported ${r.createdAt}`)
+        .map((r, i) => `${i + 1}. [${r.conditionType}]${r.title ? ` "${r.title}" —` : ''} ${r.note || '(no note)'} — reported ${r.createdAt}`)
         .join('\n')
     : '(none)';
 
@@ -150,13 +166,19 @@ function buildClassifyPrompt(conditionType, note, existingReports, segmentName) 
     'Also decide:',
     '- Is the new report a duplicate/corroboration of one of the "Existing reports" below (same',
     '  underlying condition, reported again)? If so, give its 1-based index; otherwise 0.',
-    '- Does the new report look like spam, nonsense, or an obviously false/joke submission',
-    '  (isSpam: true)? Weigh both the note text AND whether the condition is a plausible claim for',
-    '  the named street segment below, if given. Only flag genuinely implausible or garbage input,',
-    '  not just terse reports.',
+    '- A verdict for the new report — pick exactly one:',
+    '  - valid: the title and note coherently describe the selected condition type in brackets.',
+    '  - mismatch: the title and note do NOT describe the selected condition type (e.g. text about',
+    '    broken streetlights while the selected condition is no_crowd, or unrelated filler text).',
+    '  - crime_label: the title or note labels people or the place itself as criminal or',
+    '    dangerous-by-reputation (e.g. "holdup area", "addicts hang out here") instead of',
+    '    describing an observable, fixable condition.',
+    '  - spam: gibberish, a joke, or an obviously false submission. Weigh both the text AND',
+    '    whether the condition is a plausible claim for the named street segment below, if given.',
+    '    Only flag genuinely implausible or garbage input, not just terse reports.',
     '',
     segmentName ? `Location: ${segmentName}` : null,
-    `New report: [${conditionType}] ${note || '(no note)'}`,
+    `New report: [${conditionType}] "${title}" — ${note || '(no note)'}`,
     '',
     'Existing reports on this segment (most recent first):',
     existingList,
@@ -180,7 +202,7 @@ export const submitReport = onCall(
     }
     const uid = request.auth.uid;
     const data = request.data || {};
-    const { segmentId, segmentName, conditionType, note, photoPath } = data;
+    const { segmentId, segmentName, conditionType, title, note, photoPath } = data;
 
     // Step 1 — structural validation (BR-001/BR-004, the direct replacement for what
     // firestore.rules used to enforce on a client create).
@@ -189,6 +211,9 @@ export const submitReport = onCall(
     }
     if (!CONDITION_TYPES.includes(conditionType)) {
       throw new HttpsError('invalid-argument', 'conditionType must be one of the closed enum.');
+    }
+    if (typeof title !== 'string' || !title.trim() || title.length > TITLE_MAX_LEN) {
+      throw new HttpsError('invalid-argument', `title is required (max ${TITLE_MAX_LEN} chars).`);
     }
     if (note !== undefined && (typeof note !== 'string' || note.length > NOTE_MAX_LEN)) {
       throw new HttpsError('invalid-argument', `note must be a string of at most ${NOTE_MAX_LEN} chars.`);
@@ -203,6 +228,7 @@ export const submitReport = onCall(
         throw new HttpsError('invalid-argument', 'photoPath must be the caller\'s own upload path.');
       }
     }
+    const trimmedTitle = title.trim();
     const trimmedNote = (note || '').trim();
 
     // Step 2 — recent reports on this segment, for duplicate-detection context. Reuses the
@@ -222,6 +248,7 @@ export const submitReport = onCall(
     });
     const existingReports = recentDocs.map((d) => ({
       conditionType: d.get('conditionType'),
+      title: d.get('title'),
       note: d.get('note'),
       createdAt: d.get('createdAt')?.toDate?.().toISOString() ?? 'unknown time',
     }));
@@ -235,7 +262,7 @@ export const submitReport = onCall(
 
     let decision;
     try {
-      const prompt = buildClassifyPrompt(conditionType, trimmedNote, existingReports, segmentName);
+      const prompt = buildClassifyPrompt(conditionType, trimmedTitle, trimmedNote, existingReports, segmentName);
       const result = await model.generateContent(prompt);
       decision = JSON.parse(result.response.text());
     } catch (err) {
@@ -247,7 +274,7 @@ export const submitReport = onCall(
     if (
       !decision
       || !SEVERITY_VALUES.includes(decision.severity)
-      || typeof decision.isSpam !== 'boolean'
+      || !VERDICTS.includes(decision.verdict)
       || !Number.isInteger(decision.duplicateOfIndex)
       || decision.duplicateOfIndex < 0
       || decision.duplicateOfIndex > recentDocs.length
@@ -256,9 +283,10 @@ export const submitReport = onCall(
       throw new HttpsError('internal', 'Could not review this report right now. Please try again.');
     }
 
-    // Step 4 — act on the decision.
-    if (decision.isSpam) {
-      return { status: 'rejected', reason: 'This report could not be verified and was not filed.' };
+    // Step 4 — act on the decision. Any non-valid verdict rejects with canned copy (BR-006);
+    // nothing is stored.
+    if (decision.verdict !== 'valid') {
+      return { status: 'rejected', reason: REJECT_REASONS[decision.verdict], verdict: decision.verdict };
     }
 
     if (decision.duplicateOfIndex > 0) {
@@ -278,6 +306,7 @@ export const submitReport = onCall(
     const newDoc = {
       segmentId,
       conditionType,
+      title: trimmedTitle,
       createdAt: FieldValue.serverTimestamp(),
       lastActivityAt: FieldValue.serverTimestamp(),
       uid,
