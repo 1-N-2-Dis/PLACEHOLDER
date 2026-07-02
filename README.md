@@ -89,51 +89,123 @@ GuidHer provides a preventive, community-powered zone safety map that shows wome
 
 ## Installation & Setup
 
-Follow these steps to set up GuidHer locally on your machine.
+Test everything locally using the **Firebase Emulator Suite** alongside your local Express API process. Detailed environment specs can be found in the `LOCAL_DEV.md` configuration file.
 
 ### Prerequisites
-* Ensure you have **Node.js** (v18 or higher) and **npm** installed.
-* A Firebase account and a Gemini API key setup.
-
-### 1. Clone the Repository
-```bash
+* **Node 20+** — Check version using `node -v`.
+* **Java (JDK 11+)** — Required natively by the Firestore emulator engine. Check version with `java -version`. (Install via [Adoptium](https://adoptium.net) if absent).
+* **Firebase CLI** — Install globally:
+  ```bash
+  npm install -g firebase-tools
+  ```
+  
+#### 1. Clone the Repository
+```Bash
 git clone [https://github.com/1-N-2-Dis/GuidHer.git](https://github.com/1-N-2-Dis/GuidHer.git)
 cd GuidHer
 ```
 
-2. Configure Environment Variables
-Create .env files in both the backend and frontend folders (referencing any provided .env.example configurations) to plug in your environment details:
-
-Backend: Firebase Admin SDK credentials, Gemini API key, and OpenRouteService keys.
-
-Frontend: Firebase Client Configuration keys.
-
-3. Install Dependencies & Run
-For the Backend Server:
+#### 2. Set Up Frontend App Environment
 ```Bash
-# Navigate to backend directory (adjust path if your folder structure differs)
-cd backend
-npm install
-npm start
-For the Frontend Client:
-Bash
-# Open a new terminal window, navigate to frontend directory
 cd frontend
 npm install
-npm run dev
+Note: Your local frontend/.env.local contains pre-mapped settings (VITE_USE_EMULATORS=true), linking local execution ports automatically to your sandboxed mock environment.
 ```
+
+#### 3. Set Up Backend Workspace
+```Bash
+cd ../backend/server
+npm install
+```
+
+Generate an environment container file by duplicating backend/server/.env.example into backend/server/.env and append your variables:
+
+```Code snippet
+FIREBASE_SERVICE_ACCOUNT_KEY={"project_id":"demo-saferroute", ...}
+GEMINI_API_KEY=your-gemini-key-here
+CORS_ORIGIN=http://localhost:5173
+```
+> Placeholder Service Account configurations work fine against the local emulator environment as long as your terminal specifies an operational FIRESTORE_EMULATOR_HOST target address.
+
+### Running & Testing Tiers
+
+
+#### Tier 1 — Core Offline Features (No API Keys Needed)
+
+Tests routing parameters, localized security rule configurations, and reporting panels.
+
+##### Terminal A — Fire Up Emulators (Run from repo root level):
+
+```Bash
+firebase emulators:start --project demo-saferroute --only "auth,firestore"
+```
+(Monitor database reads/writes via the graphic terminal console dashboard at http://localhost:4000).
+
+##### Terminal B — Build the Frontend Interface (Run from /frontend workspace):
+
+```Bash
+cd frontend
+npm run dev
+Navigate to http://localhost:5173. Your browser developer inspector console will output [SaferRoute] Using Firebase emulators.
+```
+
+#### Tier 2 — Operational API Server (Required for Full Report Submission)
+Required for actual database commit logic and automated Gemini processing.
+
+##### Terminal C — Active API Listening (Run from backend/server):
+
+```Bash
+$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run dev
+```
+
+Ensure VITE_API_BASE_URL=http://localhost:8080 is appended inside your frontend .env.local to securely bridge client actions.
+
+##### Tier 3 — Live Google Maps Script Ingestion (Optional)
+
+1. Navigate to Google Cloud Platform Console and enable the Maps JavaScript API.
+
+2. Add Referrer URL permissions restricted specifically to http://localhost:5173/*.
+
+3. Bind your credentials within frontend/.env.local:
+
+```Code snippet
+VITE_MAPS_API_KEY=your-live-key
+```
+
+4. Kill and restart your frontend execution node terminal (npm run dev).
+
+##### Seeding Standalone Production Datastores
+
+Local testing operates on a local file array fallback `(frontend/src/data/seed-segments.js)`. To deploy or initialize the default segment nodes into live production instances:
+
+```Bash
+cd backend
+npm install
+$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run seed
+```
+
+##### Troubleshooting Sandbox Configurations
+* Java Compilation Flags Missing: Confirm path indicators match your updated JDK setup, then reopen terminal tabs.
+
+* Port Lockups/Errors: Kill conflicting execution threads or customize assignments inside firebase.json.
+
+* Firestore Write Access Denied: Check if your front end successfully issued an anonymous authentication handshake.
+
+* Network Execution Failure: Ensure your backend directory process is active and verify matching port variables across files.
+
 ---
 
 ## How to Use:
-Check Your Route: Before leaving campus, input your starting point and destination in the PUP Sta. Mesa zone.
+* Check Your Route: Before leaving campus, input your starting point and destination in the PUP Sta. Mesa zone.
 
-Review Warnings: Look out for red (hard-avoid) and yellow (soft-avoid) segments highlighted on the map accompanied by the Gemini AI risk summary.
+* Review Warnings: Look out for red (hard-avoid) and yellow (soft-avoid) segments highlighted on the map accompanied by the Gemini AI risk summary.
 
-Contribute a Report: Spot a broken street light or an unsafely isolated street? Use the One-Tap Reporting tool to flag it and keep fellow commuters safe.
+* Contribute a Report: Spot a broken street light or an unsafely isolated street? Use the One-Tap Reporting tool to flag it and keep fellow commuters safe.
 
 ---
 
 ## Deployed Project
+
 Live Demo: https://guidher.vercel.app/
 
 GitHub Link: https://github.com/1-N-2-Dis/GuidHer/
