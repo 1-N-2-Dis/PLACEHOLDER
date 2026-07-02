@@ -1,7 +1,7 @@
 <!-- CLAUDE.md — SaferRoute Sta. Mesa -->
 See [AGENTS.md](./AGENTS.md) for all project instructions.
 
-When you edit any spec doc (`docs/**/*.md`, `AGENTS.md`, `idea.md`), run the **"Docs consistency
+When you edit any spec doc (`docs/**/*.md`, including `docs/idea.md`, or `AGENTS.md`), run the **"Docs consistency
 check"** defined in AGENTS.md before finishing — it keeps one fact in one canonical doc
 (`docs/index.md` §0) so docs don't contradict. Follow the steps in AGENTS.md; don't restate them.
 

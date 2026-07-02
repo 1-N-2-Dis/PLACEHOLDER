@@ -1,24 +1,21 @@
 // F-004 structured risk summary (P1 STRETCH).
 // Role: show a clean, deduplicated summary of a segment's reports instead of raw noise.
-// Traces to: docs/03-prd.md F-004, docs/06-system-design.md (UJ-003, Gemini via Cloud Function).
+// Traces to: docs/03-prd.md F-004, docs/06-system-design.md (UJ-003, Gemini via the Render API).
 //
-// Flow: request a summary → the backend callable reads the segment's report notes → Gemini dedupes +
+// Flow: request a summary → the backend reads the segment's report notes → Gemini dedupes +
 // structures ONLY the submitted content (BR-006) → returns summary text to render.
 //
 // CONSTRAINTS:
 //   - Summary adds NO facts not present in the input reports (BR-006) — enforced by the backend prompt.
 //   - CUT-SAFE: on empty/error, degrade to the raw flag list (TC-006 fallback).
-//   - The Gemini key is NEVER in the client — the Cloud Function holds it (Threat T2).
+//   - The Gemini key is NEVER in the client — backend/server holds it (Threat T2).
 //
 // Presentation: collapsed to a single toggle button until clicked (mounted as a bottom-center
 // map overlay by ZoneMap.jsx, alongside RouteCheck.jsx) — matches the same pattern.
 import { useState } from 'react';
-import { httpsCallable } from 'firebase/functions';
 import { X } from 'lucide-react';
-import { functions } from '../../lib/firebase.js';
+import { callApi } from '../../lib/apiClient.js';
 import { CONDITION_META } from '../../data/condition-types.js';
-
-const summarizeSegment = httpsCallable(functions, 'summarizeSegment');
 
 export default function RiskSummary({ segments, selectedId, reports }) {
   const [expanded, setExpanded] = useState(false);
@@ -35,8 +32,8 @@ export default function RiskSummary({ segments, selectedId, reports }) {
     setError(null);
     setSummary(null);
     try {
-      const res = await summarizeSegment({ segmentId: selectedId });
-      setSummary(res.data.summary); // null when there are no notes → fallback renders below
+      const res = await callApi('/summarizeSegment', { segmentId: selectedId });
+      setSummary(res.summary); // null when there are no notes → fallback renders below
     } catch (err) {
       setError(err.message);
     } finally {

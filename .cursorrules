@@ -1,4 +1,5 @@
 See AGENTS.md in the project root for all project instructions.
 
 Scoped rule: .cursor/rules/docs-consistency.mdc runs the "Docs consistency check" (defined in
-AGENTS.md) whenever you edit spec docs, AGENTS.md, or idea.md — it keeps docs from contradicting.
+AGENTS.md) whenever you edit spec docs (including docs/idea.md) or AGENTS.md — it keeps docs from
+contradicting.

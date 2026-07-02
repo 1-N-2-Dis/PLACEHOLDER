@@ -11,7 +11,7 @@ import { Marker, Popup } from 'react-map-gl/maplibre';
 import { Camera } from 'lucide-react';
 import { CONDITION_META } from '../../data/condition-types.js';
 import { SEVERITY_META } from '../../data/severity-types.js';
-import { resolvePhotoUrl } from '../../lib/storage.js';
+import { resolvePhotoUrl, PHOTO_UPLOAD_ENABLED } from '../../lib/storage.js';
 
 function formatTimestamp(createdAt) {
   if (!createdAt) return null;
@@ -36,7 +36,7 @@ export default function SegmentFlag({
 
   useEffect(() => {
     setPhotoUrl(null);
-    if (!showPopup || !report?.photoPath) return;
+    if (!PHOTO_UPLOAD_ENABLED || !showPopup || !report?.photoPath) return;
     let cancelled = false;
     resolvePhotoUrl(report.photoPath)
       .then((url) => { if (!cancelled) setPhotoUrl(url); })
@@ -61,7 +61,7 @@ export default function SegmentFlag({
             onSelect(segment.segmentId);
           }}
         >
-          {report?.photoPath && (
+          {PHOTO_UPLOAD_ENABLED && report?.photoPath && (
             <span className="seg-dot-photo-badge">
               <Camera size={9} strokeWidth={3} color="#1a1a2e" />
             </span>
@@ -93,7 +93,7 @@ export default function SegmentFlag({
                   <div className="muted">Confirmed by {report.corroborationCount} reports</div>
                 )}
                 {report.note ? <div className="note">"{report.note}"</div> : null}
-                {report.photoPath && (
+                {PHOTO_UPLOAD_ENABLED && report.photoPath && (
                   photoUrl
                     ? <img className="report-photo" src={photoUrl} alt="Reported condition" />
                     : <div className="muted">Loading photo…</div>

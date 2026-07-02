@@ -1,0 +1,19 @@
+{
+  "name": "saferroute-server",
+  "description": "Express API (Render) for submitReport/assessRoute/summarizeSegment. Replaces backend/functions (Firebase Cloud Functions v2, which required the Blaze plan). Holds the Gemini key server-side and writes to Firestore via the Admin SDK.",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "20" },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.1"
+  }
+}

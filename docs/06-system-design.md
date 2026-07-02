@@ -55,6 +55,19 @@ redrawn pixel-for-pixel here; see the Components table and
 `Web App → submitReport (Cloud Function, Admin SDK) → Firestore`, `Web App → Storage` (photo
 upload, auth-gated), `Web App → ORS` (multi-route, severity-tiered).
 
+**Resolved (2026-07-02) — hosting/compute split, see ADR-0002:** Firebase Storage is **disabled**
+(`PHOTO_UPLOAD_ENABLED = false` in `frontend/src/lib/storage.js`) — new Firebase projects can't
+provision a Storage bucket on the free Spark plan. Separately, `submitReport`/`assessRoute`/
+`summarizeSegment` moved off Firebase Cloud Functions (v2 requires the Blaze plan even at zero
+usage) to a plain Express app, **`backend/server/`, deployed on Render** — same logic, same
+Gemini-key-stays-server-side posture, but a manually-verified Firebase ID token
+(`Authorization: Bearer <token>`) replaces `onCall`'s built-in `request.auth`. The frontend moved
+from Firebase Hosting to **Vercel**. Firestore + Auth are unchanged and stay on Firebase (Spark
+plan) — this is what satisfies the Google-technology requirement now that compute has moved.
+`Web App (Vercel) → backend/server (Render, verifies ID token) → Firestore`; `Web App → Firestore`
+(reads only); `Web App → ORS` (multi-route, severity-tiered). See `DEPLOYMENT_GUIDE.md` for the
+full topology and env vars.
+
 ## Components & responsibilities
 
 | Component | Responsibility | Owns | Depends on |
@@ -68,9 +81,9 @@ upload, auth-gated), `Web App → ORS` (multi-route, severity-tiered).
 | **OpenRouteService (ORS)** | Severity-tiered, multi-route (2-3 alternatives) point-to-point routing (F-005) — red hard-avoid, yellow soft-avoid, green informational only | Route geometry | API key (ships in client bundle; not yet referrer-restricted — open item, see Security must-dos in `AGENTS.md`) |
 | **Gemini API — `summarizeSegment`** | Dedup + structure free-text reports into a summary; adds no facts (BR-006) | Summary text only | Report data from Firestore |
 | **Gemini API — `submitReport`** | **Critical path (F-006), not P1.** Classifies report severity, detects duplicates for corroboration-merge, rejects spam — blocking, fail-closed | The only path that writes a `reports` doc | Report submission data, recent reports on the segment |
-| **Cloud Function (`backend/functions`)** | Server-side proxy holding the Gemini key; hosts `summarizeSegment`, `submitReport`, and `assessRoute` (F-003/F-008 — reads each on-route segment's report, returns a written safety verdict) | Gemini secret + prompts; sole writer of `reports` | Gemini API, Firestore (Admin SDK) |
-| **Firebase Storage** | Report photo evidence (F-007) | Photo objects under `reports/{uid}/...` | Auth (via storage rules); `submitReport` validates the path ownership |
-| **Storage Security Rules** | Authz gate: auth-gated write, size/type limits, public read | Access policy | Auth |
+| **Backend API (`backend/server`, Render)** | Server-side host holding the Gemini key; hosts `summarizeSegment`, `submitReport`, and `assessRoute` (F-003/F-008 — reads each on-route segment's report, returns a written safety verdict). Replaces the prior `backend/functions` Cloud Function (ADR-0002) — verifies each caller's Firebase ID token itself instead of relying on `onCall`'s `request.auth` | Gemini secret + prompts; sole writer of `reports` | Gemini API, Firestore (Admin SDK, via a service-account credential), Firebase Auth (ID token verification) |
+| **Firebase Storage** | Report photo evidence (F-007) — **disabled** (`PHOTO_UPLOAD_ENABLED = false`, ADR-0002); free Spark plan can no longer provision a bucket | Photo objects under `reports/{uid}/...` (unused while disabled) | Auth (via storage rules); `submitReport` validates the path ownership |
+| **Storage Security Rules** | Authz gate: auth-gated write, size/type limits, public read — unwired from `firebase.json` while Storage is disabled | Access policy | Auth |
 
 ## Data flow
 
@@ -145,12 +158,12 @@ single-route cascade):**
 | Choice | Why | Trade-off | Alternative rejected |
 |--------|-----|-----------|----------------------|
 | **React + Vite web app** | Fastest path to a demoable, public-repo, deployable artifact in 2 days; huge ecosystem for Maps/Firebase | Not a native mobile app (the real product is mobile-first) — acceptable for a demo | Flutter / React Native (longer setup, device/emulator friction in a hackathon) |
-| **Firebase Hosting** | One-command deploy, HTTPS, integrates with Auth/Firestore | Vendor lock-in to Google — fine, and satisfies Google-tech requirement | Vercel/Netlify (adds a second vendor; loses tight Firebase coupling) |
+| **Vercel Hosting (superseded Firebase Hosting, ADR-0002)** | Fast SPA/preview hosting; decoupled from the compute move to Render | Firebase Hosting's Auth/Firestore coupling was never load-bearing (the app is a client-side SPA); Google-tech requirement still satisfied by Firestore + Auth + Gemini, not by where static files are served | Stay on Firebase Hosting (rejected only because the compute layer already had to move off Firebase for Blaze reasons — kept together for one less moving part) |
 | **Cloud Firestore** | Realtime reads make flags update live with zero polling code; serverless = no backend to stand up | Query/aggregation limits; cost at scale unmodeled (`[unverified]`) | A custom Node/Express + DB backend (too much to build + host in 2 days) |
 | **Firebase Auth (anonymous by default, optional Google sign-in via account linking)** | Lightweight; satisfies BR-005 abuse-control gate with near-zero UI | Anonymous-only gives weak abuse control (no real accountability) until a user upgrades; Google sign-in adds friction but is opt-in via `/login`, not required | Full email/password (more UI, more time) |
 | **MapLibre GL + OpenFreeMap (keyless) rendering; OpenRouteService (ORS) routing** | Keyless vector-tile map render + overlays for F-001/F-003; ORS foot-walking directions for F-005 | No render key required; ORS route-vs-segment matching is non-trivial | Google Maps Platform (needs billing + restricted key; no Google-tech credit needed here — Firebase + Gemini already satisfy it) |
-| **Gemini API via Cloud Function** | Was an innovation hook for F-004 (P1); **now also the F-006 moderation gate (P0, critical path)** — function keeps the API key server-side for both | Adds a deploy unit + latency on every report submission (blocking UX — accepted tradeoff, see design doc); client-side call is faster to build but **leaks the key** | Client-side Gemini call (rejected for prod due to key exposure; acceptable ONLY as a throwaway demo fallback — flagged below) |
-| **Firebase Storage for photo evidence (F-007)** | Ships with the already-installed `firebase` SDK; same project, same auth model as Firestore | New privacy surface (bystander faces, incidental metadata) beyond what was threat-modeled pre-F-007 — mitigated only partially (EXIF stripped; face privacy not mitigated, see security-compliance Threat T7) | Third-party image host (adds a vendor, loses the unified Firebase auth/rules model) |
+| **Gemini API via a server-side host** | Was an innovation hook for F-004 (P1); **now also the F-006 moderation gate (P0, critical path)** — the host keeps the API key server-side for both. **Superseded (ADR-0002):** the host is `backend/server` on Render, not a Firebase Cloud Function — Functions v2 requires the Blaze plan even at zero usage | Adds a deploy unit + latency on every report submission (blocking UX — accepted tradeoff, see design doc); client-side call is faster to build but **leaks the key**; moving off `onCall` means auth (ID token verification) and CORS are now hand-rolled instead of framework-provided | Client-side Gemini call (rejected for prod due to key exposure; acceptable ONLY as a throwaway demo fallback — flagged below); staying on Firebase Cloud Functions (rejected — requires Blaze plan) |
+| **Firebase Storage for photo evidence (F-007) — now disabled, ADR-0002** | Ships with the already-installed `firebase` SDK; same project, same auth model as Firestore | New privacy surface (bystander faces, incidental metadata) beyond what was threat-modeled pre-F-007 — mitigated only partially (EXIF stripped; face privacy not mitigated, see security-compliance Threat T7). **Superseded:** the free Spark plan can no longer provision a Storage bucket at all; disabled via `PHOTO_UPLOAD_ENABLED = false` rather than removed, so it's a one-line revert if the project upgrades to Blaze | Third-party image host (adds a vendor, loses the unified Firebase auth/rules model) |
 | **Report writes moved server-side (F-006)** | Firestore Rules can't verify "went through AI review"; only a server-side write (Admin SDK, bypasses Rules) can guarantee every report was moderated | Rules no longer validate `reports` shape on create — that enforcement now lives entirely in `submitReport`'s code, a single point of failure if that code has a bug | Keep client writes + Rules-only validation (rejected — can't enforce AI review this way; a client could always skip calling the moderation function and write directly) |
 
 ## Integration points
@@ -175,11 +188,11 @@ single-route cascade):**
 ## Deployment topology
 
 - **One environment** for the hackathon (demo/prod collapsed). `[unverified]` — no separate staging; acceptable for a 2-day build, called out as a risk for anything beyond demo.
-- Web app → Firebase Hosting (global CDN, HTTPS).
-- Firestore + Auth → managed Firebase project.
-- Cloud Function (`backend/functions`, now P0 — hosts both `summarizeSegment` and `submitReport`) → same Firebase project, single region (`asia-southeast1`).
-- Storage → same Firebase project, gated by `backend/storage.rules`.
-- ORS + Gemini → external/Google-managed; consumed via key/function.
+- **Web app → Vercel** (global CDN, HTTPS). Moved off Firebase Hosting (ADR-0002).
+- **Firestore + Auth → managed Firebase project** (Spark/free plan — this is what satisfies the Google-technology requirement post-ADR-0002).
+- **Backend API (`backend/server`, now P0 — hosts `summarizeSegment`, `submitReport`, `assessRoute`) → Render.** Moved off Firebase Cloud Functions (ADR-0002) because Functions v2 requires the Blaze plan even at zero usage; a plain Node host does not.
+- **Storage → disabled** (`PHOTO_UPLOAD_ENABLED = false`; ADR-0002) — not deployed; `backend/storage.rules` kept unwired for a possible future re-enable under Blaze.
+- ORS + Gemini → external/Google-managed; consumed via key/the Render API.
 
 ## Scaling strategy
 
@@ -201,10 +214,13 @@ N/A for the hackathon beyond defaults — **because** this is a single-zone (BR-
 
 ### Proposed ADRs
 - ADR: Web app (React + Vite) over native mobile for the hackathon MVP.
-- ADR: Gemini API key held server-side in a Cloud Function (not client-side) — **now backing a P0 critical path (`submitReport`), not just the P1 `summarizeSegment`.**
+- ADR: Gemini API key held server-side (not client-side) — **now backing a P0 critical path (`submitReport`), not just the P1 `summarizeSegment`.**
 - ADR: Firebase Auth method — anonymous by default, optional Google sign-in via account linking
   (decided, implemented at `/login`).
 - ADR: Report writes moved server-side (`submitReport` via Admin SDK); `backend/firestore.rules` denies all client `create`/`update`/`delete` on `reports`.
+
+### Accepted ADRs
+- **[ADR-0002](adr/ADR-0002-hosting-compute-split.md)** — frontend moved from Firebase Hosting to Vercel; `submitReport`/`assessRoute`/`summarizeSegment` moved from Firebase Cloud Functions to an Express app (`backend/server`) on Render; Firebase Storage disabled. Firestore + Auth stay on Firebase.
 
 ## 2-day build sequence
 
