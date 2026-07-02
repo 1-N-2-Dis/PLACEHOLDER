@@ -55,7 +55,12 @@ const REJECT_REASONS = {
 // summarizeSegment, assessRoute) and fall straight through to each route's existing cut-safe
 // fallback path instead. Flip back to true to restore all AI features.
 const AI_FEATURES_ENABLED = false;
-const DEFAULT_SEVERITY_WHEN_AI_DISABLED = 'yellow';
+// No AI severity classification while disabled, so pick a plausible severity at random instead
+// of hardcoding one value for every report — weighted red-heavy since red is the rarer/urgent case.
+const RED_SEVERITY_RATIO_WHEN_AI_DISABLED = 0.4;
+function randomSeverityWhenAiDisabled() {
+  return Math.random() < RED_SEVERITY_RATIO_WHEN_AI_DISABLED ? 'red' : 'yellow';
+}
 
 // How close in time a new report must be to an existing one on the same segment to be eligible
 // for AI duplicate-merge. Tighter than the 24h "tonight" freshness window (frontend/src/lib/
@@ -301,10 +306,10 @@ app.post('/submitReport', requireAuth, async (req, res) => {
 
   // Step 3 — Gemini classify/dedupe/reject call, structured JSON output.
   // PS: skipped for demo purposes while AI_FEATURES_ENABLED is false — every report is
-  // accepted as-is with a default severity, no spam/mismatch/crime_label/duplicate checks.
+  // accepted as-is with a randomly assigned severity, no spam/mismatch/crime_label/duplicate checks.
   let decision;
   if (!AI_FEATURES_ENABLED) {
-    decision = { severity: DEFAULT_SEVERITY_WHEN_AI_DISABLED, verdict: 'valid', duplicateOfIndex: 0 };
+    decision = { severity: randomSeverityWhenAiDisabled(), verdict: 'valid', duplicateOfIndex: 0 };
   } else {
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
