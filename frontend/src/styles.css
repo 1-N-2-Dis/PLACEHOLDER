@@ -254,8 +254,9 @@ textarea.form-input { min-height: 80px; resize: vertical; }
 .location-mode-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
 .pin-map-wrap { height: 320px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
 .pin-map { position: relative; width: 100%; height: 100%; }
-.pin-map-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--wellused); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 .pin-map-hint { position: absolute; bottom: 8px; left: 8px; right: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 0.8rem; color: var(--flag); margin: 0; }
+/* Higher specificity than .map-ctrl-btn (defined later) so width:auto wins over its width:100%. */
+.pin-map .pin-map-roads-toggle { position: absolute; top: 8px; right: 8px; width: auto; z-index: 5; font-size: 0.78rem; padding: 5px 10px; }
 .review-summary { list-style: none; padding: 0; margin: 0 0 16px; font-size: 0.9rem; }
 .review-summary li { margin: 6px 0; display: flex; gap: 8px; }
 
@@ -370,7 +371,12 @@ textarea.form-input { min-height: 80px; resize: vertical; }
 
 /* ── Incident heatmap markers (F-010) ── */
 /* Visual-only layer: never intercepts clicks meant for the seg-dot at the same spot. */
-.maplibregl-popup-close-button { font-size: 20px; color: var(--flag); padding: 4px 8px; font-weight: bold; }
+.maplibregl-popup-content { background: var(--card) !important; border: 1px solid var(--line); border-radius: var(--radius-md) !important; box-shadow: var(--shadow-md) !important; padding: 14px 18px 14px 14px !important; }
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip, .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip, .maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip { border-top-color: var(--card) !important; }
+.maplibregl-popup-anchor-top .maplibregl-popup-tip, .maplibregl-popup-anchor-top-left .maplibregl-popup-tip, .maplibregl-popup-anchor-top-right .maplibregl-popup-tip { border-bottom-color: var(--card) !important; }
+.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--card) !important; }
+.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--card) !important; }
+.maplibregl-popup-close-button { font-size: 20px; color: var(--flag) !important; padding: 2px 6px; font-weight: bold; top: 0 !important; right: 0 !important; }
 .heat-marker {
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%; background: rgba(255,255,255,0.92);

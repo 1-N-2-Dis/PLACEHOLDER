@@ -6,9 +6,10 @@
 // Routing: ORS foot-walking, safety-first — avoids flagged segments, falls back if no safe path exists.
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useState, useMemo } from 'react';
-import Map, { NavigationControl } from 'react-map-gl/maplibre';
+import Map, { NavigationControl, Layer } from 'react-map-gl/maplibre';
 import { CheckCircle2, AlertTriangle, AlertOctagon } from 'lucide-react';
-import { ZONE_CENTER, ZONE_ZOOM, MAP_STYLE } from '../../lib/maps.js';
+import { useTheme } from '../../lib/theme.jsx';
+import { ZONE_CENTER, ZONE_ZOOM, getMapStyle } from '../../lib/maps.js';
 import { segmentStatus } from '../../lib/freshness.js';
 import { nearestDistanceToRoute, YELLOW_AVOID_RADIUS_M } from '../../lib/routing.js';
 import SegmentFlag from './SegmentFlag.jsx';
@@ -32,6 +33,7 @@ const STATUS_META = {
 };
 
 export default function ZoneMap({ segments, latest, reports, selectedId, onSelect, initialDestination = null, destinationLabel = null }) {
+  const { theme } = useTheme();
   const [locationA, setLocationA] = useState(INITIAL_A);
   // Pre-place Point B if navigated from Routes page
   const [locationB, setLocationB] = useState(initialDestination);
@@ -95,14 +97,15 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Map
         initialViewState={{
-          longitude: ZONE_CENTER.lng,
-          latitude: ZONE_CENTER.lat,
-          zoom: ZONE_ZOOM,
+          longitude: initialDestination ? initialDestination[1] : ZONE_CENTER.lng,
+          latitude: initialDestination ? initialDestination[0] : ZONE_CENTER.lat,
+          zoom: initialDestination ? 15 : ZONE_ZOOM,
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle={MAP_STYLE}
+        mapStyle={getMapStyle(theme)}
         cursor={settingB ? 'crosshair' : 'grab'}
         onClick={handleMapClick}
+        attributionControl={false}
       >
         <NavigationControl position="top-left" />
 
@@ -119,6 +122,21 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
             onError={setRouteError}
             onRoutes={handleRoutes}
             selectedIndex={selectedRouteIndex}
+          />
+        )}
+
+        {theme === 'dark' && (
+          <Layer
+            id="highlight-roads-dark"
+            type="line"
+            source="openmaptiles"
+            source-layer="transportation"
+            filter={['match', ['get', 'class'], ['primary', 'secondary', 'tertiary', 'trunk', 'minor', 'service', 'track', 'path'], true, false]}
+            paint={{
+              'line-color': 'rgba(255, 255, 255, 0.07)',
+              'line-width': ['interpolate', ['exponential', 1.5], ['zoom'], 13, 2, 20, 15],
+            }}
+            beforeId="highway_name_other"
           />
         )}
 

@@ -1,9 +1,13 @@
 // guidHER Dashboard — cards, quick actions, zone overview, activity feed.
 import { CheckCircle2, AlertTriangle, AlertOctagon, Flag, Navigation, Lightbulb, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Map from 'react-map-gl/maplibre';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 import { useAuth } from '../lib/authContext.jsx';
-import { ZONE_OVERVIEW } from '../lib/mockData.js';
+import { useTheme } from '../lib/theme.jsx';
+import { ZONE_CENTER, getMapStyle } from '../lib/maps.js';
+import MockLocation from '../features/map/MockLocation.jsx';
 import Owly from '../components/Owly.jsx';
 
 const MOCK_FEED = [
@@ -27,6 +31,7 @@ function statusBadgeClass(status) {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const firstName = user?.name?.split(' ')[0] || 'Commuter';
   const hour = new Date().getHours();
@@ -43,8 +48,45 @@ export default function DashboardPage() {
           <div className="text-body" style={{ color: 'var(--muted)', marginTop: 8, fontSize: '1.05rem', lineHeight: 1.4 }}>Here is tonight's commute picture for the Sta. Mesa zone.</div>
         </div>
 
+        {/* Owly tip */}
+        <div className="owly-tip-card mb-24">
+          <div className="owly-tip-text">
+            <div className="label">Owly says</div>
+            <div className="tip">Always check tonight's conditions before you leave. A 30-second look can make all the difference on your walk home.</div>
+          </div>
+          <Owly 
+            size={105} 
+            pose="looks-out" 
+            className="owly-flipped"
+            style={{ 
+              filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.3))',
+              margin: '-24px -12px -24px 0' 
+            }} 
+          />
+        </div>
+
+        {/* Zone overview */}
+        <div className="mb-24">
+          <div className="section-title mb-12">Your Location</div>
+          <div style={{ height: 200, borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
+            <Map
+              initialViewState={{
+                longitude: ZONE_CENTER.lng,
+                latitude: ZONE_CENTER.lat,
+                zoom: 14,
+              }}
+              style={{ width: '100%', height: '100%' }}
+              mapStyle={getMapStyle(theme)}
+              interactive={false}
+              attributionControl={false}
+            >
+              <MockLocation position={[ZONE_CENTER.lat, ZONE_CENTER.lng]} onMove={() => {}} />
+            </Map>
+          </div>
+        </div>
+
         {/* Dashboard cards */}
-        <div className="dash-cards">
+        <div className="dash-cards mb-24">
           <div className="dash-card dash-card--hero">
             <div className="dash-card-label dash-card-label--on-hero">Safety score</div>
             <div className="dash-card-value dash-card-value--gold">72</div>
@@ -69,40 +111,6 @@ export default function DashboardPage() {
             <div className="dash-card-sub">Segments tracked tonight</div>
             <Navigation size={52} color="var(--lavender)" className="dash-card-accent" />
           </div>
-        </div>
-
-
-        {/* Zone overview */}
-        <div className="mb-24">
-          <div className="section-title mb-12">Zone overview tonight</div>
-          <div className="zone-list">
-            {ZONE_OVERVIEW.map(zone => (
-              <div key={zone.name} className="zone-item">
-                <div>
-                  <div className="zone-name">{zone.name}</div>
-                  <div className="zone-detail">{zone.detail}</div>
-                </div>
-                <span className={statusBadgeClass(zone.status)}>{zone.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Owly tip */}
-        <div className="owly-tip-card mb-24">
-          <div className="owly-tip-text">
-            <div className="label">Owly says</div>
-            <div className="tip">Always check tonight's conditions before you leave. A 30-second look can make all the difference on your walk home.</div>
-          </div>
-          <Owly 
-            size={105} 
-            pose="looks-out" 
-            className="owly-flipped"
-            style={{ 
-              filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.3))',
-              margin: '-24px -12px -24px 0' 
-            }} 
-          />
         </div>
 
         {/* Activity feed */}

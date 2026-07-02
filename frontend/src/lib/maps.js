@@ -8,3 +8,8 @@ export const ZONE_CENTER = { lat: 14.5985, lng: 121.0102 };
 export const ZONE_ZOOM = 15;
 
 export const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+export const MAP_STYLE_DARK = 'https://tiles.openfreemap.org/styles/dark';
+
+export function getMapStyle(theme) {
+  return theme === 'dark' ? MAP_STYLE_DARK : MAP_STYLE;
+}
