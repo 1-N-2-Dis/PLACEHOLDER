@@ -160,6 +160,7 @@ textarea.form-input { min-height: 80px; resize: vertical; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 20px; background: var(--card); border-bottom: 1px solid var(--line);
   position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow-sm);
 }
 .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
 .nav-actions { display: flex; align-items: center; gap: 8px; }
@@ -175,6 +176,7 @@ textarea.form-input { min-height: 80px; resize: vertical; }
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--card); border-top: 1px solid var(--line);
   z-index: 200; padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
 }
 .bottom-nav-inner { display: flex; }
 .bottom-nav-item {
