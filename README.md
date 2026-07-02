@@ -109,8 +109,10 @@ cd GuidHer
 ```Bash
 cd frontend
 npm install
-Note: Your local frontend/.env.local contains pre-mapped settings (VITE_USE_EMULATORS=true), linking local execution ports automatically to your sandboxed mock environment.
 ```
+
+Note: Your local frontend/.env.local contains pre-mapped settings (VITE_USE_EMULATORS=true), linking local execution ports automatically to your sandboxed mock environment.
+
 
 #### 3. Set Up Backend Workspace
 ```Bash
