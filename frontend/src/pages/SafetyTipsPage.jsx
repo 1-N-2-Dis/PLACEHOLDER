@@ -70,7 +70,7 @@ const CATEGORIES = [
 
 export default function SafetyTipsPage() {
   const [tipIdx, setTipIdx] = useState(0);
-  const [activeCategory, setActiveCategory] = useState('before');
+  const [activeCategory, setActiveCategory] = useState(null);
 
   function nextTip() {
     setTipIdx(i => (i + 1) % OWLY_TIPS.length);

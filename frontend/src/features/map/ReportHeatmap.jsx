@@ -20,7 +20,7 @@ export default function ReportHeatmap({ reports, segments, visible }) {
     // More corroborating reports -> bigger chip (capped): 26px solo up to 38px at the cap.
     const size = 26 + (Math.min(m.count, HEAT_COUNT_CAP) - 1) * 3;
     return (
-      <Marker key={m.segmentId} longitude={m.lng} latitude={m.lat} anchor="center">
+      <Marker key={m.segmentId} longitude={m.lng} latitude={m.lat} anchor="center" style={{ pointerEvents: 'none' }}>
         <div
           className={`heat-marker heat-marker--${m.severity}`}
           style={{ width: size, height: size }}
