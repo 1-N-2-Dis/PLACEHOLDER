@@ -1,8 +1,9 @@
 # Running SaferRoute locally
 
 Test everything on your machine before you deploy anything to the cloud. You will run the React app
-with the **Firebase Emulator Suite** — local copies of Auth, Firestore, and Functions. No real Firebase
-project, no billing, nothing to clean up.
+with the **Firebase Emulator Suite** (local copies of Auth + Firestore) alongside the Express API
+(`backend/server/`) running as a plain Node process — no real Firebase project, no billing, nothing
+to clean up.
 
 ## How the pieces fit
 
@@ -10,7 +11,7 @@ project, no billing, nothing to clean up.
 |------|----------------------|-------------------|
 | React app (Vite) | `frontend/` on `http://localhost:5173` | no |
 | Auth + Firestore | Firebase emulators on your machine | no |
-| Gemini summary (F-004) | Functions emulator on your machine | yes — a free Gemini key (optional) |
+| `submitReport`/`assessRoute`/`summarizeSegment` (F-004) | `backend/server/` running locally (plain `node`, port 8080) | yes — a free Gemini key (optional) |
 | Google Map tiles | Google's servers (no emulator exists) | yes — a Maps key (optional) |
 
 You can test most of the app — reporting, the live map flags, the route check, the security rules —
@@ -74,35 +75,50 @@ Open **http://localhost:5173**. The browser console should say
 > The map pins come from `frontend/src/data/seed-segments.js`, so you do **not** need to seed Firestore
 > to test locally. (Seeding the `segments` collection matters only when you deploy — see the bottom.)
 
-> The **Summarize reports** button (F-004) will fall back to a raw list here, because the Functions
-> emulator is not running in Tier 1. That is expected — turn it on in Tier 2.
+> The **Summarize reports** button (F-004), report submission's AI review, and the route check's AI
+> assessment will all use their cut-safe fallback here, because `backend/server/` is not running in
+> Tier 1. That is expected — turn it on in Tier 2. (Report submission itself still requires
+> `backend/server/` to be running at all — it's the only path that writes a report — so Tier 1 alone
+> won't let you file a report end to end.)
 
 ---
 
-## Tier 2 — add the Gemini summary (F-004)
+## Tier 2 — run the backend API (required for report submission; Gemini part is optional)
 
-Optional. Needs a free Gemini API key from Google AI Studio (https://aistudio.google.com/apikey).
+`backend/server/` is the only path that writes a report (`submitReport`) — Tier 1 alone lets you
+browse the map, but filing a report needs this running. A Gemini key additionally unlocks the AI
+summary/classification; without one, everything still works via each route's cut-safe fallback
+(`AI_FEATURES_ENABLED = false` in `backend/server/index.js`).
 
-1. **Install the function's dependencies:**
+1. **Install the server's dependencies:**
    ```powershell
-   cd backend/functions
+   cd backend/server
    npm install
    ```
 
-2. **Give the emulator your Gemini key** (kept out of git). Create
-   `backend/functions/.secret.local` with one line:
+2. **Configure it** — copy `backend/server/.env.example` to `backend/server/.env` (kept out of git)
+   and fill in:
    ```
+   FIREBASE_SERVICE_ACCOUNT_KEY={"project_id":"demo-saferroute", ...}
    GEMINI_API_KEY=your-gemini-key-here
+   CORS_ORIGIN=http://localhost:5173
    ```
+   Against the local Firestore emulator, `FIREBASE_SERVICE_ACCOUNT_KEY` can be any well-formed
+   placeholder service account JSON — set `FIRESTORE_EMULATOR_HOST=127.0.0.1:8080` (see step 3) so
+   the Admin SDK talks to the emulator instead of real Firestore, no real credential needed.
+   `GEMINI_API_KEY` is genuinely optional — a Gemini API key from
+   https://aistudio.google.com/apikey unlocks the AI features.
 
-3. **Start all emulators** (from the repo root) — drop the `--only` filter:
+3. **Start it**, pointed at the emulator:
    ```powershell
-   firebase emulators:start --project demo-saferroute
+   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run dev
    ```
+   It listens on `http://localhost:8080` by default. Add `VITE_API_BASE_URL=http://localhost:8080`
+   to `frontend/.env.local` so the app points at it.
 
-4. In the app, file a report **with a note** on a segment, then press **Summarize reports**. The local
-   function reads that segment's notes, calls Gemini, and returns a deduplicated summary. Delete the key
-   or stop the function and the button falls back to the raw list — the cut-safe path.
+4. In the app, file a report **with a note** on a segment, then press **Summarize reports**. With a
+   real `GEMINI_API_KEY` and `AI_FEATURES_ENABLED = true`, the server reads that segment's notes,
+   calls Gemini, and returns a deduplicated summary. Otherwise you get the cut-safe raw list.
 
 ---
 
@@ -143,17 +159,15 @@ $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run seed
 - **Blank map / "Map unavailable"** — no `VITE_MAPS_API_KEY` yet. Expected; the side panel still works.
 - **Report write fails with permission-denied** — that is the security rules working. Confirm you are
   signed in (the app signs in anonymously on load) and you are not adding extra fields.
+- **Report submission fails with a network/fetch error** — `backend/server/` isn't running, or
+  `VITE_API_BASE_URL` in `frontend/.env.local` doesn't match where it's listening. See Tier 2.
 - **Env change not applied** — Vite reads `.env.local` at startup. Stop and rerun `npm run dev`.
 
 ---
 
 ## When local testing passes, then deploy
 
-1. Create a real Firebase project; set it as `default` in `.firebaserc`.
-2. Replace the demo values in `frontend/.env.local` with your real Firebase config, and set
-   `VITE_USE_EMULATORS=false`.
-3. `firebase deploy --only firestore:rules,firestore:indexes` — the pre-demo security gate.
-4. (F-004) `firebase functions:secrets:set GEMINI_API_KEY`, then `firebase deploy --only functions`.
-5. `cd frontend; npm run build; firebase deploy --only hosting`.
-
-See `docs/12-security-compliance.md` for the full pre-demo security checklist.
+Local dev uses emulators + a locally-run `backend/server/`; a real deploy splits across Vercel
+(frontend), Render (`backend/server/`), and Firebase (Firestore + Auth only). See
+[`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) for the full step-by-step, including required env
+vars for each platform and the pre-demo security checklist in `docs/12-security-compliance.md`.

@@ -90,7 +90,7 @@ F-001 (render flags) and F-003 (route → segment matching).
 
 ### report (`reports/{reportId}`)
 
-Written by `submitReport` (F-006, `backend/functions/index.js`) — **not** a direct client write;
+Written by `submitReport` (F-006, `backend/server/index.js` — Express on Render, ADR-0002) — **not** a direct client write;
 see Firestore Security Rules below. Read by F-001/F-003/F-005/F-008 (current flags + routing) and
 F-004 (notes → Gemini).
 
@@ -131,6 +131,10 @@ out-of-band via `backend/scripts/seed-auth-users.mjs`'s Admin SDK write, which b
 | `role` | string (**closed enum**) | No | `'user'` | One of `{user, admin}`. `admin` grants read of all `users` docs and delete on any `reports` doc (moderation) — see `backend/firestore.rules` `isAdmin()`. |
 
 ### Storage objects (`reports/{uid}/{timestamp}-{filename}`, F-007)
+
+**Disabled (2026-07-02, ADR-0002):** the free Spark plan can no longer provision a Storage
+bucket. `PHOTO_UPLOAD_ENABLED = false` (`frontend/src/lib/storage.js`) — no report currently gets
+a `photoPath`. The shape below is kept for a future re-enable under the Blaze plan.
 
 Not a Firestore collection — Firebase Storage objects, referenced by a report's optional
 `photoPath`. Public read (consistent with reports being public safety info); write requires
@@ -213,10 +217,11 @@ why this moved out of Rules):**
 cannot verify "this write went through AI review" — they can only inspect the write itself — so
 Rules now simply deny client `create`/`update`/`delete` on `reports` outright, and all the
 validation that used to live in Rules (closed enum, required fields, closed field allowlist, UID
-ownership) has moved into `submitReport`'s code (`backend/functions/index.js`), which writes via
-the Admin SDK — a path that bypasses Rules by design. The `false` lines below document intent;
-they are not what stops a malicious write (the Function's own logic, and the fact that only the
-Function holds the credential for an Admin SDK write, are what actually enforce this).
+ownership) has moved into `submitReport`'s code (`backend/server/index.js`, Express on Render —
+ADR-0002), which writes via the Admin SDK — a path that bypasses Rules by design. The `false`
+lines below document intent; they are not what stops a malicious write (that code's own logic,
+and the fact that only its service-account credential can perform an Admin SDK write, are what
+actually enforce this).
 
 ```
 match /reports/{id} {

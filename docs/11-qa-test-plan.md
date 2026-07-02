@@ -28,7 +28,9 @@
 - F-004 (P1) Gemini dedup/structure summary, no added facts.
 - F-005 severity-tiered, multi-route (2-3 alternative) recommendation.
 - F-006 AI report classification + moderation (blocking): create/duplicate-merge/reject.
-- F-007 photo evidence on reports (upload, EXIF strip, marker + popup).
+- F-007 photo evidence on reports (upload, EXIF strip, marker + popup). **Disabled as of
+  2026-07-02 (ADR-0002)** — `PHOTO_UPLOAD_ENABLED = false`; TC-023/024/025/027 are currently N/A
+  (nothing to exercise) and become live again only if Storage is re-enabled under Blaze.
 - F-008 AI-assessed "is my route safe tonight?" for the recommended route (`assessRoute`).
 - Security: Firestore rules (client `create` on `reports` denied — F-006; closed enum / no
   crime-label BR-001 now enforced in `submitReport`'s code), Storage rules (F-007), ORS key
@@ -42,9 +44,9 @@
 
 ## Environments
 
-- **One collapsed demo/prod environment** on Firebase Hosting (system design: single environment,
-  `[unverified]` no staging). Firestore + Auth in one Firebase project; Cloud Function (P1) in a
-  single region (`asia-*` `[unverified]`).
+- **One collapsed demo/prod environment**, split across Vercel (frontend), Render
+  (`backend/server`), and Firebase (system design: single environment, `[unverified]` no staging;
+  hosting/compute split per ADR-0002). Firestore + Auth in one Firebase project.
 - **Test data:** the current `SEED_SEGMENTS` provisional pins (idea §7; originally 8, reduced to
   5 during build 2026-07-01 — see `docs/09-data-model.md` for the removal log) plus 81
   `WELL_USED_SEGMENTS` (well-used streets around PUP, several as multiple points along the real
@@ -52,7 +54,7 @@
   evidence. See `frontend/src/data/seed-segments.js` for the authoritative current set. Add
   hand-crafted reports for dedup/freshness tests.
 - **Secrets handling:** reference only, never inline. The ORS routing key lives in the client bundle but MUST be
-  origin-restricted + capped (currently unrestricted `[unverified]` — known gap); the MapLibre GL + OpenFreeMap render is keyless; Gemini key MUST live only in the Cloud Function. Tests assert this, never print key values.
+  origin-restricted + capped (currently unrestricted `[unverified]` — known gap); the MapLibre GL + OpenFreeMap render is keyless; `GEMINI_API_KEY` and `FIREBASE_SERVICE_ACCOUNT_KEY` MUST live only as Render env vars on `backend/server` (ADR-0002). Tests assert this, never print key values.
 - **Freshness window value** for "tonight" is `[unverified]` — a value must be chosen at build step 6
   and documented before TC-009/TC-010 can have a concrete pass bar.
 
@@ -108,7 +110,7 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Steps:** Select a segment; select one condition flag; enter a coherent title + note; tap Submit.
 - **Expected:** Blocking spinner while `submitReport` runs; on success, report
   {segmentId, conditionType, title, severity, corroborationCount, createdAt, lastActivityAt, uid}
-  written to Firestore (NOT by the client directly — via the Cloud Function); map flag updates
+  written to Firestore (NOT by the client directly — via `backend/server`'s `submitReport` route, Render); map flag updates
   live (no reload); tapping the flag shows the title in the popup.
 
 ### TC-004 — Report form has NO free-form crime-label field, and severity is never user-selectable
@@ -137,7 +139,7 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Steps:** From the browser console (signed in or signed out), attempt a direct
   `addDoc(collection(db,'reports'), {...})` write, bypassing `submitReport` entirely.
 - **Expected:** Write rejected (permission denied) regardless of auth state or payload shape — the
-  only path that can write a report is the Cloud Function. This replaces the original
+  only path that can write a report is `backend/server`'s `submitReport` route. This replaces the original
   TC-007/TC-008 (which tested auth-gating and enum-validation on a *direct* client write; that
   validation now lives in `submitReport`'s code — see TC-017/TC-021 for its coverage).
 
@@ -184,7 +186,7 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 
 ### TC-015 — Gemini key never in client bundle
 - **Covers:** Security (system design §Auth point 4)
-- **Steps:** Grep built client bundle / network calls for the Gemini key; confirm Gemini is called via Cloud Function only.
+- **Steps:** Grep built client bundle / network calls for the Gemini key; confirm Gemini is called only from `backend/server` (Render), never directly from the client.
 - **Expected:** Key absent from client; only the Function holds it. (If a throwaway client-side fallback is used, this FAILS — flag as a knowing demo tradeoff.)
 
 ### TC-016 — Offline behavior
@@ -279,7 +281,7 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Preconditions:** No destination set on the map.
 - **Steps:** Expand "Is my route okay tonight?".
 - **Expected:** "Set a destination on the map first, then ask here." — no Ask button shown, no
-  Cloud Function call made.
+  `backend/server` API call made.
 
 ### TC-027 — Storage rules reject invalid uploads
 - **Covers:** F-007, Security

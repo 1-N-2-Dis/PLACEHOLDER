@@ -15,32 +15,41 @@ before they set out.
 > Scope, segment, and payer story to be re-validated after July 2.
 
 ## Architecture
-React + Vite single-page web app, served from **Firebase Hosting**.
+React + Vite single-page web app, served from **Vercel** (moved off Firebase Hosting — ADR-0002).
 - **Map render:** **MapLibre GL JS + OpenFreeMap** vector tiles — free, keyless, no API key.
 - **Routing:** **OpenRouteService (ORS)** — severity-tiered multi-route recommendation (F-005);
   client-side key that must be origin-restricted + usage-capped (currently unrestricted — open item).
-- **Reports:** written **server-side only** via the `submitReport` **Cloud Function** (F-006) —
-  Gemini classifies severity, merges duplicates, rejects spam; clients cannot write `reports`
-  directly (Firestore Rules deny client create/update/delete).
-- **Route check:** the `assessRoute` Cloud Function (F-003/F-008) returns a Gemini-written verdict
-  grounded only in real on-route reports.
-- **Photos:** **Firebase Storage** (F-007), EXIF-stripped client-side (BR-008).
-- **Auth:** **Firebase Auth** (anonymous or Google sign-in).
+- **Reports:** written **server-side only** via the `submitReport` route on **`backend/server`
+  (Express, deployed on Render — ADR-0002)** — Gemini classifies severity, merges duplicates,
+  rejects spam; clients cannot write `reports` directly (Firestore Rules deny client
+  create/update/delete). A Firebase ID token (`Authorization: Bearer <token>`) is verified
+  server-side in place of Cloud Functions' `onCall` auth.
+- **Route check:** the `assessRoute` route (`backend/server`, F-003/F-008) returns a Gemini-written
+  verdict grounded only in real on-route reports.
+- **Photos:** **Firebase Storage, disabled** (F-007, ADR-0002) — the free Spark plan can no longer
+  provision a bucket. `PHOTO_UPLOAD_ENABLED = false` in `frontend/src/lib/storage.js`; the
+  EXIF-stripping code (BR-008) and Storage rules still exist, just unwired, for a future re-enable.
+- **Auth:** **Firebase Auth** (anonymous or Google sign-in) — unchanged, stays on Firebase.
+- **Firestore:** unchanged, stays on Firebase (Spark/free plan).
 
-The mandatory Google-technology requirement is satisfied by **Firebase + Gemini** — the maps/routing
-stack is intentionally non-Google. The stack is owned by [System Design](./docs/06-system-design.md).
+The mandatory Google-technology requirement is satisfied by **Firestore + Auth + Gemini** — the
+maps/routing stack is intentionally non-Google, and hosting/compute for the frontend and
+Gemini-backed routes moved to Vercel/Render (ADR-0002) without affecting this. The stack is owned
+by [System Design](./docs/06-system-design.md).
 
 ## Build & run
 ```
-npm install
-npm run dev        # local Vite dev server
-firebase emulators:start   # Auth + Firestore + Functions + Storage locally
+cd frontend && npm install && npm run dev   # local Vite dev server
+cd backend/server && npm install && npm run dev   # Express API (submitReport/assessRoute/summarizeSegment)
+firebase emulators:start --only auth,firestore   # Auth + Firestore locally
 ```
+See [`docs/LOCAL_DEV.md`](./docs/LOCAL_DEV.md) for the full local setup and
+[`docs/DEPLOYMENT_GUIDE.md`](./docs/DEPLOYMENT_GUIDE.md) for deploying to Vercel + Render + Firebase.
 
 ## Test
 ```
 npm run test       # unit/component tests
-firebase deploy --only firestore:rules,storage:rules   # deploy + verify Security Rules
+firebase deploy --only firestore:rules   # deploy + verify the Firestore Security Rules gate
 ```
 All changes must pass tests before they're considered done. **Do not deploy the deny-client-write
 Firestore rule until `submitReport` is verified against the emulator** — deploying it early breaks
@@ -78,10 +87,12 @@ report submission with no fallback.
 - **Map render is keyless** — MapLibre GL + OpenFreeMap ship no API key; nothing to restrict or leak.
 - **Restrict the OpenRouteService (ORS) key** — it ships in the client bundle; restrict by
   origin/referrer + set a usage cap in the ORS dashboard. **Currently unrestricted — open item.**
-- **Keep the Gemini key server-side only**, inside the Cloud Functions. Never ship it to the browser.
-  It now backs a P0 path (`submitReport`), so its uptime gates report submission.
-- **Deploy Firestore + Storage Security Rules before demo** — Firestore denies client `reports`
-  writes (F-006); Storage is auth-gated, path-scoped, size/type-limited (F-007).
+- **Keep the Gemini key server-side only**, as a Render env var on `backend/server`. Never ship it
+  to the browser. It now backs a P0 path (`submitReport`), so its uptime gates report submission.
+- **Keep `FIREBASE_SERVICE_ACCOUNT_KEY` server-side only** (Render env var, `backend/server`) —
+  new secret since ADR-0002; grants full Admin SDK access, never commit or ship it client-side.
+- **Deploy Firestore Security Rules before demo** — denies client `reports` writes (F-006). Storage
+  rules exist (`backend/storage.rules`) but are unwired while Storage is disabled (ADR-0002).
 - **No secrets committed** to the repo (API keys, service accounts, `.env`).
 
 ## Do not touch
@@ -93,7 +104,8 @@ report submission with no fallback.
 - Build passes, tests pass.
 - Traceability preserved: code change ties to an `F-###`; that `F-###` has a test in the QA plan.
 - No secrets committed; report writes are server-side + auth-gated; the ORS key is restricted; the
-  Gemini key is server-side only; Storage rules deployed.
+  Gemini key and `FIREBASE_SERVICE_ACCOUNT_KEY` are server-side only (Render); Firestore rules
+  deployed (Storage rules N/A while disabled — ADR-0002).
 - Business rules verified end-to-end (no SOS copy, single zone, condition-only data, EXIF stripped).
 - Docs updated when behavior changes — and the Docs consistency check below is run.
 
@@ -101,9 +113,9 @@ report submission with no fallback.
 
 > **This is the one canonical copy of the check.** Kiro runs it automatically on save via the
 > "Docs Consistency Guard" hook (`.kiro/hooks/`). Claude Code, Cursor, and Gemini don't get that
-> auto-trigger, so they must run it themselves whenever they edit a doc in `docs/`, `AGENTS.md`,
-> or `idea.md`. The tool entrypoints (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/docs-consistency.mdc`)
-> only point here — they do not restate the steps.
+> auto-trigger, so they must run it themselves whenever they edit a doc in `docs/` (which includes
+> `docs/idea.md`) or `AGENTS.md`. The tool entrypoints (`CLAUDE.md`, `GEMINI.md`,
+> `.cursor/rules/docs-consistency.mdc`) only point here — they do not restate the steps.
 
 When you edit any spec doc, before you finish:
 1. Read `docs/index.md` §0 — the source-of-truth map (one fact, one canonical owner).
@@ -130,6 +142,7 @@ When you edit any spec doc, before you finish:
 - [Data Model](./docs/09-data-model.md) — segment + report schema, Storage objects
 - [QA Test Plan](./docs/11-qa-test-plan.md) — traceability matrix
 - [Security & Compliance](./docs/12-security-compliance.md) — threats, auth, secrets, privacy
-- [ADRs](./docs/adr/) — significant decisions (map stack = ADR-0001)
+- [ADRs](./docs/adr/) — significant decisions (map stack = ADR-0001; hosting/compute split = ADR-0002)
+- [Idea brief](./docs/idea.md), [Deployment Guide](./docs/DEPLOYMENT_GUIDE.md), [Deploy Quick Reference](./docs/deploy.md), [Local Dev](./docs/LOCAL_DEV.md) — the origin brief and the operational how-tos, kept alongside the rest of `docs/`
 
 <!-- Optional: scoped, path-specific rules live under ./.cursor/rules/*.mdc. -->

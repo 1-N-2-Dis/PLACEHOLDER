@@ -1,18 +1,15 @@
 // F-002/F-006: submit a one-tap report for AI review (severity classify / duplicate-merge /
 // reject) instead of writing directly to Firestore.
-// Traces to: docs/03-prd.md F-006, backend/functions/index.js submitReport.
+// Traces to: docs/03-prd.md F-006, backend/server/index.js submitReport.
 //
 // This is a blocking call by design (confirmed UX decision): the caller shows a spinner until
 // this resolves, then renders one of the three outcomes below. No optimistic map update happens
 // before the AI review completes.
-import { httpsCallable } from 'firebase/functions';
-import { functions } from './firebase.js';
+import { callApi } from './apiClient.js';
 import { ensureSignedIn } from './auth.js';
 import { isValidConditionType } from '../data/condition-types.js';
 import { stripExifAndResize } from './photo.js';
-import { uploadReportPhoto } from './storage.js';
-
-const submitReportCallable = httpsCallable(functions, 'submitReport');
+import { uploadReportPhoto, PHOTO_UPLOAD_ENABLED } from './storage.js';
 
 // Returns one of:
 //   { status: 'created', reportId, severity }
@@ -23,7 +20,7 @@ const submitReportCallable = httpsCallable(functions, 'submitReport');
 //
 // photoFile, if given, is a raw File from an <input type="file">. It's EXIF-stripped and
 // uploaded to Storage BEFORE the AI review call, so submitReport only ever sees a photoPath it
-// can validate against the caller's own uid (see backend/functions/index.js).
+// can validate against the caller's own uid (see backend/server/index.js).
 //
 // segmentName, if given, is the display name already known client-side (from the segment list
 // the report wizard offers) — passed through so the AI classify prompt has location context for
@@ -43,11 +40,12 @@ export async function submitReportForReview({ segmentId, segmentName, conditionT
   if (trimmedNote) payload.note = trimmedNote;
   if (segmentName) payload.segmentName = segmentName;
 
-  if (photoFile) {
+  // PS: Storage is disabled while on the Firebase Spark (free) plan — see PHOTO_UPLOAD_ENABLED
+  // in storage.js. A picked photoFile is silently dropped instead of uploaded.
+  if (photoFile && PHOTO_UPLOAD_ENABLED) {
     const blob = await stripExifAndResize(photoFile);
     payload.photoPath = await uploadReportPhoto(user.uid, blob);
   }
 
-  const result = await submitReportCallable(payload);
-  return result.data;
+  return callApi('/submitReport', payload);
 }

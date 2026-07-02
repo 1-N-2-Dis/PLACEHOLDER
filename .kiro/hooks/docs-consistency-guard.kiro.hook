@@ -1,15 +1,14 @@
 {
   "enabled": true,
   "name": "Docs Consistency Guard",
-  "description": "When any spec doc (docs/*.md, AGENTS.md, or idea.md) is saved, check it against the source-of-truth map in docs/index.md §0 and flag any cross-doc contradiction or broken traceability before it spreads.",
+  "description": "When any spec doc (docs/*.md, including docs/idea.md, or AGENTS.md) is saved, check it against the source-of-truth map in docs/index.md §0 and flag any cross-doc contradiction or broken traceability before it spreads.",
   "version": "1",
   "when": {
     "type": "fileEdited",
     "patterns": [
       "docs/*.md",
       "docs/adr/*.md",
-      "AGENTS.md",
-      "idea.md"
+      "AGENTS.md"
     ]
   },
   "then": {

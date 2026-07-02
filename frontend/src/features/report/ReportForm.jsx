@@ -15,6 +15,7 @@
 //   - Write requires auth (BR-005); the Cloud Function is the sole enforcement point now (BR-001).
 import { useState } from 'react';
 import { submitReportForReview } from '../../lib/reportIntake.js';
+import { PHOTO_UPLOAD_ENABLED } from '../../lib/storage.js';
 import LocationStep from './steps/LocationStep.jsx';
 import DetailsStep from './steps/DetailsStep.jsx';
 import PhotoStep from './steps/PhotoStep.jsx';
@@ -66,7 +67,7 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
         note={note}
         onNoteChange={setNote}
       />
-      <PhotoStep photoFile={photoFile} onChange={setPhotoFile} />
+      {PHOTO_UPLOAD_ENABLED && <PhotoStep photoFile={photoFile} onChange={setPhotoFile} />}
 
       <button type="button" className="btn btn-primary btn-full" disabled={busy || !canSubmit} onClick={submit}>
         {busy ? <span className="spinner" /> : 'Submit report'}

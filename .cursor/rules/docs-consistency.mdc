@@ -1,12 +1,12 @@
 ---
 description: Docs consistency guard — enforce the source-of-truth map when editing spec docs
-globs: docs/**/*.md, AGENTS.md, idea.md
+globs: docs/**/*.md, AGENTS.md
 alwaysApply: false
 ---
 
 # Docs consistency guard (Cursor)
 
-When editing any file matching the globs above (spec docs, AGENTS.md, idea.md), you MUST run the
+When editing any file matching the globs above (spec docs, including `docs/idea.md`, or AGENTS.md), you MUST run the
 **"Docs consistency check"** defined canonically in [AGENTS.md](../../AGENTS.md).
 
 Do not restate the steps here — follow the version in AGENTS.md so there is only one copy. In
