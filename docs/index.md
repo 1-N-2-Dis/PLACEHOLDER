@@ -1,8 +1,13 @@
-# Documentation Index — SaferRoute Sta. Mesa
+# Documentation Index — GuidHer (internal codename: SaferRoute Sta. Mesa)
 
-**Maintained by:** SaferRoute team (SparkFest 2026)
-**Last updated:** 2026-07-02
+**Maintained by:** GuidHer team (SparkFest 2026)
+**Last updated:** 2026-07-06
 **FMD schema:** 3.1.0
+
+> **Name:** the product is **GuidHer** (public). "SaferRoute" / "SaferRoute Sta. Mesa" is the
+> original internal codename, still present in code and doc provenance banners; `demo-saferroute` is
+> the Firebase project id and must not be renamed. Same product — see
+> [POSTMORTEM.md](./POSTMORTEM.md) §1.
 
 <!--
 Read this FIRST in any session: §0 says which single doc owns which fact. This suite was
@@ -20,6 +25,8 @@ until the loser is reconciled.
 
 | Concern | Canonical owner | Note |
 |---------|-----------------|------|
+| Change history · pivots · naming · what is TRUE vs UNVALIDATED | [POSTMORTEM](POSTMORTEM.md) | append-only change/decision log; the anti-hallucination anchor. If history disagrees, this wins |
+| Competition rules · timeline · judging rubric · pitch format | [Hackathon Context](00-hackathon-context.md) | SparkFest 2026 brief; owns the rubric weights, the 5-min pitch + 15-min Q&A format, the Google-tech + community-sector requirements |
 | Vision · problem · who it's for | [idea.md](./idea.md) | the brief; origin of the `F-###` spine (F-001..F-008 MVP, F-101..F-103 final) |
 | What we build (features `F-###`, journeys `UJ-###`, business rules `BR-###`) | [PRD](03-prd.md) | stable IDs; F-001..F-008, UJ-001..004, BR-001..008 |
 | How it's built (architecture, components, **map/routing stack**, server-side writes) | [System Design](06-system-design.md) | owns MapLibre/OpenFreeMap + ORS + the `submitReport`/`assessRoute` design |
@@ -39,6 +46,9 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
 
 | Document | File | Status | Last updated |
 |----------|------|--------|--------------|
+| Team Start Here | [START-HERE.md](START-HERE.md) | current — teammate onboarding, repo navigation, per-person next actions | 2026-07-06 |
+| Change & Decision Log | [POSTMORTEM.md](POSTMORTEM.md) | current — anti-hallucination anchor, pivots, naming | 2026-07-06 |
+| Hackathon Context | [00-hackathon-context.md](00-hackathon-context.md) | current — SparkFest 2026 brief, rubric, format | 2026-07-06 |
 | Idea brief | [idea.md](./idea.md) | draft (schema 1.1.0) | 2026-07-01 |
 | PRD | [03-prd.md](03-prd.md) | draft | 2026-07-01 |
 | System Design | [06-system-design.md](06-system-design.md) | draft (MapLibre/ORS + server-side writes) | 2026-07-01 |
@@ -75,8 +85,7 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
   `docs/12-security-compliance.md`, `docs/03-prd.md`, `docs/09-data-model.md`,
   `docs/11-qa-test-plan.md`, `AGENTS.md`, `DEPLOYMENT_GUIDE.md`, and `LOCAL_DEV.md` were all
   reconciled to this decision on 2026-07-02. `backend/functions/` (the old Cloud Functions code,
-  superseded by `backend/server/`) is slated for deletion — pending as of this writing because the
-  directory was locked by another process; delete it once the lock clears.
+  superseded by `backend/server/`) has been **deleted** (verified absent 2026-07-06).
 - **Resolved (2026-07-02) — spec files now committed:** the `docs/superpowers/specs/2026-07-01-*.md`
   files (routing cascade, report wizard, login/account page) that `06-system-design.md`, the PRD,
   and `ADR-0001` link to are tracked in git; the links resolve. (History of this item: first

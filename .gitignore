@@ -444,3 +444,6 @@ agents/
 
 # FMD documents-factory tooling (external submodule; not part of the product build)
 fmd/
+
+# macOS Finder metadata
+.DS_Store

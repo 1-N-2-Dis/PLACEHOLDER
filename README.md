@@ -25,6 +25,9 @@
 
 ---
 
+> **Team member picking this up?** Start with **[docs/START-HERE.md](docs/START-HERE.md)** — repo
+> navigation + what to do next, per person.
+
 ## About the Project
 
 This project is developed as part of **SparkFest 2026**, a hackathon organized by **Google Developer Groups on Campus – Polytechnic University of the Philippines (GDG PUP)**.
@@ -81,7 +84,7 @@ GuidHer provides a preventive, community-powered zone safety map that shows wome
 
 * **Frontend:** React, Vite, MapLibre GL, OpenFreeMap
 * **Backend:** Node.js, OpenRouteService
-* **Database:** Cloud Firestore, Firebase Storage
+* **Database:** Cloud Firestore (Firebase Storage code present but **disabled** — [ADR-0002](docs/adr/ADR-0002-hosting-compute-split.md))
 * **AI / ML:** Gemini API
 * **Tools & Authentication:** Firebase Auth, Git/GitHub, Render (Backend Hosting), Vercel (Frontend Hosting)
 
@@ -162,19 +165,10 @@ $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run dev
 
 Ensure VITE_API_BASE_URL=http://localhost:8080 is appended inside your frontend .env.local to securely bridge client actions.
 
-##### Tier 3 — Live Google Maps Script Ingestion (Optional)
-
-1. Navigate to Google Cloud Platform Console and enable the Maps JavaScript API.
-
-2. Add Referrer URL permissions restricted specifically to http://localhost:5173/*.
-
-3. Bind your credentials within frontend/.env.local:
-
-```Code snippet
-VITE_MAPS_API_KEY=your-live-key
-```
-
-4. Kill and restart your frontend execution node terminal (npm run dev).
+> **Note on maps:** GuidHer renders maps with **MapLibre GL + OpenFreeMap**, which are keyless and
+> require **no Google Maps API key** (see [ADR-0001](docs/adr/ADR-0001-maps-stack.md)). There is no
+> `VITE_MAPS_API_KEY` and no Google Maps setup step — the Google-technology requirement is met by
+> Firebase + Gemini, not the map layer.
 
 ##### Seeding Standalone Production Datastores
 
