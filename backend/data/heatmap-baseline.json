@@ -1,0 +1,364 @@
+{
+  "_meta": {
+    "generated": "2026-07-06",
+    "source": "crime-reports-MERGED.csv (99 rows)",
+    "description": "Baseline heatmap risk weights derived from collected community incident data. Maps each GuidHer segment to a risk_weight, severity, and incident breakdown. This feeds seed-reports.mjs to populate Firestore with initial heatmap data.",
+    "severity_logic": "red = Robbery/Physical Assault/Snatching with weapon; yellow = Theft/Groping/Catcalling/Poor Lighting/Scam; corroboration_count = independent report tally (capped at 5 per heatmap.js HEAT_COUNT_CAP)",
+    "total_reports": 99,
+    "total_locations": 21
+  },
+
+  "segments": [
+    {
+      "segmentId": "seg_pureza_approaches",
+      "name": "Pureza station approaches",
+      "geo": { "lat": 14.59859, "lng": 121.0048 },
+      "risk_weight": 16,
+      "severity": "red",
+      "corroboration_count": 5,
+      "top_condition": "poor_lighting",
+      "report_count": 16,
+      "incident_breakdown": {
+        "Theft": 5,
+        "Poor Lighting/Unsafe Area": 4,
+        "Groping/Harassment": 3,
+        "Overcharging/Scam": 3,
+        "Other": 1
+      },
+      "confirmed_patterns": [
+        "Bag-slashing at south exit (Jollibee/Chowking side)",
+        "Dark overpass area — follower incidents at night",
+        "Trike predatory special fares for lone riders",
+        "Verbal harassment by youth group near Chowking",
+        "Groping on stairs during crowded descents"
+      ],
+      "seed_report": {
+        "conditionType": "recent_incident",
+        "severity": "red",
+        "title": "Multiple incidents reported near station exits",
+        "note": "Station exits reported as poorly lit after 8 PM. Multiple accounts of bag-slashing and unwanted contact on stairs. Trike terminal has reported overcharging for solo riders.",
+        "corroborationCount": 5
+      }
+    },
+
+    {
+      "segmentId": "seg_magsaysay_jeeps",
+      "name": "Magsaysay Blvd / Old Sta. Mesa jeepney route",
+      "geo": { "lat": 14.5968, "lng": 121.0085 },
+      "risk_weight": 11,
+      "severity": "red",
+      "corroboration_count": 5,
+      "top_condition": "recent_incident",
+      "report_count": 11,
+      "incident_breakdown": {
+        "Snatching": 4,
+        "Poor Lighting/Unsafe Area": 3,
+        "Robbery": 2,
+        "Overcharging/Scam": 1,
+        "Theft": 1
+      },
+      "confirmed_patterns": [
+        "Motorcycle snatch targeting jewelry and phones in traffic",
+        "Armed jeep holdup confirmed by GMA News (patalim, 5 passengers)",
+        "Physical assault on jeep in afternoon — not only a night risk",
+        "Ketchup/water spill distraction modus on jeepneys",
+        "No-phone-near-window advisory corroborated"
+      ],
+      "seed_report": {
+        "conditionType": "recent_incident",
+        "severity": "red",
+        "title": "Snatch incidents on and near jeepneys",
+        "note": "Multiple reports of phone and bag snatching along this stretch, including on moving jeepneys. Avoid using phone near open windows. Motorcycle-borne snatchers active during traffic.",
+        "corroborationCount": 5
+      }
+    },
+
+    {
+      "segmentId": "seg_recto_legarda",
+      "name": "Recto–Legarda environs",
+      "geo": { "lat": 14.6035, "lng": 120.9968 },
+      "risk_weight": 10,
+      "severity": "red",
+      "corroboration_count": 5,
+      "top_condition": "recent_incident",
+      "report_count": 10,
+      "incident_breakdown": {
+        "Robbery": 4,
+        "Poor Lighting/Unsafe Area": 3,
+        "Theft": 2,
+        "Other": 1
+      },
+      "confirmed_patterns": [
+        "Armed holdup under LRT Recto station (patalim confirmed)",
+        "Weapon drawn near Tulay Recto / Isetan area",
+        "Jeep holdup at Recto-Legarda corner near CEU",
+        "Youth theft syndicate active — organized, multi-person",
+        "Unsafe 3-5 AM window — women pay moto-taxi to avoid walking"
+      ],
+      "seed_report": {
+        "conditionType": "recent_incident",
+        "severity": "red",
+        "title": "Armed incidents reported along this corridor",
+        "note": "This corridor has multiple confirmed reports of weapon-involved incidents. The stretch under and near the LRT station is poorly lit. Consider the P. Campa alternative route.",
+        "corroborationCount": 5
+      }
+    },
+
+    {
+      "segmentId": "seg_teresa_wellused_1",
+      "name": "Teresa Street 1",
+      "geo": { "lat": 14.60026, "lng": 121.01279 },
+      "risk_weight": 9,
+      "severity": "red",
+      "corroboration_count": 5,
+      "top_condition": "recent_incident",
+      "report_count": 9,
+      "incident_breakdown": {
+        "Snatching": 4,
+        "Poor Lighting/Unsafe Area": 2,
+        "Robbery": 1,
+        "Other": 2
+      },
+      "confirmed_patterns": [
+        "Phone and bag snatching — 3+ independent first-party reports",
+        "Robbery/stabbing incident witnessed firsthand near PNR",
+        "Unsafe infrastructure: trikes block pedestrian lane midday",
+        "Community workarounds active: bag-on-chest, walk fast, groups"
+      ],
+      "seed_report": {
+        "conditionType": "recent_incident",
+        "severity": "red",
+        "title": "Grab-and-run incidents reported on this stretch",
+        "note": "Multiple reports of phone and bag snatching, especially at low foot-traffic times. Travel with others if possible and keep valuables secured inside your bag.",
+        "corroborationCount": 5
+      }
+    },
+
+    {
+      "segmentId": "seg_legarda_estero",
+      "name": "Legarda east / Estero de San Miguel",
+      "geo": { "lat": 14.6010, "lng": 120.9975 },
+      "risk_weight": 7,
+      "severity": "red",
+      "corroboration_count": 5,
+      "top_condition": "poor_lighting",
+      "report_count": 7,
+      "incident_breakdown": {
+        "Theft": 4,
+        "Poor Lighting/Unsafe Area": 2,
+        "Snatching": 1
+      },
+      "confirmed_patterns": [
+        "Active pickpocket syndicate on LRT-2 train and platform",
+        "Bystander signalling modus — co-passengers tip off thieves",
+        "Police scope gap confirmed: station police won't act outside station",
+        "Dark exit toward Estero de San Miguel after sunset",
+        "Tricycle-borne phone snatch near station (suspects arrested, 2021)"
+      ],
+      "seed_report": {
+        "conditionType": "poor_lighting",
+        "severity": "yellow",
+        "title": "Poorly lit exit toward Estero — stay alert",
+        "note": "The east exit toward the estero is unlit after sunset with limited security. Pickpocketing has been reported on the platform and inside the train on this stretch.",
+        "corroborationCount": 4
+      }
+    },
+
+    {
+      "segmentId": "seg_pureza_st_1",
+      "name": "Pureza Street 1",
+      "geo": { "lat": 14.60306, "lng": 121.00395 },
+      "risk_weight": 6,
+      "severity": "yellow",
+      "corroboration_count": 4,
+      "top_condition": "poor_lighting",
+      "report_count": 6,
+      "incident_breakdown": {
+        "Poor Lighting/Unsafe Area": 3,
+        "Theft": 2,
+        "Robbery": 1
+      },
+      "confirmed_patterns": [
+        "Dark at both ends, only lit at Magsaysay intersection",
+        "Suspicious jeep estribo behavior at dark stops — commuter refused to alight",
+        "UV Express armed holdup Pureza-to-Bacood route (GMA News 2023)",
+        "Child pickpockets active on foot on Pureza St"
+      ],
+      "seed_report": {
+        "conditionType": "poor_lighting",
+        "severity": "yellow",
+        "title": "Street poorly lit away from Magsaysay intersection",
+        "note": "Pureza Street is only well-lit at the main intersection. Both ends are significantly darker. Stay alert when boarding or alighting from jeepneys at poorly lit stops.",
+        "corroborationCount": 3
+      }
+    },
+
+    {
+      "segmentId": "seg_anonas_st_3",
+      "name": "Anonas Street 3",
+      "geo": { "lat": 14.59875, "lng": 121.00546 },
+      "risk_weight": 2,
+      "severity": "yellow",
+      "corroboration_count": 2,
+      "top_condition": "recent_incident",
+      "report_count": 2,
+      "incident_breakdown": {
+        "Theft": 1,
+        "Catcalling": 1
+      },
+      "confirmed_patterns": [
+        "Pickpockets target newcomers — bag-slashing and close-following modus",
+        "Catcalling near Hipodromo junction"
+      ],
+      "seed_report": {
+        "conditionType": "recent_incident",
+        "severity": "yellow",
+        "title": "Pickpocket advisory near Mass Comm building",
+        "note": "Pickpockets target people unfamiliar with the area near the PUP Mass Comm building. Keep your bag in front of you and be aware of people following too closely.",
+        "corroborationCount": 2
+      }
+    },
+
+    {
+      "segmentId": "seg_vmapa_sm",
+      "name": "V. Mapa → SM Sta. Mesa",
+      "geo": { "lat": 14.6020, "lng": 121.0145 },
+      "risk_weight": 2,
+      "severity": "yellow",
+      "corroboration_count": 2,
+      "top_condition": "recent_incident",
+      "report_count": 2,
+      "incident_breakdown": {
+        "Theft": 2
+      },
+      "confirmed_patterns": [
+        "Crowd-squeeze theft syndicate — groups of men working together",
+        "Footbridge avoided at night due to poor lighting and loitering"
+      ],
+      "seed_report": {
+        "conditionType": "no_crowd",
+        "severity": "yellow",
+        "title": "Group-based theft reported near transit stop",
+        "note": "Reports of coordinated theft using crowd pressure near the transit stop. Stay close to the platform edge and keep belongings secure in crowded queues.",
+        "corroborationCount": 2
+      }
+    },
+
+    {
+      "segmentId": "seg_hipodromo_st_2",
+      "name": "Hipodromo Street 2",
+      "geo": { "lat": 14.60130, "lng": 121.00916 },
+      "risk_weight": 1,
+      "severity": "yellow",
+      "corroboration_count": 1,
+      "top_condition": "recent_incident",
+      "report_count": 1,
+      "incident_breakdown": {
+        "Catcalling": 1
+      },
+      "confirmed_patterns": [
+        "Daily catcalling by tambay in the area"
+      ],
+      "seed_report": {
+        "conditionType": "recent_incident",
+        "severity": "yellow",
+        "title": "Verbal harassment reported on this street",
+        "note": "Verbal harassment has been reported on this stretch. Consider walking with company or taking a different route if you feel unsafe.",
+        "corroborationCount": 1
+      }
+    },
+
+    {
+      "segmentId": "seg_pcampa_altroute",
+      "name": "P. Campa / Loyola / Dalupan alt-route",
+      "geo": { "lat": 14.6055, "lng": 120.9930 },
+      "risk_weight": 0,
+      "severity": "green",
+      "corroboration_count": 0,
+      "top_condition": "safe_alternative",
+      "report_count": 2,
+      "incident_breakdown": {
+        "Other": 2
+      },
+      "confirmed_patterns": [
+        "Community-recommended quieter alternative to Recto–Legarda walking corridor",
+        "Route: P. Campa → Loyola → Dalupan → San Anton → Figueras"
+      ],
+      "seed_report": {
+        "conditionType": "no_crowd",
+        "severity": null,
+        "title": "Quieter alternative route to Legarda",
+        "note": "Community tip: P. Campa → Loyola → Dalupan → San Anton → Figueras is a quieter alternative to walking the Recto–Legarda corridor, especially late at night.",
+        "corroborationCount": 0
+      }
+    }
+  ],
+
+  "extended_corridor": {
+    "description": "Locations outside the immediate PUP zone captured in the dataset. Not yet in GuidHer's segment map but relevant for future expansion.",
+    "locations": [
+      {
+        "name": "Recto Avenue",
+        "approx_geo": { "lat": 14.6027, "lng": 120.9948 },
+        "report_count": 9,
+        "severity": "red",
+        "top_incident": "Theft",
+        "note": "Overwhelmingly pickpocket/theft in broad daylight. Organized child/youth syndicates. Isetann/LRT exit hotspot. Bump-and-grab + coin-drop modus confirmed."
+      },
+      {
+        "name": "España Boulevard",
+        "approx_geo": { "lat": 14.6099, "lng": 120.9930 },
+        "report_count": 7,
+        "severity": "yellow",
+        "top_incident": "Poor Lighting / Theft",
+        "note": "Streetlights frequently off (flood/typhoon protocols). Rugby users near UST at night. Theft in coffee shops by child distraction teams. Groping/solicitation at night."
+      },
+      {
+        "name": "Lacson Avenue",
+        "approx_geo": { "lat": 14.6076, "lng": 120.9997 },
+        "report_count": 6,
+        "severity": "red",
+        "top_incident": "Snatching",
+        "note": "España-Lacson corner confirmed pickpocket hotspot. 5AM phone snatch by motorcycle. Known holdap corridor for years per community. Dark opposite-UST side."
+      },
+      {
+        "name": "Morayta Street",
+        "approx_geo": { "lat": 14.6027, "lng": 120.9978 },
+        "report_count": 5,
+        "severity": "red",
+        "top_incident": "Robbery / Theft",
+        "note": "Armed balisong robbery in broad daylight (3PM). Catcalling with following behavior. Exhibitionism near transit stop evening hours. Backpack-opening endemic even while walking fast."
+      },
+      {
+        "name": "LRT-2 Araneta-Cubao Station",
+        "approx_geo": { "lat": 14.6197, "lng": 121.0566 },
+        "report_count": 4,
+        "severity": "yellow",
+        "top_incident": "Snatching / Groping",
+        "note": "Snatch attempts inside train (1st door, 2nd cart). Groping on overpass at night. LRT2-MRT3 walkway has snatchers during rush hour."
+      }
+    ]
+  },
+
+  "summary": {
+    "priority_1_validate": [
+      "seg_pureza_approaches",
+      "seg_magsaysay_jeeps",
+      "seg_recto_legarda",
+      "seg_teresa_wellused_1",
+      "seg_legarda_estero"
+    ],
+    "severity_distribution": {
+      "red": 5,
+      "yellow": 4,
+      "green": 1
+    },
+    "top_incident_types_overall": {
+      "Theft": 28,
+      "Poor Lighting/Unsafe Area": 20,
+      "Snatching": 14,
+      "Groping/Harassment": 7,
+      "Robbery": 7
+    }
+  }
+}
