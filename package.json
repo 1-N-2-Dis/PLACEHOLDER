@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "graph:fetch": "node scripts/fetch-graph.mjs",
+    "graph:build": "node scripts/build-graph.mjs"
+  },
   "devDependencies": {
     "firebase-tools": "^15.22.4"
   }

@@ -1,0 +1,16 @@
+{
+  "name": "router",
+  "type": "module",
+  "description": "Client-side A* pedestrian router over a preprocessed OSM graph (SaferRoute F-005, ADR-0003).",
+  "version": "0.1.0",
+  "files": [
+    "router_bg.wasm",
+    "router.js",
+    "router.d.ts"
+  ],
+  "main": "router.js",
+  "types": "router.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

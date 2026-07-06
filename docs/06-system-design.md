@@ -68,17 +68,30 @@ plan) — this is what satisfies the Google-technology requirement now that comp
 (reads only); `Web App → ORS` (multi-route, severity-tiered). See `DEPLOYMENT_GUIDE.md` for the
 full topology and env vars.
 
+**Resolved (2026-07-06) — client-side routing engine, see ADR-0003:** point-to-point routing
+(F-005) no longer calls OpenRouteService. A Rust/WASM router, running in a Web Worker
+(`frontend/src/workers/routeWorker.js`), loads a preprocessed 20km pedestrian graph
+(`frontend/public/graph/pup-20km.bin` — built from Overpass data via `scripts/fetch-graph.mjs` +
+`scripts/build-graph.mjs`, committed as a static asset) and runs A* with dynamic edge-weight
+penalties from live flagged reports. This removes the external routing dependency entirely — no
+ORS key, no quota, no cold start. The engine returns **exactly 2 routes** ("Recommended" +
+"Alternative", never 3) — a hard cap, not the prior 1-3 range. The diagram above is not redrawn
+pixel-for-pixel here; see the Components table and Data flow below for the current shape:
+`Web App → routeWorker.js (Web Worker) → WASM router` (in-browser, no network call at request
+time), `Web App → pup-20km.bin` (one cached static fetch, keyless).
+
 ## Components & responsibilities
 
 | Component | Responsibility | Owns | Depends on |
 |-----------|----------------|------|------------|
-| **Web app (React + Vite)** | Renders zone map, segment flags, report form, route-check result | UI state, client validation (condition-only fields, BR-001) | Firebase JS SDK, MapLibre GL + OpenFreeMap (keyless), ORS |
+| **Web app (React + Vite)** | Renders zone map, segment flags, report form, route-check result | UI state, client validation (condition-only fields, BR-001) | Firebase JS SDK, MapLibre GL + OpenFreeMap (keyless), client-side routing engine (Rust/WASM, ADR-0003) |
 | **Firebase Auth** | Authenticate reporters (BR-005) | User identity / session token | — |
 | **Cloud Firestore** | Store + serve segment reports with type + timestamp (BR-004); serve seed pins | Report documents, segment metadata | Written only by `submitReport` (Admin SDK) as of F-006 — see Security Rules |
 | **Firestore Security Rules** | Authz gate: reads open; `reports` writes now denied entirely for clients (F-006) — enforcement moved to `submitReport`'s code | Access policy | Auth |
 | **MapLibre GL + OpenFreeMap** | Map tiles, segment overlays (F-001) | Map render + geometry | None — OpenFreeMap is keyless |
 | **Report heatmap layer (F-010)** | Client-side visualization of validated (yellow/red severity) reports as glowing lucide severity-icon markers | Rendering only — no data ownership | Cloud Firestore (`reports`, already-subscribed), segment `geo` (seed data), react-map-gl markers + lucide-react icons |
-| **OpenRouteService (ORS)** | Severity-tiered, multi-route (2-3 alternatives) point-to-point routing (F-005) — red hard-avoid, yellow soft-avoid, green informational only | Route geometry | API key (ships in client bundle; not yet referrer-restricted — open item, see Security must-dos in `AGENTS.md`) |
+| **Client-side routing engine (Rust/WASM, ADR-0003)** | Severity-tiered, exactly-2-route (recommended + alternative) point-to-point routing (F-005) via A* over a preprocessed pedestrian graph — red hard-avoid, yellow soft-avoid, green informational only; runs entirely in-browser | Route geometry, dynamic edge-weight penalties, A* search | `frontend/public/graph/pup-20km.bin` (committed, keyless static graph asset), `frontend/src/workers/routeWorker.js` (Web Worker host), `frontend/rust/router` (wasm-bindgen crate, committed `pkg/` output — no Rust toolchain on Vercel) |
+| **Routing graph build pipeline (`scripts/`)** | Repeatable, re-runnable compilation of the 20km pedestrian graph from source OSM data — not hand-carried | `scripts/fetch-graph.mjs` (Overpass fetch), `scripts/build-graph.mjs` (binary graph compile) | Overpass API (build-time only, not a runtime dependency) |
 | **Gemini API — `summarizeSegment`** | Dedup + structure free-text reports into a summary; adds no facts (BR-006) | Summary text only | Report data from Firestore |
 | **Gemini API — `submitReport`** | **Critical path (F-006), not P1.** Classifies report severity, detects duplicates for corroboration-merge, rejects spam — blocking, fail-closed | The only path that writes a `reports` doc | Report submission data, recent reports on the segment |
 | **Backend API (`backend/server`, Render)** | Server-side host holding the Gemini key; hosts `summarizeSegment`, `submitReport`, and `assessRoute` (F-003/F-008 — reads each on-route segment's report, returns a written safety verdict). Replaces the prior `backend/functions` Cloud Function (ADR-0002) — verifies each caller's Firebase ID token itself instead of relying on `onCall`'s `request.auth` | Gemini secret + prompts; sole writer of `reports` | Gemini API, Firestore (Admin SDK, via a service-account credential), Firebase Auth (ID token verification) |
@@ -93,18 +106,24 @@ full topology and env vars.
 3. App matches route to segments, computes per-segment status from flag type + freshness window (BR-004), and renders "okay" vs. "flagged tonight."
 4. User decides: proceed / re-route / pay. (No SOS or dispatch anywhere — BR-002.)
 
-**Map point-to-point routing (F-005, severity-tiered multi-route, superseding the 2026-07-01
-single-route cascade):**
+**Map point-to-point routing (F-005, client-side WASM engine, superseding both the 2026-07-01
+single-route cascade and the later 1-3-route ORS cascade — see ADR-0003):**
 1. User sets Point A (defaults to zone center) and clicks a destination Point B on the map.
-2. App fetches 1-3 ranked route candidates from ORS: "safest" (avoids both red-severity and
-   yellow-severity zones, refined away from highway legs), "red-only" (avoids red only, may cross
-   yellow), "unrestricted" — each fetched only when it could add a distinct alternative. Capped at
-   4 ORS calls per request (up from 2) — see
-   `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` for the full cascade.
-3. All candidates render green (never orange/caution) with opacity stepped by rank — the safest
-   full-opacity, alternates progressively fainter — plus a per-route text badge naming the
-   tradeoff (uses a major road / passes a caution area / passes a dangerous area / a dangerous
-   area could not be avoided).
+2. `frontend/src/lib/routing.js`'s `fetchSafeRoutes(a, b, flaggedReports)` lazily spins up
+   `routeWorker.js` (a Web Worker) and posts the request. On first use the worker fetches
+   `frontend/public/graph/pup-20km.bin` once (cached thereafter), loads it into the Rust/WASM
+   router, applies dynamic edge-weight penalties from `flaggedReports` (red ×1000 — soft-infinite
+   unless unavoidable, yellow ×5), and runs A* twice: an A* pass on the penalized graph
+   ("Recommended"), then a penalty-based reroute of that path's edges to find a second path
+   ("Alternative") — preferring one that's geometrically distinct, but falling back to whichever
+   candidate merely differs from the recommended route by at least one edge (even a near-duplicate)
+   rather than dropping the alternative. **Exactly 2 routes are returned whenever a second path
+   exists at all** — a single route only when the recommended path is the sole way through (a true
+   bottleneck, no second path exists). No network call leaves the browser at request time; the
+   whole computation runs off the main thread in the worker.
+3. Both candidates render green (never orange/caution) — the recommended route full-opacity, the
+   alternative fainter — plus a per-route text badge naming the tradeoff (uses a major road /
+   passes a caution area / passes a dangerous area / a dangerous area could not be avoided).
 4. `RouteCheck.jsx` (F-003/F-008, bottom-center map overlay, collapsed to a toggle button by
    default) lets the user ask "Is my route okay tonight?" for the currently selected route.
    **Revised (2026-07-01, later same day):** the earlier rule-based `RouteSafetyPanel.jsx`
@@ -161,7 +180,8 @@ single-route cascade):**
 | **Vercel Hosting (superseded Firebase Hosting, ADR-0002)** | Fast SPA/preview hosting; decoupled from the compute move to Render | Firebase Hosting's Auth/Firestore coupling was never load-bearing (the app is a client-side SPA); Google-tech requirement still satisfied by Firestore + Auth + Gemini, not by where static files are served | Stay on Firebase Hosting (rejected only because the compute layer already had to move off Firebase for Blaze reasons — kept together for one less moving part) |
 | **Cloud Firestore** | Realtime reads make flags update live with zero polling code; serverless = no backend to stand up | Query/aggregation limits; cost at scale unmodeled (`[unverified]`) | A custom Node/Express + DB backend (too much to build + host in 2 days) |
 | **Firebase Auth (anonymous by default, optional Google sign-in via account linking)** | Lightweight; satisfies BR-005 abuse-control gate with near-zero UI | Anonymous-only gives weak abuse control (no real accountability) until a user upgrades; Google sign-in adds friction but is opt-in via `/login`, not required | Full email/password (more UI, more time) |
-| **MapLibre GL + OpenFreeMap (keyless) rendering; OpenRouteService (ORS) routing** | Keyless vector-tile map render + overlays for F-001/F-003; ORS foot-walking directions for F-005 | No render key required; ORS route-vs-segment matching is non-trivial | Google Maps Platform (needs billing + restricted key; no Google-tech credit needed here — Firebase + Gemini already satisfy it) |
+| **MapLibre GL + OpenFreeMap (keyless) rendering** | Keyless vector-tile map render + overlays for F-001/F-003 | No render key required | Google Maps Platform (needs billing + restricted key; no Google-tech credit needed here — Firebase + Gemini already satisfy it) |
+| **Client-side Rust/WASM routing engine, exactly 2 routes (ADR-0003)** | Removes the external routing dependency entirely for F-005 — no ORS key, no quota, no cold start; ships a preprocessed 20km pedestrian graph as a static asset, computed off the main thread in a Web Worker | Larger one-time asset (committed binary graph + wasm bundle) instead of a live API call; the Overpass fetch + graph-compile build pipeline (`scripts/`) must be re-run whenever the underlying map data needs refreshing; no Rust toolchain on Vercel, so the wasm `pkg/` and the `.bin` graph are committed build artifacts, not build-time outputs | OpenRouteService (ORS) — rejected: external dependency at demo time, unrestricted client-side key was an open security item, route-vs-segment matching was non-trivial to reason about across the cascade |
 | **Gemini API via a server-side host** | Was an innovation hook for F-004 (P1); **now also the F-006 moderation gate (P0, critical path)** — the host keeps the API key server-side for both. **Superseded (ADR-0002):** the host is `backend/server` on Render, not a Firebase Cloud Function — Functions v2 requires the Blaze plan even at zero usage | Adds a deploy unit + latency on every report submission (blocking UX — accepted tradeoff, see design doc); client-side call is faster to build but **leaks the key**; moving off `onCall` means auth (ID token verification) and CORS are now hand-rolled instead of framework-provided | Client-side Gemini call (rejected for prod due to key exposure; acceptable ONLY as a throwaway demo fallback — flagged below); staying on Firebase Cloud Functions (rejected — requires Blaze plan) |
 | **Firebase Storage for photo evidence (F-007) — now disabled, ADR-0002** | Ships with the already-installed `firebase` SDK; same project, same auth model as Firestore | New privacy surface (bystander faces, incidental metadata) beyond what was threat-modeled pre-F-007 — mitigated only partially (EXIF stripped; face privacy not mitigated, see security-compliance Threat T7). **Superseded:** the free Spark plan can no longer provision a Storage bucket at all; disabled via `PHOTO_UPLOAD_ENABLED = false` rather than removed, so it's a one-line revert if the project upgrades to Blaze | Third-party image host (adds a vendor, loses the unified Firebase auth/rules model) |
 | **Report writes moved server-side (F-006)** | Firestore Rules can't verify "went through AI review"; only a server-side write (Admin SDK, bypasses Rules) can guarantee every report was moderated | Rules no longer validate `reports` shape on create — that enforcement now lives entirely in `submitReport`'s code, a single point of failure if that code has a bug | Keep client writes + Rules-only validation (rejected — can't enforce AI review this way; a client could always skip calling the moderation function and write directly) |
@@ -169,7 +189,7 @@ single-route cascade):**
 ## Integration points
 
 - **MapLibre GL + OpenFreeMap (keyless) rendering** — MapLibre GL JS loaded in-browser; OpenFreeMap vector tiles need no API key. Failure mode: tile endpoint unreachable → blank map; mitigate with a clear error state and seeded static fallback.
-- **OpenRouteService (ORS) routing** — called from the browser for point-to-point directions (F-005); ORS API key ships in the client bundle and is **not yet origin-restricted** (open item — restrict by referrer/origin + cap request volume). Failure mode: key invalid/quota exhausted → route candidates fail; mitigate with a clear error state.
+- **Client-side routing engine (Rust/WASM + preprocessed graph, ADR-0003)** — runs entirely in-browser inside a Web Worker (`routeWorker.js`); no external routing API, no key, nothing to restrict or leak. `frontend/public/graph/pup-20km.bin` is a keyless static asset fetched once and cached. Failure mode: graph fetch fails or a path can't be found → `routing.js` surfaces a friendly "routing data still loading" / "no route found" error through `RouteLayer.jsx`'s existing error path, same as the old ORS-failure handling.
 - **Cloud Firestore** — Firebase JS SDK over HTTPS/WebSocket; offline cache available. Failure mode: rules misconfigured → either data leak or total write-block; mitigate by testing rules before demo. As of F-006, `reports` create is denied for all clients regardless of rules content — the only failure mode left is `submitReport` itself failing (fail-closed: no write happens, not an unmoderated one).
 - **Gemini API — `summarizeSegment`** — called from a Cloud Function. Failure mode: quota/latency/empty input → UJ-003 falls back to raw flag list. BR-006 enforced via a constrained prompt.
 - **Gemini API — `submitReport`** — called from the same Cloud Function, now on the critical path for every report. Failure mode: quota/latency/malformed response → **fail-closed**, the report is rejected outright (not written unmoderated, not falling back to a raw write). BR-007 enforced via a constrained classify prompt.
@@ -181,7 +201,7 @@ single-route cascade):**
 
 1. **Cloud Firestore (read/write reports)** — Reads: open (flags are public safety info; no PII beyond uid). **Writes: denied for all clients (F-006)** — `allow create, update, delete: if false`. The only writer is `submitReport`, via the Admin SDK, which bypasses Rules entirely; that Function's own auth check (`request.auth != null`, BR-005) and validation code (closed enum, BR-001) are now the real gate, not Rules. Without rules at all, Firestore would still be write-blocked for clients (the `false` lines are explicit, not merely a default) but reads would need their own gate — rules remain mandatory.
 2. **Firebase Auth** — the identity surface itself. Anonymous by default (demo speed), with an optional Google sign-in upgrade via account linking (`/login`) that preserves the `uid`. While still anonymous, weak abuse control is a documented limitation, unchanged by F-006 (the Function still trusts whatever `request.auth.uid` Firebase Auth hands it).
-3. **Map key surface** — **Rendering (MapLibre GL + OpenFreeMap): no key at all** — OpenFreeMap tiles are keyless, so there is nothing to restrict or leak. **Routing (OpenRouteService): a client-side key** ships in the browser bundle and is **not yet origin-restricted** — the open security item is to restrict it by HTTP referrer/origin and cap request volume in the ORS dashboard.
+3. **Map key surface** — **Rendering (MapLibre GL + OpenFreeMap): no key at all** — OpenFreeMap tiles are keyless, so there is nothing to restrict or leak. **Routing (client-side Rust/WASM engine, ADR-0003): no key at all** — the preprocessed graph (`pup-20km.bin`) is a keyless static asset served from the same origin as the app; the prior "ORS client-side key not yet origin-restricted" open security item is resolved by removing the external routing call entirely.
 4. **Gemini API key** — **must NOT ship in the client.** Held in a Cloud Function (server-side); invoked by the authenticated client for both `summarizeSegment` and, as of F-006, `submitReport` — the latter is now P0/critical-path, not a P1 stretch. Client-side Gemini calls expose the key and are only acceptable as a knowingly-throwaway demo fallback — flagged as a security tradeoff, not for any real deployment.
 5. **Firebase Storage (report photos, F-007)** — **Authz via Storage Security Rules** (`backend/storage.rules`). Reads: open (same public-safety-info posture as reports). Writes: require `request.auth != null`, path-scoped to the caller's own `reports/{uid}/` prefix, `<5MB`, `image/(jpeg|png)` only. Without rules, Storage is world-writable — same mandatory-gate posture as Firestore Rules.
 
@@ -192,7 +212,8 @@ single-route cascade):**
 - **Firestore + Auth → managed Firebase project** (Spark/free plan — this is what satisfies the Google-technology requirement post-ADR-0002).
 - **Backend API (`backend/server`, now P0 — hosts `summarizeSegment`, `submitReport`, `assessRoute`) → Render.** Moved off Firebase Cloud Functions (ADR-0002) because Functions v2 requires the Blaze plan even at zero usage; a plain Node host does not.
 - **Storage → disabled** (`PHOTO_UPLOAD_ENABLED = false`; ADR-0002) — not deployed; `backend/storage.rules` kept unwired for a possible future re-enable under Blaze.
-- ORS + Gemini → external/Google-managed; consumed via key/the Render API.
+- **Routing graph asset (`frontend/public/graph/pup-20km.bin`) → served statically from Vercel** alongside the web app build — no separate hosting, no key, no runtime build step (Vercel has no Rust toolchain; the `.bin` and the wasm `pkg/` are committed artifacts, not generated at deploy time). See ADR-0003.
+- Gemini → external/Google-managed; consumed via key through the Render API.
 
 ## Scaling strategy
 
@@ -211,6 +232,7 @@ N/A for the hackathon beyond defaults — **because** this is a single-zone (BR-
   persists. → Proposed ADR.
 - **Single-environment deploy** — accepted no staging for a 2-day build; not safe beyond demo.
 - **Report creation: client-direct-write vs. server-only-via-callable (F-006)** — **decided: server-only.** Firestore Rules can only inspect a write's shape, not whether it passed AI review, so client-direct-write + Rules-as-gate cannot enforce moderation (a client could always skip the review call). Moving creation into `submitReport` (Admin SDK, bypasses Rules) makes the Function the single, auditable enforcement point, at the cost of Rules no longer validating `reports` shape on create and a new single-point-of-failure surface (a bug in the Function's validation is no longer backstopped by Rules). → Proposed ADR.
+- **Point-to-point routing: OpenRouteService vs. client-side Rust/WASM engine (F-005)** — **decided: client-side WASM.** Removes an external-dependency/cold-start risk at demo time and the unrestricted-key open item, at the cost of a committed binary graph + wasm bundle (no Rust toolchain on Vercel) and a build pipeline (`scripts/fetch-graph.mjs`, `scripts/build-graph.mjs`) that must be re-run when the underlying OSM data needs refreshing. Also **caps routing at exactly 2 routes** (recommended + one alternative, down from the prior 1-3 ORS cascade) — carried over from the demo-simplicity decision in `docs/BUILD-GUIDE.md`/`docs/POSTMORTEM.md`. → [ADR-0003](adr/ADR-0003-client-side-wasm-routing.md).
 
 ### Proposed ADRs
 - ADR: Web app (React + Vite) over native mobile for the hackathon MVP.
@@ -221,6 +243,7 @@ N/A for the hackathon beyond defaults — **because** this is a single-zone (BR-
 
 ### Accepted ADRs
 - **[ADR-0002](adr/ADR-0002-hosting-compute-split.md)** — frontend moved from Firebase Hosting to Vercel; `submitReport`/`assessRoute`/`summarizeSegment` moved from Firebase Cloud Functions to an Express app (`backend/server`) on Render; Firebase Storage disabled. Firestore + Auth stay on Firebase.
+- **[ADR-0003](adr/ADR-0003-client-side-wasm-routing.md)** — OpenRouteService replaced by a client-side Rust/WASM routing engine (A* over a preprocessed 20km pedestrian graph, running in a Web Worker); routing capped at exactly 2 routes (recommended + alternative). Supersedes the ORS half of ADR-0001.
 
 ## 2-day build sequence
 

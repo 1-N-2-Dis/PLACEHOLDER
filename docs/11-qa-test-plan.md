@@ -33,8 +33,8 @@
   (nothing to exercise) and become live again only if Storage is re-enabled under Blaze.
 - F-008 AI-assessed "is my route safe tonight?" for the recommended route (`assessRoute`).
 - Security: Firestore rules (client `create` on `reports` denied — F-006; closed enum / no
-  crime-label BR-001 now enforced in `submitReport`'s code), Storage rules (F-007), ORS key
-  referrer-restriction, Gemini key server-side only.
+  crime-label BR-001 now enforced in `submitReport`'s code), Storage rules (F-007), routing graph
+  asset load (no client-side key exists — ADR-0003), Gemini key server-side only.
 - Negative/edge: empty zone, stale flags, offline, red-segment-unavoidable, AI rejection.
 
 ### Out of scope
@@ -53,8 +53,10 @@
   street geometry, sourced from OpenStreetMap via Overpass) — all `[unverified]` demo content, not
   evidence. See `frontend/src/data/seed-segments.js` for the authoritative current set. Add
   hand-crafted reports for dedup/freshness tests.
-- **Secrets handling:** reference only, never inline. The ORS routing key lives in the client bundle but MUST be
-  origin-restricted + capped (currently unrestricted `[unverified]` — known gap); the MapLibre GL + OpenFreeMap render is keyless; `GEMINI_API_KEY` and `FIREBASE_SERVICE_ACCOUNT_KEY` MUST live only as Render env vars on `backend/server` (ADR-0002). Tests assert this, never print key values.
+- **Secrets handling:** reference only, never inline. Routing has no client-side key at all as of
+  ADR-0003 (client-side WASM engine replaced OpenRouteService); the MapLibre GL + OpenFreeMap
+  render is keyless; `GEMINI_API_KEY` and `FIREBASE_SERVICE_ACCOUNT_KEY` MUST live only as Render
+  env vars on `backend/server` (ADR-0002). Tests assert this, never print key values.
 - **Freshness window value** for "tonight" is `[unverified]` — a value must be chosen at build step 6
   and documented before TC-009/TC-010 can have a concrete pass bar.
 
@@ -82,9 +84,9 @@
 | BR-008 | Photo EXIF stripped before upload | TC-024 | manual (metadata inspection) | todo |
 
 Security-specific TCs: TC-007 (client `create` on `reports` rejected outright — F-006), TC-008
-(reject non-enum/crime-label field, now inside `submitReport`'s validation), TC-014 (ORS key
-referrer-restricted), TC-015 (Gemini key never in client bundle), TC-027 (Storage rules reject
-oversized/wrong-type/unauthenticated uploads).
+(reject non-enum/crime-label field, now inside `submitReport`'s validation), TC-014 (routing graph
+asset loads safely, no external routing calls — ADR-0003), TC-015 (Gemini key never in client
+bundle), TC-027 (Storage rules reject oversized/wrong-type/unauthenticated uploads).
 Negative/edge TCs: TC-009 (stale flags), TC-010 (freshness boundary), TC-011 (empty zone),
 TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/false report).
 
@@ -94,7 +96,7 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 
 ### TC-001 — Map renders zone with seeded flags ⭐DEMO-CRITICAL
 - **Covers:** F-001
-- **Preconditions:** App deployed; MapLibre GL + OpenFreeMap render loads (keyless); ORS key set; Firestore/seed data loaded with the demo segment pins (see `frontend/src/data/seed-segments.js`) and demo reports (`backend/scripts/seed-reports.mjs`, `npm run seed:reports`).
+- **Preconditions:** App deployed; MapLibre GL + OpenFreeMap render loads (keyless); routing graph asset loaded (keyless, ADR-0003); Firestore/seed data loaded with the demo segment pins (see `frontend/src/data/seed-segments.js`) and demo reports (`backend/scripts/seed-reports.mjs`, `npm run seed:reports`).
 - **Steps:** Open app; let zone map load.
 - **Expected:** Sta. Mesa zone renders via MapLibre GL + OpenFreeMap; ≥ the seeded segment flags are visible.
 
@@ -179,10 +181,18 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Steps:** Inspect map bounds + content.
 - **Expected:** Only PUP Sta. Mesa zone; no metro-wide expansion.
 
-### TC-014 — ORS key is origin-restricted + capped
-- **Covers:** Security (system design §Auth point 3)
-- **Steps:** Confirm the OpenRouteService key has an HTTP-referrer/origin allowlist + request cap in the ORS dashboard; attempt use from a non-allowed origin.
-- **Expected:** Restrictions present; off-origin use blocked. **Known gap:** the ORS key is currently unrestricted `[unverified]` — this TC fails until origin-restriction + a usage cap are applied. (MapLibre GL + OpenFreeMap render is keyless, so there is no map-render key to restrict.)
+### TC-014 — Routing graph asset loads correctly; failure produces a clear error state
+- **Covers:** Security (system design §Auth point 3) — **superseded by ADR-0003:** routing no longer
+  has a client-side key to restrict at all (OpenRouteService removed), so this TC's subject
+  changed from "is the ORS key restricted" to "does the replacement asset load safely."
+- **Steps:** (a) Confirm the network tab shows no ORS or other external routing API calls when a
+  route is requested — only a cached fetch of `frontend/public/graph/pup-20km.bin` and the wasm
+  module. (b) Simulate the graph asset failing to load (e.g. block the `/graph/` request) and
+  request a route.
+- **Expected:** (a) No external routing calls; the graph asset and wasm module are same-origin,
+  keyless static files. (b) A clear "routing data still loading" / "no route found" error surfaces
+  through `RouteLayer.jsx`'s existing error path — no crash, no hang — mirroring the old
+  ORS-failure expectation this TC replaced.
 
 ### TC-015 — Gemini key never in client bundle
 - **Covers:** Security (system design §Auth point 4)
@@ -203,13 +213,19 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 
 ### TC-018 — Route recommendation renders up to 2 ranked green routes (safest + alternative) ⭐DEMO-CRITICAL
 - **Covers:** F-005
-- **Preconditions:** Live ORS access; zone has a mix of severities (or none, for the trivial case).
+- **Preconditions:** Client-side WASM routing engine (ADR-0003) — no external service required;
+  the graph asset (`frontend/public/graph/pup-20km.bin`) must have loaded. Zone has a mix of
+  severities (or none, for the trivial case).
 - **Steps:** Set a destination that has no flagged segments nearby; then one with only yellow
-  nearby; then one with a red segment on the direct path.
-- **Expected:** No-flag case → 1 route. Yellow-nearby → up to 2 routes, both green, second at
-  lower opacity. Red-on-path (with a street-level detour available) → the safest route avoids it
-  entirely; an "Alternative" option may still cross it, labeled accordingly, still rendered green
-  (never orange) per the opacity-only distinction.
+  nearby; then one with a red segment on the direct path. Check the network tab throughout.
+- **Expected:** No-flag case → 2 routes (recommended + alternative — the alternative may be a
+  near-duplicate of the recommended path when the street layout offers no genuinely distinct
+  detour; 1 only when the graph offers no second path at all, a true bottleneck). Yellow-nearby →
+  2 routes, both green, alternative at lower opacity. Red-on-path (with a street-level detour
+  available) → the recommended route avoids it entirely; the "Alternative" option may still cross
+  it, labeled accordingly, still rendered green (never orange) per the opacity-only distinction.
+  Never more than 2 routes. Copy reads "Recommended (safest we found)" / "Alternative". Network
+  tab shows zero external routing calls — only the cached graph/wasm fetch.
 
 ### TC-019 — Red segment genuinely unavoidable (edge)
 - **Covers:** F-005 (edge)

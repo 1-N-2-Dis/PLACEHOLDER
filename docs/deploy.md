@@ -9,8 +9,10 @@ tables, and troubleshooting.
 - [ ] Firebase project created (Firestore + Auth, Spark/free plan)
 - [ ] Firebase service account key generated (Console → Project settings → Service accounts)
 - [ ] Gemini API key (https://aistudio.google.com/apikey)
-- [ ] ORS API key (https://openrouteservice.org/dev/#/signup)
 - [ ] Vercel account + Render account
+
+Routing needs no key/signup at all — it's a client-side Rust/WASM engine over a committed graph
+asset (ADR-0003), not an external service.
 
 ## 1. Point Firebase at your real project
 
@@ -49,7 +51,7 @@ firebase deploy --only firestore:rules,firestore:indexes
 
 1. Import repo into a new Vercel project (`vercel.json` already sets build/output).
 2. Set env vars: `VITE_USE_EMULATORS=false`, `VITE_FIREBASE_*` (from Firebase Console),
-   `VITE_API_BASE_URL=<your-render-url>`, `VITE_ORS_API_KEY`.
+   `VITE_API_BASE_URL=<your-render-url>`.
 3. Deploy.
 
 ## 6. Lock down CORS
@@ -62,7 +64,6 @@ Back in Render → Environment → set `CORS_ORIGIN=<your-vercel-url>` → redep
 - [ ] `/health` on Render responds
 - [ ] `GEMINI_API_KEY` / `FIREBASE_SERVICE_ACCOUNT_KEY` never appear in `frontend/dist`
 - [ ] `CORS_ORIGIN` on Render = real Vercel URL (not permissive)
-- [ ] ORS key origin-restricted in the ORS dashboard (public/non-demo only)
 - [ ] Smoke test: sign in → submit report → appears in Firestore
 - [ ] Smoke test: route check (`assessRoute`)
 - [ ] No secrets committed to the repo

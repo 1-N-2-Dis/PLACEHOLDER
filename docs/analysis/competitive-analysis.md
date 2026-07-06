@@ -99,7 +99,7 @@ side of. That's why he was worth an hour (interview reconciled in [mentor-synthe
 | **Intelligence** | sklearn RF trained on **synthetic** formula labels | Gemini **structures/dedupes real reports**, adds no facts (BR-006) |
 | **Rescue/SOS** | **Yes** — Buddy Alert SMS + Call 911 | **No** — rescue promise is a kill-criterion (BR-002) |
 | **Trip type** | Walking navigation | Multi-modal commute (LRT + jeep + walk), pre-trip check |
-| **Stack** | FastAPI/Python, PostgreSQL, Leaflet, ORS, sklearn, Twilio | Node/Express, **Firebase (Firestore/Auth) + Gemini**, MapLibre, ORS |
+| **Stack** | FastAPI/Python, PostgreSQL, Leaflet, ORS, sklearn, Twilio | Node/Express, **Firebase (Firestore/Auth) + Gemini**, MapLibre, client-side Rust/WASM routing engine |
 | **Google-tech** | None | **Firebase + Gemini** (a competition requirement for us) |
 | **Cold-start** | Sidestepped via pre-seeding | **The core unsolved risk** (our riskiest assumption) |
 | **Users / validation** | None (demo only) | None yet (both unvalidated) |

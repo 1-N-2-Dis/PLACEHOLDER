@@ -28,10 +28,10 @@ Each box is a remaining task. `(opt)` = optional/roadmap, cut-safe. `[guardrail]
 ### Jim — demo + engineering (the critical path to our score)
 
 - [ ] Make the **first screen render from the static seed module**, not a live call to a cold-starting service. Warm the backend / add a keep-alive for demo day.
-- [ ] Verify the **core loop end-to-end**: open map → conditions → submit report → route adjusts, with **2 routes max**, recommended (safest computed) path **+ visible alternative**, and "recommended = safest we found" copy (F-005).
-- [ ] Confirm the **PRD F-005 line reads "2 routes"** (was 2–3); if you change it, add a line to [POSTMORTEM §3](./POSTMORTEM.md).
+- [x] Verify the **core loop end-to-end**: open map → conditions → submit report → route adjusts, with **2 routes max**, recommended (safest computed) path **+ visible alternative**, and "recommended = safest we found" copy (F-005). Done via the client-side WASM routing engine (ADR-0003) — verified in-browser 2026-07-06, see [POSTMORTEM §3](./POSTMORTEM.md).
+- [x] Confirm the **PRD F-005 line reads "2 routes"** (was 2–3); if you change it, add a line to [POSTMORTEM §3](./POSTMORTEM.md). Done as part of ADR-0003.
 - [ ] **Record a demo video fallback** — do not rely on live-only on stage.
-- [ ] **Restrict the ORS key** (origin/referrer + usage cap) — currently unrestricted.
+- [x] ~~Restrict the ORS key (origin/referrer + usage cap) — currently unrestricted.~~ **Obsolete (ADR-0003):** ORS is removed entirely — routing runs client-side (Rust/WASM), there is no routing key to restrict anymore.
 - [ ] `(opt)` Google One Tap sign-up (Firebase Auth Google sign-in already exists — low effort).
 - [ ] `[guardrail]` Do **not** deploy the deny-client-write Firestore rule until `submitReport` is verified against the emulator (breaks submission otherwise).
 
@@ -52,7 +52,7 @@ Each box is a remaining task. `(opt)` = optional/roadmap, cut-safe. `[guardrail]
 
 ## Definition of Done (sprint gate) — status 2026-07-06
 - [ ] **(Jim)** Core loop works, live + on video.
-- [ ] **(Jim)** 2-route recommendation with visible alternative + "safest we found" copy.
+- [x] **(Jim)** 2-route recommendation with visible alternative + "safest we found" copy. (ADR-0003, client-side WASM engine.)
 - [ ] **(Jim/Farhana)** No crime-zone labels; conditions-only verified end-to-end.
 - [ ] **(Jim)** Backend warmed / demo video recorded as fallback.
 - [x] Name + stack consistent across key docs; decision log seeded → [POSTMORTEM](./POSTMORTEM.md).

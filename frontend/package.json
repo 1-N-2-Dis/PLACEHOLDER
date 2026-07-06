@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:wasm": "wasm-pack build rust/router --target web --out-dir ../../src/wasm/router && node -e \"require('fs').rmSync('src/wasm/router/.gitignore',{force:true})\""
   },
   "dependencies": {
     "firebase": "^11.1.0",
@@ -20,6 +21,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0"
   }
 }

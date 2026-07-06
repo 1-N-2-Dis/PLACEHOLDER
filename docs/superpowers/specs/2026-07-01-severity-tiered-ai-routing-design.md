@@ -1,5 +1,12 @@
 # Severity-tiered routing, AI report moderation, photo evidence — design
 
+> ⚠️ **Superseded (2026-07-06) by [ADR-0003](../../adr/ADR-0003-client-side-wasm-routing.md):**
+> the routing half of this doc (the OpenRouteService 1-3-route cascade, avoid-polygon mechanism,
+> highway-waytype refinement) has been replaced by a client-side Rust/WASM A* engine over a
+> preprocessed pedestrian graph — see [System Design](../../06-system-design.md). This doc is kept
+> as-is for historical reference (it is not rewritten); the AI report moderation / photo evidence
+> half (F-006/F-007) is unaffected and still current.
+
 Status: implemented (frontend + Cloud Function), pending live-Gemini verification and the
 `firestore.rules` deny-client-create flip (see Testing approach).
 

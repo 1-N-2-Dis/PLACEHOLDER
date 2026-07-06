@@ -27,7 +27,8 @@ Deeper reference when you need it: [BUILD-GUIDE.md](./BUILD-GUIDE.md) (sprint ch
 [LOCAL_DEV.md](./LOCAL_DEV.md) + [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) (run/deploy).
 
 **Repo layout in one glance:**
-- `frontend/` — React + Vite SPA (MapLibre GL + OpenFreeMap maps, ORS routing). Deploys to Vercel.
+- `frontend/` — React + Vite SPA (MapLibre GL + OpenFreeMap maps, client-side Rust/WASM routing —
+  ADR-0003). Deploys to Vercel.
 - `backend/server/` — Express API (`submitReport`, `assessRoute`, `summarizeSegment`; holds the
   Gemini key server-side). Deploys to Render.
 - `backend/` — Firestore rules, indexes, seed scripts, storage rules (Storage disabled).
@@ -46,12 +47,15 @@ The unchecked Definition-of-Done items are all yours (see the [BUILD-GUIDE task 
 2. **Make the first screen render from the static seed module**, not a live call to a cold-starting
    service (Troy's #1 regret was a fragile backend). Warm the backend / add a keep-alive for the demo.
 3. **Record a demo video fallback** of the full core loop. Do not rely on live-only on stage.
-4. **Verify the core loop end-to-end:** open map → see conditions → submit report → route adjusts,
-   with **2 routes max**, the recommended (safest computed) path **and** a visible alternative, and
-   the copy "recommended = safest we found."
+4. ~~**Verify the core loop end-to-end:**~~ **Done (2026-07-06, ADR-0003)** — open map → see
+   conditions → submit report → route adjusts, with **2 routes max**, the recommended (safest
+   computed) path **and** a visible alternative, copy "Recommended (safest we found)." Now backed
+   by a client-side Rust/WASM routing engine, not OpenRouteService — see
+   [ADR-0003](./adr/ADR-0003-client-side-wasm-routing.md).
 - **Do NOT deploy the deny-client-write Firestore rule** until `submitReport` is verified against the
-  emulator (it breaks report submission otherwise). **Restrict the ORS key** (origin + usage cap) —
-  it's currently unrestricted. Details: [POSTMORTEM §4](./POSTMORTEM.md), [AGENTS.md](../AGENTS.md).
+  emulator (it breaks report submission otherwise). ~~**Restrict the ORS key**~~ — **obsolete
+  (ADR-0003):** routing has no client-side key anymore. Details: [POSTMORTEM §4](./POSTMORTEM.md),
+  [AGENTS.md](../AGENTS.md).
 
 ### Farhana — the AI/data story + technical Q&A
 1. Lock the one-liner: **Gemini structures real reports** (classifies severity, dedupes, filters

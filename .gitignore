@@ -447,3 +447,11 @@ fmd/
 
 # macOS Finder metadata
 .DS_Store
+
+# Routing graph build pipeline (scripts/fetch-graph.mjs, scripts/build-graph.mjs) — intermediate
+# only; frontend/public/graph/*.bin (the compiled output) is committed, this raw fetch is not.
+scratch/
+
+# Rust build output (frontend/rust/router) — frontend/src/wasm/router (the wasm-pack pkg/ output)
+# is committed since Vercel has no Rust toolchain; this native build cache is not.
+frontend/rust/router/target/

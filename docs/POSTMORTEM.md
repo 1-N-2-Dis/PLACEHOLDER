@@ -67,6 +67,24 @@ SaferRoute; that is a known, tracked migration (see §4 open items), **not** a c
   and a new **[Design System](./design-system.md)** (Helena-owned, grounded in `frontend/src/styles.css`)
   to the [index.md](./index.md) source-of-truth map so they're discoverable and drift-checked.
 
+### 2026-07-06 (later same day) — OpenRouteService replaced by a client-side Rust/WASM routing engine (ADR-0003)
+- Point-to-point routing (F-005) no longer calls OpenRouteService — a Rust crate compiled to
+  WebAssembly (`frontend/rust/router`) runs A* in a Web Worker (`routeWorker.js`) over a
+  preprocessed 20km pedestrian graph (`frontend/public/graph/pup-20km.bin`, built from Overpass
+  data via `scripts/fetch-graph.mjs` + `scripts/build-graph.mjs`). No external routing API, no
+  key, no quota, no cold start.
+- This is also where the "2 routes max" decision (Troy, 2026-07-01, above) actually landed in
+  code — the engine returns **exactly 2 routes** ("Recommended (safest we found)" + "Alternative"),
+  never the prior 1-3 ORS cascade. `03-prd.md`/`11-qa-test-plan.md` already read "2 routes" as of
+  the entry above; this is the implementation catching up to that already-reconciled text.
+- Resolves the previously-open "ORS key unrestricted" security item (Threat T2,
+  `docs/12-security-compliance.md`) by elimination — there is no client-side routing key anymore.
+- Verified in-browser 2026-07-06: destination selection returns exactly 2 route options with the
+  expected copy, network tab shows only the wasm module + graph asset fetched (no ORS calls, no
+  console errors), rendered route geometry follows real PUP Sta. Mesa streets.
+- See [ADR-0003](./adr/ADR-0003-client-side-wasm-routing.md) and
+  [System Design](./06-system-design.md) for the full design.
+
 ### 2026-07-02 — Hosting/compute split (ADR-0002)
 - Frontend Firebase Hosting → **Vercel**. `submitReport`/`assessRoute`/`summarizeSegment` moved from
   Firebase Cloud Functions → **`backend/server` (Express) on Render**. **Firebase Storage disabled**
@@ -107,7 +125,9 @@ SaferRoute; that is a known, tracked migration (see §4 open items), **not** a c
   deny-write gate or the static segments module. Diagnose, don't guess. Video fallback required.
 - **Do NOT deploy the deny-client-write Firestore rule** until `submitReport` is verified vs the
   emulator (breaks submission otherwise).
-- **ORS key is unrestricted** — restrict by origin + usage cap before any public demo.
+- ~~**ORS key is unrestricted** — restrict by origin + usage cap before any public demo.~~
+  **Resolved (2026-07-06, ADR-0003):** ORS is removed entirely — routing runs client-side
+  (Rust/WASM), no routing key exists to restrict anymore.
 - **Validation gap** — riskiest assumption (use vs group chat; will they contribute) is unproven.
   Interview probe sheet ([pitch kit §5](./analysis/alex-pitch-kit.md)) is how we test it. Judges'
   first question is "is the problem validated?"

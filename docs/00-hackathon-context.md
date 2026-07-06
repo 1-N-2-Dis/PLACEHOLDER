@@ -67,7 +67,7 @@ Weights below are the ones the final-round pitch is scored on. **Total = 100 pts
 
 | Criterion | Weight | What "excellent" means | Our exposure |
 |-----------|-------:|------------------------|--------------|
-| **Technology** | **25** | Well-chosen, well-integrated stack; real technical depth and understanding | Highest single weight. Must defend the non-Google map stack (MapLibre + OpenFreeMap + ORS) **and** show the Google-tech requirement is met (Firebase + Gemini). Gemini's *trust role* (structure/dedupe/classify real reports, invents nothing) is the depth story. |
+| **Technology** | **25** | Well-chosen, well-integrated stack; real technical depth and understanding | Highest single weight. Must defend the non-Google map stack (MapLibre + OpenFreeMap for render; a client-side Rust/WASM routing engine, ADR-0003) **and** show the Google-tech requirement is met (Firebase + Gemini). Gemini's *trust role* (structure/dedupe/classify real reports, invents nothing) is the depth story — the WASM routing engine is a second, complementary depth story (no external routing dependency at all). |
 | **Relevance to the Theme** | **20** | Directly promotes public safety, justice, strong institutions | Say the theme mapping explicitly: public safety + inclusion + institution-funded. Do not assume judges infer it. |
 | **Creativity & Innovation** | **15** | Unique approach, not common practice | The wedge: conditions-only + bottom-up crowdsourcing vs top-down scraped/synthetic crime maps. |
 | **Uniqueness & Originality** | **15** | Novel approach / distinct execution | Single-zone depth + women wedge + "AI structures real reports, never manufactures danger." |

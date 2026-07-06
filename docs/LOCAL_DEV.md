@@ -23,7 +23,7 @@ with **zero** real keys. The Maps key and Gemini key only unlock the visual map 
 
 1. **Node 20+** — check with `node -v`. You already have it if the app built.
 
-2. **Java (JDK 11+)** — the Firestore emulator needs it. Check with `java -version`. If it is missing,
+2. **Java (JDK 21+)** — the Firestore emulator needs it. Check with `java -version`. If it is missing,
    install Temurin/Adoptium (https://adoptium.net) and reopen your terminal.
 
 3. **Firebase CLI** — install once, globally:
@@ -40,6 +40,25 @@ with **zero** real keys. The Maps key and Gemini key only unlock the visual map 
 
 Your `frontend/.env.local` is already created with `VITE_USE_EMULATORS=true` and demo values, so the
 app will talk to the emulators automatically.
+
+5. **Rust + wasm-pack — only if you're changing the routing engine.** The compiled routing graph
+   (`frontend/public/graph/pup-20km.bin`) and the wasm build output (`frontend/src/wasm/router/`)
+   are both committed to the repo (Vercel has no Rust toolchain — see
+   [ADR-0003](./adr/ADR-0003-client-side-wasm-routing.md)), so a fresh clone works with **zero**
+   Rust setup. Only install this if you're editing `frontend/rust/router` or refreshing the graph
+   data:
+   ```powershell
+   rustup target add wasm32-unknown-unknown
+   cargo install wasm-pack
+   ```
+   Then:
+   ```powershell
+   cd frontend && npm run build:wasm   # rebuild the wasm package after a Rust change
+   cd .. && npm run graph:fetch        # repo root — re-fetch OSM data via Overpass (slow, ~a few minutes)
+   npm run graph:build                 # repo root — recompile the fetched data into pup-20km.bin
+   ```
+   `cargo test` inside `frontend/rust/router` runs the engine's fixture-based unit tests (no wasm
+   toolchain needed for that — they run natively).
 
 ---
 
@@ -153,7 +172,7 @@ $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run seed
 
 ## Troubleshooting
 
-- **`java` not found / Firestore emulator won't start** — install JDK 11+ and reopen the terminal.
+- **`java` not found / Firestore emulator won't start** — install JDK 21+ and reopen the terminal.
 - **Port already in use** — another emulator is still running; close it, or change the port in
   `firebase.json`.
 - **Blank map / "Map unavailable"** — no `VITE_MAPS_API_KEY` yet. Expected; the side panel still works.

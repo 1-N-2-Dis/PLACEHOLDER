@@ -1,6 +1,6 @@
 // guidHER Safety Map page — full-viewport ZoneMap.
 // Accepts optional navigation state { destination: [lat, lng], destinationLabel }
-// so Routes page "View on map" pre-places Point B and triggers ORS routing.
+// so Routes page "View on map" pre-places Point B and triggers routing (client-side WASM engine).
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import ZoneMap from '../features/map/ZoneMap.jsx';

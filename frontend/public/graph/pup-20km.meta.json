@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "center": {
+    "lat": 14.5985,
+    "lng": 121.0102
+  },
+  "radiusMeters": 20000,
+  "bbox": {
+    "south": 14.418837765001797,
+    "north": 14.778162234998202,
+    "west": 120.82454400399801,
+    "east": 121.19585599600198
+  },
+  "nodeCount": 676530,
+  "edgeCount": 751940,
+  "sourceWayCount": 197355,
+  "generatedAt": "2026-07-06T10:35:13.203Z"
+}

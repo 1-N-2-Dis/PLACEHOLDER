@@ -3,13 +3,14 @@
 // Traces to: docs/03-prd.md F-001, docs/06-system-design.md.
 //
 // Uses MapLibre GL JS via react-map-gl + OpenFreeMap vector tiles (OSM data, includes buildings).
-// Routing: ORS foot-walking, safety-first — avoids flagged segments, falls back if no safe path exists.
+// Routing: client-side Rust/WASM A* engine (ADR-0003), safety-first — avoids flagged segments,
+// falls back if no safe path exists. See frontend/src/lib/routing.js.
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useState, useMemo } from 'react';
 import Map, { NavigationControl, Layer } from 'react-map-gl/maplibre';
 import { CheckCircle2, AlertTriangle, AlertOctagon } from 'lucide-react';
 import { useTheme } from '../../lib/theme.jsx';
-import { ZONE_CENTER, ZONE_ZOOM, getMapStyle } from '../../lib/maps.js';
+import { ZONE_CENTER, ZONE_ZOOM, getMapStyle, PHILIPPINES_BOUNDS } from '../../lib/maps.js';
 import { segmentStatus } from '../../lib/freshness.js';
 import { nearestDistanceToRoute, YELLOW_AVOID_RADIUS_M } from '../../lib/routing.js';
 import SegmentFlag from './SegmentFlag.jsx';
@@ -106,6 +107,8 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
         cursor={settingB ? 'crosshair' : 'grab'}
         onClick={handleMapClick}
         attributionControl={false}
+        maxBounds={PHILIPPINES_BOUNDS}
+        minZoom={5}
       >
         <NavigationControl position="top-left" />
 
@@ -202,7 +205,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
                       <meta.Icon size={14} />
                     </span>
                   )}
-                  {i === 0 ? 'Safest route' : `Alternative ${i + 1}`}
+                  {i === 0 ? 'Recommended (safest we found)' : 'Alternative'}
                   {' — '}
                   {meta ? meta.copy : route.status}
                 </button>

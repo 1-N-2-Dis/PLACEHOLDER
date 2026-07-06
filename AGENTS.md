@@ -21,8 +21,10 @@ before they set out.
 ## Architecture
 React + Vite single-page web app, served from **Vercel** (moved off Firebase Hosting — ADR-0002).
 - **Map render:** **MapLibre GL JS + OpenFreeMap** vector tiles — free, keyless, no API key.
-- **Routing:** **OpenRouteService (ORS)** — severity-tiered multi-route recommendation (F-005);
-  client-side key that must be origin-restricted + usage-capped (currently unrestricted — open item).
+- **Routing:** **client-side Rust/WASM engine** (`frontend/rust/router`, ADR-0003) — severity-tiered,
+  exactly-2-route recommendation (F-005); A* over a preprocessed 20km pedestrian graph
+  (`frontend/public/graph/pup-20km.bin`), running in a Web Worker. Replaced OpenRouteService — no
+  external routing API, no key, no quota, no cold start.
 - **Reports:** written **server-side only** via the `submitReport` route on **`backend/server`
   (Express, deployed on Render — ADR-0002)** — Gemini classifies severity, merges duplicates,
   rejects spam; clients cannot write `reports` directly (Firestore Rules deny client
@@ -89,8 +91,9 @@ report submission with no fallback.
 
 ## Security must-dos
 - **Map render is keyless** — MapLibre GL + OpenFreeMap ship no API key; nothing to restrict or leak.
-- **Restrict the OpenRouteService (ORS) key** — it ships in the client bundle; restrict by
-  origin/referrer + set a usage cap in the ORS dashboard. **Currently unrestricted — open item.**
+- **Routing is keyless too (ADR-0003)** — the client-side Rust/WASM engine has no external API key
+  to restrict; the routing graph asset (`frontend/public/graph/pup-20km.bin`) is a same-origin
+  static file. This resolves the prior "restrict the ORS key" open item by elimination.
 - **Keep the Gemini key server-side only**, as a Render env var on `backend/server`. Never ship it
   to the browser. It now backs a P0 path (`submitReport`), so its uptime gates report submission.
 - **Keep `FIREBASE_SERVICE_ACCOUNT_KEY` server-side only** (Render env var, `backend/server`) —
@@ -101,15 +104,14 @@ report submission with no fallback.
 
 ## Do not touch
 - The condition enum and the "no crime-label field" rule — kill-criterion safeguards (idea §9).
-- The server-side write gate (`submitReport`), Storage rules, and the ORS-key restriction — gates,
-  not polish.
+- The server-side write gate (`submitReport`) and Storage rules — gates, not polish.
 
 ## Definition of done
 - Build passes, tests pass.
 - Traceability preserved: code change ties to an `F-###`; that `F-###` has a test in the QA plan.
-- No secrets committed; report writes are server-side + auth-gated; the ORS key is restricted; the
-  Gemini key and `FIREBASE_SERVICE_ACCOUNT_KEY` are server-side only (Render); Firestore rules
-  deployed (Storage rules N/A while disabled — ADR-0002).
+- No secrets committed; report writes are server-side + auth-gated; routing has no client-side key
+  at all (ADR-0003); the Gemini key and `FIREBASE_SERVICE_ACCOUNT_KEY` are server-side only
+  (Render); Firestore rules deployed (Storage rules N/A while disabled — ADR-0002).
 - Business rules verified end-to-end (no SOS copy, single zone, condition-only data, EXIF stripped).
 - Docs updated when behavior changes — and the Docs consistency check below is run.
 
@@ -130,9 +132,9 @@ When you edit any spec doc, before you finish:
 3. If your edit restated a fact owned by another doc and now disagrees, fix it: update the
    canonical owner (if it's a real decision change) or replace the restatement with a link.
 4. Spot-check invariants: every `F-###` (F-001..F-008) still has ≥1 QA test; every network surface
-   (Firestore, Auth, ORS key, Gemini key, Storage) declares auth/authz; the Google-tech requirement
-   is still satisfied (Firebase + Gemini not both removed); no doc reintroduces "Google Maps" as the
-   map stack.
+   (Firestore, Auth, Gemini key, Storage) declares auth/authz; the Google-tech requirement
+   is still satisfied (Firebase + Gemini not both removed); no doc reintroduces "Google Maps" or
+   "OpenRouteService" as the map/routing stack (both superseded — see ADR-0001/ADR-0003).
 5. Report contradictions with file+line and a proposed fix; if consistent, say so in one line.
 
 ## References
@@ -146,7 +148,7 @@ When you edit any spec doc, before you finish:
 - [Data Model](./docs/09-data-model.md) — segment + report schema, Storage objects
 - [QA Test Plan](./docs/11-qa-test-plan.md) — traceability matrix
 - [Security & Compliance](./docs/12-security-compliance.md) — threats, auth, secrets, privacy
-- [ADRs](./docs/adr/) — significant decisions (map stack = ADR-0001; hosting/compute split = ADR-0002)
+- [ADRs](./docs/adr/) — significant decisions (map stack = ADR-0001; hosting/compute split = ADR-0002; client-side WASM routing = ADR-0003)
 - [Idea brief](./docs/idea.md), [Deployment Guide](./docs/DEPLOYMENT_GUIDE.md), [Deploy Quick Reference](./docs/deploy.md), [Local Dev](./docs/LOCAL_DEV.md) — the origin brief and the operational how-tos, kept alongside the rest of `docs/`
 
 <!-- Optional: scoped, path-specific rules live under ./.cursor/rules/*.mdc. -->

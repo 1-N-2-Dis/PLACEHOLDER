@@ -78,8 +78,8 @@ Business-level (not signups/views):
 ## Budget / cost-benefit
 
 - **Cost:** near-zero infra by design — Firebase Spark (free), Vercel + Render (free tiers),
-  keyless MapLibre/OpenFreeMap tiles, capped ORS + Gemini usage (ADR-0002). Main cost is **team
-  time** for manual data-seeding and field validation.
+  keyless MapLibre/OpenFreeMap tiles, a keyless client-side routing engine (ADR-0003), capped
+  Gemini usage (ADR-0002). Main cost is **team time** for manual data-seeding and field validation.
 - **Value:** unproven. Institutional band cited is ₱10M–₱100M (§5) but is **order-of-magnitude
   reasoning, not a validated pipeline**. Do not present it as a forecast.
 

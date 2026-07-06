@@ -33,7 +33,7 @@
       Storage disabled.
 - [ ] Report writes are server-side + auth-gated (`submitReport`); Gemini key + service-account key
       server-side only (Render).
-- [ ] ORS client key origin-restricted + usage-capped (**currently unrestricted — open item**).
+- [x] ~~ORS client key origin-restricted + usage-capped~~ — **N/A (ADR-0003):** routing has no client-side key anymore.
 - [ ] Business-rule sign-off: no SOS/rescue copy (BR-002), single zone (BR-003), condition-only
       data (BR-001), no crime-zone/neighborhood labels, EXIF stripped where photos re-enable (BR-008).
 - [ ] Seed pins loaded as **"confirm-or-kill" hypotheses**, not stated facts (Tier B, unverified).

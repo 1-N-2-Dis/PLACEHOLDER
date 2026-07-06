@@ -19,7 +19,7 @@ const COMMUTE_PREFS = [
 
 const FEATURES = [
   { icon: Map,         title: 'Zone Safety Map',       body: 'See every flagged segment of the Sta. Mesa zone live. You can tap any flag for its condition, severity, and exact report time.' },
-  { icon: Route,       title: 'Route Recommendations', body: 'Get 2–3 ranked routes to your destination, scored by tonight\'s real reported conditions.' },
+  { icon: Route,       title: 'Route Recommendations', body: 'Get a recommended route plus an alternative to your destination, scored by tonight\'s real reported conditions.' },
   { icon: Bot,         title: 'AI Route Check',        body: 'Ask "Is my route okay tonight?" and get a Gemini-written verdict grounded only in real reports near your path.' },
   { icon: Flag,        title: 'Community Reporting',   body: 'Flag poor lighting, thin crowds, or a recent incident, with a required note and an optional photo.' },
   { icon: ShieldAlert, title: 'Risk Summary',          body: 'A segment with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },

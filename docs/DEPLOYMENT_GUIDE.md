@@ -14,10 +14,11 @@ Three separate pieces:
 | `submitReport`, `summarizeSegment`, `assessRoute` (hold the Gemini key server-side) | **Render** | Plain Node/Express host — no Blaze plan required (see note below) |
 | Firestore (report data) + Firebase Auth (anonymous/Google/email sign-in) | **Firebase** | Google-technology requirement for this hackathon; both stay on the free **Spark** plan |
 
-Map rendering (MapLibre GL + OpenFreeMap) and routing (OpenRouteService) are external,
-non-Google services, unchanged by this split. For the full architecture and the reasoning behind
-each choice, see [`06-system-design.md`](./06-system-design.md) — that document is the
-canonical owner of the stack; this guide only covers *how to ship it*.
+Map rendering (MapLibre GL + OpenFreeMap) is an external, non-Google, keyless service. Routing
+(F-005) runs entirely client-side — a Rust/WASM engine over a preprocessed graph asset committed
+to the repo (ADR-0003) — no external routing service or key at all. For the full architecture and
+the reasoning behind each choice, see [`06-system-design.md`](./06-system-design.md) — that
+document is the canonical owner of the stack; this guide only covers *how to ship it*.
 
 > **Why Render instead of Firebase Functions:** the three Gemini-backed routes used to be
 > Firebase Cloud Functions (v2). Functions v2 requires the **Blaze** (pay-as-you-go) plan even at
@@ -41,7 +42,10 @@ canonical owner of the stack; this guide only covers *how to ship it*.
 | A Google account with a Firebase project | Firestore + Auth (Spark/free plan — no Blaze needed) | https://console.firebase.google.com — create a new project |
 | A Firebase service account key | Lets the Render API authenticate to Firestore/Auth outside GCP | Firebase Console → Project settings → Service accounts → Generate new private key |
 | Gemini API key | Powers `submitReport`'s moderation gate (P0) and the optional summary/route-check routes | https://aistudio.google.com/apikey (free tier) |
-| OpenRouteService (ORS) API key | Powers point-to-point routing (F-005) | https://openrouteservice.org/dev/#/signup (free tier) |
+
+You do **not** need an OpenRouteService (or any routing) key either. Routing (F-005) is a
+client-side Rust/WASM engine over a preprocessed graph asset committed to the repo
+(`frontend/public/graph/pup-20km.bin`, ADR-0003) — nothing to sign up for, nothing to restrict.
 
 You do **not** need a Google Maps key. Map rendering is MapLibre GL JS + OpenFreeMap vector tiles,
 which are free and keyless by design (see system design's "Resolved 2026-07-01" note). If you see
@@ -70,12 +74,11 @@ for local testing against real services):
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Yes | Same source |
 | `VITE_FIREBASE_APP_ID` | Yes | Same source |
 | `VITE_API_BASE_URL` | Yes | Your Render deployment URL (e.g. `https://saferroute-api.onrender.com`) |
-| `VITE_ORS_API_KEY` | Yes | Used by `frontend/src/lib/routing.js`. **Ships in the client bundle by design** — see the security note below. |
 | `VITE_MAPS_API_KEY` | No — unused | Legacy var from the pre-MapLibre design; safe to leave blank |
 
 The Firebase `VITE_FIREBASE_*` values are client identifiers, not secrets — Firestore Security
-Rules are the real access gate, not key secrecy. `VITE_ORS_API_KEY` is meant to be client-side but
-should be origin-restricted (see the security note in step 4).
+Rules are the real access gate, not key secrecy. There is no routing key to configure at all
+(ADR-0003) — the routing graph asset ships as a committed static file, not a live API.
 
 ### Render (backend API) environment variables
 
@@ -141,10 +144,9 @@ This is the access-control gate: public reads, denied client writes to `reports`
 > service from a config file instead of clicking through the dashboard, but isn't required for a
 > single-service deploy like this one.
 
-> **Open security item, carried from `docs/06-system-design.md`:** the ORS key ships in the client
-> bundle and is not yet origin-restricted. Before a real (non-demo) launch, restrict it by
-> HTTP referrer in the ORS dashboard and set a request-volume cap. Treat this as a deploy-day
-> must-do, not an optional hardening step, if the deployment is public.
+> **Resolved (ADR-0003):** the prior open item here — an unrestricted OpenRouteService key
+> shipping in the client bundle — no longer applies. Routing is a client-side Rust/WASM engine
+> with no external key at all.
 
 ### 5. Deploy the frontend to Vercel
 
@@ -181,7 +183,8 @@ Pulled from `docs/index.md` §2 (health check) and `AGENTS.md` ("Definition of d
       bundle to confirm neither ever appears client-side.
 - [ ] `CORS_ORIGIN` on Render is set to the real Vercel URL (not left permissive) if this is a
       public, non-demo deploy.
-- [ ] ORS key is origin-restricted in the ORS dashboard (if this is a public, non-demo deploy).
+- [x] ~~ORS key is origin-restricted in the ORS dashboard~~ — **N/A (ADR-0003):** routing has no
+      client-side key anymore.
 - [ ] Smoke-test the full report flow: sign in (anonymous is fine) → submit a report with a
       condition flag → confirm it appears in Firestore via `submitReport`, not a direct write.
 - [ ] Smoke-test the route check (`assessRoute`) and, if enabled, the summary (`summarizeSegment`).
@@ -208,8 +211,12 @@ Pulled from `docs/index.md` §2 (health check) and `AGENTS.md` ("Definition of d
 - **Roll back a bad Render deploy** — Render keeps deploy history under the service's **Events**/
   **Deploys** tab; pick a previous successful deploy and use **Manual Deploy → Deploy an existing
   commit**, or redeploy from a known-good commit on the connected branch.
-- **Blank map after deploy** — this points to an ORS or Firebase config issue, not a Maps key (there
-  isn't one to configure). Check the browser console for the actual failing request.
+- **Blank map after deploy** — this points to a Firebase config issue, not a Maps key (there isn't
+  one to configure). Check the browser console for the actual failing request.
+- **Routes fail to load** — check that `frontend/public/graph/pup-20km.bin` and
+  `frontend/src/wasm/router/` were actually committed and included in the Vercel build (both are
+  build artifacts, not generated at deploy time — see ADR-0003); check the Network tab for a
+  failed fetch of `/graph/pup-20km.bin`.
 
 ## References
 

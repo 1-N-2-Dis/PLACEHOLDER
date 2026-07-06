@@ -16,7 +16,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useRef, useState, useCallback } from 'react';
 import Map, { Marker, NavigationControl, Layer } from 'react-map-gl/maplibre';
-import { ZONE_CENTER, ZONE_ZOOM, MAP_STYLE } from '../../lib/maps.js';
+import { ZONE_CENTER, ZONE_ZOOM, MAP_STYLE, PHILIPPINES_BOUNDS } from '../../lib/maps.js';
 import { isWithinCoverage, snapToRenderedRoad, makeRoadSegmentId } from '../../lib/osmRoads.js';
 
 const ROAD_LAYER_ID = 'pin-roads';
@@ -88,6 +88,8 @@ export default function PinMap({ onSnap }) {
         cursor="crosshair"
         onClick={handleClick}
         onLoad={handleLoad}
+        maxBounds={PHILIPPINES_BOUNDS}
+        minZoom={5}
       >
         <NavigationControl position="top-left" />
 

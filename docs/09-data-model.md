@@ -84,7 +84,7 @@ F-001 (render flags) and F-003 (route → segment matching).
 |-------|------|-------|---------|-------------|
 | `segmentId` | string (doc ID) | No | — | Stable segment key; also the document ID. Used as join key by `reports.segmentId`. |
 | `name` | string | No | — | Human-readable segment label (e.g., "Teresa Street stretch"). For map/pin display. |
-| `geo` | GeoPoint **or** array of GeoPoint | No | — | Point (pin) or polyline (path) geometry for MapLibre overlay (F-001) + ORS routing (F-003). Shape `[unverified]` — system design lists "point or polyline"; pick one at build time. |
+| `geo` | GeoPoint **or** array of GeoPoint | No | — | Point (pin) or polyline (path) geometry for MapLibre overlay (F-001) + the client-side WASM routing engine (F-003, ADR-0003). Shape `[unverified]` — system design lists "point or polyline"; pick one at build time. |
 
 > No crime/neighborhood-classification field exists on `segment` (BR-001).
 

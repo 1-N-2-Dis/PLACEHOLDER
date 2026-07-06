@@ -1,5 +1,5 @@
 // Mock route + zone data for guidHER prototype.
-// Traces to: docs/06-system-design.md (F-005, ORS routing).
+// Traces to: docs/06-system-design.md (F-005, client-side WASM routing engine — ADR-0003).
 
 export const MOCK_ROUTES = [
   {

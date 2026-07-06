@@ -82,8 +82,8 @@ GuidHer provides a preventive, community-powered zone safety map that shows wome
 
 ## Tech Stack
 
-* **Frontend:** React, Vite, MapLibre GL, OpenFreeMap
-* **Backend:** Node.js, OpenRouteService
+* **Frontend:** React, Vite, MapLibre GL, OpenFreeMap, Rust/WebAssembly (client-side routing engine — [ADR-0003](docs/adr/ADR-0003-client-side-wasm-routing.md))
+* **Backend:** Node.js (Express)
 * **Database:** Cloud Firestore (Firebase Storage code present but **disabled** — [ADR-0002](docs/adr/ADR-0002-hosting-compute-split.md))
 * **AI / ML:** Gemini API
 * **Tools & Authentication:** Firebase Auth, Git/GitHub, Render (Backend Hosting), Vercel (Frontend Hosting)
@@ -96,7 +96,7 @@ Test everything locally using the **Firebase Emulator Suite** alongside your loc
 
 ### Prerequisites
 * **Node 20+** — Check version using `node -v`.
-* **Java (JDK 11+)** — Required natively by the Firestore emulator engine. Check version with `java -version`. (Install via [Adoptium](https://adoptium.net) if absent).
+* **Java (JDK 21+)** — Required natively by the Firestore emulator engine. Check version with `java -version`. (Install via [Adoptium](https://adoptium.net) if absent).
 * **Firebase CLI** — Install globally:
   ```bash
   npm install -g firebase-tools
