@@ -1,0 +1,789 @@
+location,landmark_name,safety_type,operating_hours,is_24_7,last_verified
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Hipodromo,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-23:00,No,2026-07
+España Boulevard,Welcome Supermarket,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,Shell,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Uncle John's,24/7 Store,24/7,Yes,2026-07
+LRT-2 Betty Go-Belmonte Station,Burger King,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Anonas Street,Baliwag Lechon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Shell,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Hipodromo,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Banawe Pares King,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Bulaluhan sa N. Ramirez,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Rose,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,McDonald's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Emily's Place,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,RA Kambingan Ihaw-ihaw,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Leo's Canteen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Betty Go-Belmonte Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Betty Go-Belmonte Station,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-22:00,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Savemore,Well-Lit Zone,Unknown,No,2026-07
+Hipodromo,Watsons,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Watsons,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Garcia's,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Jollibee,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,City Government of San Juan,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Mercury Drug,Well-Lit Zone,06:00-23:00,No,2026-07
+Hipodromo,Bob's Halu-halo,High Foot Traffic,Unknown,No,2026-07
+Recto Legarda,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Recto Legarda,TGP,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,KFC,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Wendy's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,McDonald's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-23:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Mo-Su 06:00-22:00,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Chopsticks,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,KFC,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Botika ng Bayan,Well-Lit Zone,Unknown,No,2026-07
+Hipodromo,Wilson Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Burger King,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,KFC,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Manson Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-22:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Sbarro,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Tropical Hut,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Papa John's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Hipodromo,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-22:00,No,2026-07
+Hipodromo,Jollibee,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Project Pie,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Greenhills Shopping Center,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Madison Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Ortigas–Santolan Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Mercury Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,KFC,24/7 Store,24/7,Yes,2026-07
+España Boulevard,Chowking,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Lunch Box,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Savemore,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,K Plaza Supermarket,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Partners Pares-Mami House,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Lugawan ni Bro,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Gateway Underground Parking,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Ala Eh Bulalo,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Chowking,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Uncle John's,24/7 Store,24/7,Yes,2026-07
+Anonas Street,Ilocos Empanada,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Highmart Supermarket,Well-Lit Zone,07:00-22:00,No,2026-07
+Morayta Street,Jollibee,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Chowking,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,HM Transport Cubao,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Daet Express Cubao,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Amber,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Teriyaki Boy,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Subway,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Max's,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Jollibee,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Razon's,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Yellow Cab Pizza,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,7-Eleven,24/7 Store,24/7,Yes,2026-07
+España Boulevard,SM Hypermarket,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,D' Amburger Gastro Pub,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Red Buffalo Wings & Pizza,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Lola Nena's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Manang's Chicken,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Mercury Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 V. Mapa Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Recto Legarda,Jollibee,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Mercury Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Aling Banang's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Melvi Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Ersao,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Betty Go-Belmonte Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,abandoned building,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,The Sandwich Guy,24/7 Store,24/7,Yes,2026-07
+Anonas Street,Uncle John's,24/7 Store,24/7,Yes,2026-07
+Anonas Street,Wellcome Supermarket,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Andok's,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,McDonald's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Uncle John's,24/7 Store,24/7,Yes,2026-07
+LRT-2 J. Ruiz Station,McDonald's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Planet Drugstore,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Tapa King,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Ortigas/Greenhills,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Mercury Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Isetann Supermarket,Well-Lit Zone,Mo-Su 09:00-21:00,No,2026-07
+LRT-2 Araneta-Cubao Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Yellow Cab Pizza,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Hipodromo,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,7-Eleven,24/7 Store,24/7,Yes,2026-07
+España Boulevard,Balic-Balic Turning Point,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Dunkin' Donuts,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Generika,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,The Marketplace,Well-Lit Zone,08:00-22:00,No,2026-07
+LRT-2 Gilmore Station,Nathaniel's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Puregold,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,RSS Drug & General Merchandise,Well-Lit Zone,Unknown,No,2026-07
+Lacson Avenue,Chowking,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Army Navy,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Inasal Chicken Bacolod,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,BonChon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Zark's Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Krispy Kreme,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Police Community Precinct,Security Presence,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,German Espiritu Liner Cubao,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Beijing Tong Ren Tang,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Country Chicken,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,MedExpress,Well-Lit Zone,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,FamilyMart,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Chowking,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,Soy & Bean,High Foot Traffic,Mo-Su 08:00-20:00,No,2026-07
+España Boulevard,Calabash Police Community Precinct,Security Presence,24/7,Yes,2026-07
+España Boulevard,Batangas Lomi,24/7 Store,24/7,Yes,2026-07
+Morayta Street,Jollibee,24/7 Store,24/7,Yes,2026-07
+España Boulevard,ENALIN SIMON SILOG,High Foot Traffic,Mo-Su 10:00-22:00,No,2026-07
+LRT-2 Gilmore Station,Watson's,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Unimart,Well-Lit Zone,Mo-Su 09:00-20:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Dada's Fried Itik,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Little Baguio - Romualdez,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Romualdez - Little Baguio,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Mightee Mart,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 J. Ruiz Station,Mercury Drug,Well-Lit Zone,Mo-Su 09:00-21:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-23:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Mo-Su 08:00-21:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-22:00,No,2026-07
+Hipodromo,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-22:00,No,2026-07
+Hipodromo,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Chowking,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Elar's Lechon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Angus tapa centrale,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Generous & Joyous Ventures Inc.,High Foot Traffic,Unknown,No,2026-07
+Recto Legarda,Police Station,Security Presence,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,McDonald's,High Foot Traffic,Unknown,No,2026-07
+Recto Legarda,Watsons,Well-Lit Zone,Unknown,No,2026-07
+Recto Legarda,Mr Kimbob,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Teresa Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Aling Banang,High Foot Traffic,Unknown,No,2026-07
+V. Mapa,Santa Mesa,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Burger King,High Foot Traffic,Mo-Su 06:00-24:00,No,2026-07
+LRT-2 Araneta-Cubao Station,"AAA Pharma, Inc.",Well-Lit Zone,Unknown,No,2026-07
+Hipodromo,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,K5 prohealth,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Gamot Publiko,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,Police Community Precinct 1,Security Presence,Unknown,No,2026-07
+España Boulevard,M. Peralta,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Imba Imbang Kainan,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Jasper Store and Eatery,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Aling Banang,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,clinsors,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Kuya Allan's Maki,High Foot Traffic,02:00+,No,2026-07
+LRT-2 Gilmore Station,Pares,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Police Community Precinct № 8,Security Presence,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Scott Hamburger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Isetann Supermarket,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Burger King,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Tapsihan sa Don Egea,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Kamuning Police Post,Security Presence,Unknown,No,2026-07
+Anonas Street,Kabayans Gotohan,24/7 Store,24/7,Yes,2026-07
+Anonas Street,Tapsihan ni Don Egea,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,TGP,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Dunkin' Donuts,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Robinsons Supermarket,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mister Donut,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Lucky Swerte 88,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,Bulalohan sa España,High Foot Traffic,Unknown,No,2026-07
+Lacson Avenue,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 V. Mapa Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,All About Baking,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Celebrity X Food Kiosk,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Santo Domingo Church,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Banawe Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Bánh Mì Kitchen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Go Salads!,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Chooks To Go,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Dunkin',High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Puregold,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Ling Nam,High Foot Traffic,Unknown,No,2026-07
+Stop & Shop,Chef Von,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Marketplace,Well-Lit Zone,Unknown,No,2026-07
+NDC Compound,Tatay Pepe's Tapsilogan,High Foot Traffic,Unknown,No,2026-07
+NDC Compound,Lugawan sa Hipodromo,High Foot Traffic,Unknown,No,2026-07
+Earnshaw Street,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,McDonald's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,The Marketplace,Well-Lit Zone,08:00-22:00,No,2026-07
+LRT-2 J. Ruiz Station,SM Supermarket,Well-Lit Zone,Unknown,No,2026-07
+Lacson Avenue,Dunkin',High Foot Traffic,Unknown,No,2026-07
+Lacson Avenue,KFC,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Chowking,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Taco Bell,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Edm's Canteen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Big Mak,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Potato Corner,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Botikalyn,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Loose Leaf,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Dexter's Pizza,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Conerbricks Barbeque House,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Nid’s B’alot at Bilao atbp.,24/7 Store,24/7,Yes,2026-07
+LRT-2 J. Ruiz Station,Convenience Store,24/7 Store,24/7,Yes,2026-07
+LRT-2 V. Mapa Station,Sr. Pedro,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Dunkin',High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Dairy Queen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Pizza Hut Express,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Baby Zita's Store,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,Carmen Eatery,High Foot Traffic,"08:30-12:30,15:30-20:00",No,2026-07
+LRT-2 Gilmore Station,Mercy Bentelogan,24/7 Store,24/7,Yes,2026-07
+LRT-2 J. Ruiz Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Dan's and Norm's Eatery,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,king am,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Boyet's Tapsilogan,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Connie’s Kitchen Deli,High Foot Traffic,Unknown,No,2026-07
+Stop & Shop,Lawson,24/7 Store,24/7,Yes,2026-07
+Stop & Shop,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Mama Dad's Grill Kitchen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Maricor's Tapsilogan,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,AlJm eatery,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Aling Paz Store,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,Parkway Store,24/7 Store,24/7,Yes,2026-07
+LRT-2 J. Ruiz Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Burger House,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Food Hub,High Foot Traffic,Mo-Su 11:00-23:00,No,2026-07
+LRT-2 V. Mapa Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Zark's Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Watsons,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Tokyo Tokyo,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,McDonald's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,KFC,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Greenwich,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Dunkin' Donuts,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Dairy Queen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Classic Savory,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Chowking,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Bonchon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Takehome Sushi,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Cinema Snackbar,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Wendy's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Krispy Kreme,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,Unknown,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Sunrise Buckets,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Bánh Mì Kitchen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Ho-Land,Well-Lit Zone,Mo-Su 08:00-20:00,No,2026-07
+LRT-2 Gilmore Station,Bacolod Lapaz Batchoy,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 V. Mapa Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Jolly Friend,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Jollibee,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Sandugo,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Unknown,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Unknown,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,chooks to go,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Pansit ng taga Malabon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,JBLR Food Hun,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Fast Food,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Tapsilugan,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,TGP,Well-Lit Zone,Unknown,No,2026-07
+Recto Avenue,Unknown,Well-Lit Zone,Unknown,No,2026-07
+Recto Avenue,Unknown,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Mercury Drug,Well-Lit Zone,07:00-22:00,No,2026-07
+LRT-2 Betty Go-Belmonte Station,GoodAh!,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Brothers' Burger,High Foot Traffic,10:00-20:00,No,2026-07
+Anonas Street,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Super8 Supermarket,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Greenhills Shopping Center,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Roosevelt Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Roosevelt Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Madison Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Club Filipino Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Club Filipino Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Wilson Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,La Salle Green Hills,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,La Salle Green Hills,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Petron,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Caltex,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Central Colleges of the Philippines,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,LRT V. Mapa Station 1,High Foot Traffic,Unknown,No,2026-07
+V. Mapa,Stop n' Shop,High Foot Traffic,Unknown,No,2026-07
+Recto Legarda,Magsaysay Boulevard/De Dios Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Doña Hemady Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,1st Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Magsaysay–V. Mapa Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,V. Mapa–Valenzuela Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,V. Mapa–Valenzuela Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Guadalcanal Street,High Foot Traffic,Unknown,No,2026-07
+Lacson Avenue,Pureza Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Columbia–Yale Intersection,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Goto Tendon,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Philippine National Police,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Arayat Turning Point,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,N. Domingo Street–Mayor I.S. Diaz Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Natib Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mayor Diaz Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Aurora Boulevard–N. Domingo Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Ermin Garcia Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,New York–Cambridge Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Columbia–Cambridge Intersection,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,T. Gener Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,K-E Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,11th Jamboree Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,11th Jamboree Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Kamuning–Judge Jimenez Intersection,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,"Don Alejandro Roces, Sr. Science and Technology High School",High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Marathon Extension,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,LRT Araneta Center-Cubao Station 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,LRT Araneta Center-Cubao Station 1,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Judge D. Jimenez Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Kamuning–Judge Jimenez Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Kamuning–Judge Jimenez Intersection,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,T. Gener Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,L. Sanghio Intersection,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,K-3rd Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,E. Rodriguez Sr. Avenue–New York Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,E. Rodriguez Sr. Avenue–New York Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Monte de Piedad Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Monte de Piedad Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Victory Liner Motorpool,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Victory Liner Motorpool,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Betty Go-Belmonte Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Scout Tobias Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Marathon Extension,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Scout Lozano Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Tomas Morato Elementary School,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,K-1st Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Ermin Garcia Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Arayat Turning Point,High Foot Traffic,Unknown,No,2026-07
+Legarda Street,Master Buffalo,High Foot Traffic,Mo-Sa 07:00-17:00,No,2026-07
+España Boulevard,Mercury Drug,Well-Lit Zone,Mo-Su 07:00-22:00,No,2026-07
+España Boulevard,Tapsilog Avenue,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Old Santa Mesa Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Paco-Santa Mesa Road,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Teresa Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Old Santa Mesa/Magsaysay,High Foot Traffic,Unknown,No,2026-07
+Recto Legarda,Nagtahan Interchange,High Foot Traffic,Unknown,No,2026-07
+Recto Avenue,Lardizabal Street,High Foot Traffic,Unknown,No,2026-07
+Morayta Street,Masbate Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Gerardo Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Bataan Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Bataan Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Gerardo Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Masbate Street,High Foot Traffic,Unknown,No,2026-07
+Morayta Street,Wellcome Balic-Balic,High Foot Traffic,Unknown,No,2026-07
+Recto Avenue,G. Tuazon–Vicente Cruz Intersection,High Foot Traffic,Unknown,No,2026-07
+Morayta Street,Wellcome Balic-Balic,High Foot Traffic,Unknown,No,2026-07
+Recto Avenue,G. Tuazon–Vicente Cruz Intersection,High Foot Traffic,Unknown,No,2026-07
+Recto Avenue,G. Tuazon–Vicente Cruz Intersection,High Foot Traffic,Unknown,No,2026-07
+Recto Avenue,G. Tuazon Street,High Foot Traffic,Unknown,No,2026-07
+Recto Avenue,Lardizabal Turning Point,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Giant Taho,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Angel's Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Jho and JR Canteen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Alfamart,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Cameo,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Minute Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Yobe,High Foot Traffic,Mo-Th 10:00-20:00; Fr-Su 09:00-20:00,No,2026-07
+LRT-2 Gilmore Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+España Boulevard,Yellow Cab Pizza,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,La Salle Green Hills (School Buses Only),High Foot Traffic,Unknown,No,2026-07
+Recto Legarda,Chooks to Go,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,General's Lechon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Bok Korean Fried Chicken,High Foot Traffic,11:00-03:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Main Avenue - EDSA Carousel SB,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,NGCP Doña Imelda Substation,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Galas Police Station Ⅱ,Security Presence,Unknown,No,2026-07
+LRT-2 Gilmore Station,Burger Machine,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Araneta City Jeepney Terminal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Araneta City Jeepney Terminal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Araneta City Jeepney Terminal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Araneta City Jeepney Terminal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Araneta City Jeepney Terminal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Araneta City Jeepney Terminal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,General's Lechon,High Foot Traffic,Mo-Su 10:00-19:00,No,2026-07
+Anonas Street,Papa Johns,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Fariñas Ilocos Empanada,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Gang Gang Chicken,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Hackensack,High Foot Traffic,Unknown,No,2026-07
+Lacson Avenue,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Sonix Kitchennette,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Dunkin',High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Julie Naputo Eatery,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Violy's Kainan & Pancit Cabagan,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Robinsons Easymart,Well-Lit Zone,Mo-Su 07:00-23:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Uncle John's,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Devil's,High Foot Traffic,Unknown,No,2026-07
+Legarda Street,HDI Adventures,Well-Lit Zone,Unknown,No,2026-07
+Hipodromo,Yvette Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+Hipodromo,The Realmed Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,24 Chicken,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,San Juan Plaza Mayor,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Ferino's,High Foot Traffic,Mo-Su 09:00-21:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Yellow Cab Pizza,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Krispy Kreme,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Fariñas Ilocos Empanada,High Foot Traffic,Mo-Su 10:00-21:00,No,2026-07
+Recto Avenue,McDonald's,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,H. Lozada Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Lope K. Santos Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,D. Tuazon Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Welcome Rotonda,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Ortigas–Santolan Intersection,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Apo Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Dr. Jesus C. Delgado Memorial Hospital,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,D. Tuazon Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,N. Domingo Street/Gilmore Avenue,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Balete Drive,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,St. Luke's Medical Center,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Ortigas–Santolan Intersection,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Banawe Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,D. Tuazon Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Betty Go-Belmonte Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,N. Domingo Street/Gilmore Avenue,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,St. Luke's Medical Center,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Ortigas–Santolan Intersection,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Tomas Morato Avenue,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,E. Rodriguez Avenue–D. Tuazon Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Balete Drive,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Scout Lozano Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Doña Hemady/E. Rodriguez Sr. Avenue,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Christ the King Mission Seminary,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Araneta Avenue,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Welcome Rotonda,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Christ the King Mission Seminary,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Araneta Avenue,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Dr. Jesus C. Delgado Memorial Hospital,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Robinsons Magnolia,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,The Brewed Buddies,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,LRT Gilmore Station,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,LRT Gilmore Station,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Balete Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Aurora–N. Domingo Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Broadway Avenue,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,LRT Betty Go-Belmonte Station,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Aurora–N. Domingo Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Broadway Avenue,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Balete Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,LRT Betty Go-Belmonte Station,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,St. Paul University,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,BLK513,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,S&R New York Style Pizza,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,TGP,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Army Navy,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,V. Mapa Police Community Precint,Security Presence,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Damka,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Victory Liner Cubao Terminal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,WalterMart,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Uniku,High Foot Traffic,Mo-Fr 09:30-21:30; Sa-Su 10:00-22:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Cubao,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Watsons,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,San Juan City Police Station,Security Presence,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Luk Yuen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mercury Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,8sticks,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Junmery's Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+Recto Avenue,Watsons,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Popeyes,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,3rd Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Knot for Gain by KEC,High Foot Traffic,09:00-22:00,No,2026-07
+LRT-2 Gilmore Station,Tama Gogo,High Foot Traffic,12:00-20:00,No,2026-07
+LRT-2 Gilmore Station,Bun Appétit,High Foot Traffic,11:00-21:00,No,2026-07
+LRT-2 Gilmore Station,Fat Daddy,High Foot Traffic,11:00-22:00,No,2026-07
+LRT-2 Gilmore Station,Bun Run,High Foot Traffic,06:00-24:00,No,2026-07
+Anonas Street,7-Eleven,24/7 Store,24/7,Yes,2026-07
+Anonas Street,Frostea,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,24 Chicken,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Chooks to Go,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Nie & Laine Pinoy Food Express,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Potato Corner,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Mediscount Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Dunkin',High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Southstar Drug,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Hong Kong Fried Noodle Express,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,K2 Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mang Inasal,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Joccs Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Chooks to Go,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Heihei Chicken Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Shawarma Shack,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Kuya Nath's Goto,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,happy haus Donuts,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Siomai King,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Zane-Star Drugstore,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Carina's Fresh Buko,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Super8 Grocery Warehouse,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,Fruitas,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Minute Burger,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Oxymed Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,Baliwag,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Don.C,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Bia Crispy Sisig,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Al's Pritos,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Generic Saves! Drugstore,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Tentako,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,AllEn One,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Alni Fried Chicken,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Triple 888 Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Chooks to Go,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Baliwag,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Benox Generic Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+Hipodromo,Dunkin',High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Kapampangan Eatery,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Ali Raza Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Unknown,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Unknown,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Unknown,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,New Manila TODA,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Papeo,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,La Rotisserie,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Shari Shari,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Upper Crust,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Kaokee,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,7-Eleven,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,Angus Pares,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Andok's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Abuela Cantina,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Old China,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Souper Xin Jiang,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Cinnabon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Unknown,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Eng Bee Tin,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Chuan Kee Plus,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Big Man Chibugan,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Unknown,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Unknown,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Pinaglabanan Church,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Angel's Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Baksilog Express,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Popeyes,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Shake Shack,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Dairy Queen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Rhoma's,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Savemore,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 V. Mapa Station,KFC,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Jollibee,24/7 Store,24/7,Yes,2026-07
+LRT-2 Gilmore Station,Ern's Kainan,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Santa Lucia Police Sub-station,Security Presence,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Marugame Udon,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Quezon Ave–Araneta,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Uncle John's Grocery Store,Well-Lit Zone,24/7,Yes,2026-07
+LRT-2 Gilmore Station,FairyLuxe Cosmetics,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Gilmore Station,Maki Haus,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Manhattan Parkway,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Mama Empanada,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Golden Chopsticks,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Trinity University of Asia,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Trinity University of Asia,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Santo Domingo Church,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Gateway Mall 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Unimart Greenhills,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Cardinal Santos Medical Center,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Cardinal Santos Medical Center,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,G-Square,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,G-Square,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,KFC,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Dunkin',High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Tang's Kitchen,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Scout Chuatoco Avenue & Scout Tobias Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Scout Chuatoco Avenue & Scout Tobias Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Scout Tobias & Don A. Roces Avenue,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Greenhills Shopping Center,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Unknown,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Founders Donuts,High Foot Traffic,08:00-20:00,No,2026-07
+España Boulevard,Teyon,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Don Bosco School - Manila,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,2nd Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,2nd Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Santolan–C. Benitez Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Castilla Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Greenhills Barangay Hall,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Balete Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Across from Greenhills Barangay Hall,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Balete Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Horseshoe,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Frankie's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Sweet Ecstasy,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Panda Express,High Foot Traffic,10:00-22:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Wendy's,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Tokyo Tokyo,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Minute Burger,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Happy N' Healthy - QC,High Foot Traffic,Unknown,No,2026-07
+Recto Legarda,Nagtahan Interchange,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Lopez Jaena Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Quezon Institute,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,E. Rodriguez Avenue–D. Tuazon Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Instruccion Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Plaza Noli,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,LRT J. Ruiz Station 1,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,H. Lozada Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,A. Luna Street,High Foot Traffic,Unknown,No,2026-07
+NDC Compound,Magsaysay Railroad Crossing,High Foot Traffic,Unknown,No,2026-07
+Lacson Avenue,Pureza Street,High Foot Traffic,Unknown,No,2026-07
+NDC Compound,Magsaysay Railroad Crossing,High Foot Traffic,Unknown,No,2026-07
+V. Mapa,Stop n' Shop,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Magsaysay–V. Mapa Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,UE Ramon Magsaysay Campus 1,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,UE Ramon Magsaysay Campus 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Across from SM City Santa Mesa,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,LRT V. Mapa Station 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,A. Luna Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,S. Veloso Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,LRT J. Ruiz Station 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Cordillera Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Tzu Chi 1st,High Foot Traffic,Unknown,No,2026-07
+LRT-2 V. Mapa Station,Tzu Chi 2nd,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Tokyo Tokyo,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,L. Sanghio Intersection,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,K-1st Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,Tomas Morato Elementary School,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,K-3rd Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,K-1st Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Ermin Garcia Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Sergeant J. Catolos Street & Monte de Piedad Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,E. Rodriguez Sr. Avenue–New York Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Cubao Cathedral,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Kamuning–Judge Jimenez Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,K-5th Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,K-5th Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Seattle Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Cubao Cathedral,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,N. Domingo Street–Mayor I.S. Diaz Street,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,"Don Alejandro Roces, Sr. Science and Technology High School",High Foot Traffic,Unknown,No,2026-07
+Anonas Street,District 4 Action Center,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,District 4 Action Center,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Apoteka Pharmaceutical,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Burger Machine,High Foot Traffic,Unknown,No,2026-07
+Anonas Street,MekiKanto,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Generika,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Chooks to Go,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Thor's,High Foot Traffic,"Mo-Sa 09:00-20:00, Su off",No,2026-07
+LRT-2 Araneta-Cubao Station,Watson's Pharmacy,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Pharma Choice,Well-Lit Zone,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mightee Mart,Well-Lit Zone,24/7,Yes,2026-07
+LRT-2 Araneta-Cubao Station,Dandoy Canteen,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Angel's Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Kuya Nath's Goto,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Jollibee,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Minute Burger,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,TGP,Well-Lit Zone,Unknown,No,2026-07
+Anonas Street,Ultimate Burger and Pizza,High Foot Traffic,Mo-Su 15:00-23:00,No,2026-07
+LRT-2 Araneta-Cubao Station,Angel's Pizza,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Lion Cave,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Moonleaf,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Mister Donut,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Potato Corner,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Generika,Well-Lit Zone,Unknown,No,2026-07
+España Boulevard,M. Cuenco Sr. Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Philippine Orthopedic Hospital,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Dapitan Street,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,P. Florentino Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Maria Clara Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Calamba Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Dapitan Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Maria Clara Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,Simoun Street,High Foot Traffic,Unknown,No,2026-07
+España Boulevard,M. Cuenco Sr. Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Araneta Avenue,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Across from Jose Abad Santos Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Across from Pinaglabanan Church,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Pinaglabanan Shrine 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Across from Lieutenant Artiaga Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Lieutenant Artiaga Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Central San Juan Fire Volunteers 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Across from Filoil EcoOil Centre,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,D. Santiago Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Central San Juan Fire Volunteers 1,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,N. Domingo–Araneta Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Pinaglabanan Shrine 1,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,BPI San Juan,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Filoil EcoOil Centre,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Gilmore Station,Jose Abad Santos Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Agora Public Market,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Columbia–Yale Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Ermin Garcia Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,New York–Cambridge Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Columbia–Cambridge Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Robinsons Magnolia,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Across from Robinsons Magnolia,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Araneta–P. Florentino,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Puregold QI Central,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,SM City Santa Mesa,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Across from NGCP Doña Imelda Substation,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Bayani Road,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Araneta–E. Rodriguez Intersection,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Quezon Ave–Araneta,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Araneta–E. Rodriguez Intersection,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Landargon Street,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Landargon Street,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Across from La Funeraria Paz,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Central Colleges of the Philippines,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Across from Arlington Memorial Chapels,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,La Funeraria Paz,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,Arlington Memorial Chapels,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Across from Petron Araneta Ave,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Petron Araneta Ave,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Across from Puregold QI Central,High Foot Traffic,Unknown,No,2026-07
+Hipodromo,Bayani Road,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Across from Avida Towers New Manila,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Avida Towers New Manila,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Sunrise Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Sunrise Drive,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Camp Crame Gate 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,EDSA–Santolan Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Camp Crame Gate 3,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Camp Crame Gate 3,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,3rd West Crame Road,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Betty Go-Belmonte Station,Santolan–C. Benitez Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,3rd West Crame Road,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Camp Crame Gate 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,EDSA–Santolan Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 J. Ruiz Station,N. Domingo–Araneta Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,New York–Cambridge Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Stanford Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,New York–Cambridge Intersection,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Stanford Street,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Nepa Q-Mart,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,West Crame Barangay Hall,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Road 2,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Camp Crame Gate 4,High Foot Traffic,Unknown,No,2026-07
+LRT-2 Araneta-Cubao Station,Camp Crame Elementary School,High Foot Traffic,Unknown,No,2026-07
