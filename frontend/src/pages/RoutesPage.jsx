@@ -140,8 +140,8 @@ export default function RoutesPage() {
       <div className="page-scroll-inner">
 
         {/* Header */}
-        <div className="mb-20">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
             <div style={{ paddingRight: 16 }}>
               <div className="text-h1" style={{ margin: 0, fontSize: '2.2rem', color: 'var(--ink)' }}>Routes</div>
               <div className="text-body" style={{ color: 'var(--muted)', marginTop: 8, fontSize: '1.05rem', lineHeight: 1.4 }}>Curated by Owly based on tonight's safety activity</div>
@@ -150,21 +150,8 @@ export default function RoutesPage() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="route-tabs">
-          {[['recommended','Recommended'],['saved','Saved']].map(([id, label]) => (
-            <button key={id}
-              className={`route-tab${activeTab === id ? ' active' : ''}`}
-              onClick={() => setActiveTab(id)}>
-              {label} {id === 'saved' && saved.length > 0 && (
-                <span className="route-tab-count">{saved.length}</span>
-              )}
-            </button>
-          ))}
-        </div>
-
         {activeTab === 'recommended' && (
-          <div>
+          <div className="route-list">
             {RECOMMENDED.map(route => (
               <RouteCard key={route.id} route={route}
                 isSaved={isSaved(route.id)}
@@ -172,13 +159,13 @@ export default function RoutesPage() {
                 onViewMap={handleViewMap} />
             ))}
             <p style={{ fontSize: '0.78rem', color: 'var(--muted)', textAlign: 'center', marginTop: 8 }}>
-              For live routing with segment flags, use the Safety Map.
+              For live routing with road flags, use the Safety Map.
             </p>
           </div>
         )}
 
         {activeTab === 'saved' && (
-          <div>
+          <div className="route-list">
             {saved.length === 0 ? (
               <div className="empty-state">
                 <Bookmark size={40} color="var(--muted)" style={{ margin: '0 auto 12px' }} />
@@ -200,6 +187,19 @@ export default function RoutesPage() {
             )}
           </div>
         )}
+
+        {/* Tabs */}
+        <div className="route-tabs">
+          {[['recommended','Recommended'],['saved','Saved']].map(([id, label]) => (
+            <button key={id}
+              className={`route-tab${activeTab === id ? ' active' : ''}`}
+              onClick={() => setActiveTab(id)}>
+              {label} {id === 'saved' && saved.length > 0 && (
+                <span className="route-tab-count">{saved.length}</span>
+              )}
+            </button>
+          ))}
+        </div>
 
       </div>
     </div>

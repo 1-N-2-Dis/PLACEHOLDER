@@ -329,11 +329,20 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Covers:** F-010
 - **Preconditions:** At least one green-severity report and one yellow/red-severity report exist
   within the freshness window.
-- **Steps:** Toggle "Show incident heatmap" on the zone map.
-- **Expected:** Glowing severity-icon markers appear only on segments with yellow/red reports
-  (red icon when any qualifying report on the segment is red); a segment with only a green report
-  gets no heatmap marker; toggling off removes the layer (markers are hidden until toggled on);
-  heatmap markers never block clicking the segment's flag dot.
+- **Steps:** Toggle "Toggle Red Zones"/"Toggle Yellow Zones" on the zone map.
+- **Expected:** A MapLibre heatmap cloud appears only over segments with yellow/red reports (a
+  segment counts as red if any qualifying report on it is red); a segment with only a green report
+  contributes no cloud; toggling off removes the layer (clouds are hidden until toggled on).
+
+### TC-031 — Cloud size scales with real, cross-user likes
+- **Covers:** F-010
+- **Preconditions:** A yellow or red report exists within the freshness window, with no likes yet.
+- **Steps:** Note the cloud's rendered size/intensity at a fixed zoom. Like the report (thumbs-up
+  in the segment's popup) from a second signed-in account (or a second browser/incognito session
+  to get a distinct anonymous uid). Re-observe the cloud at the same zoom.
+- **Expected:** The cloud is visibly larger/more intense after the like than before (weight is
+  `1 + likedBy.length`, capped at `HEAT_COUNT_CAP`); liking again from the same uid does not
+  double-count (`arrayUnion` is idempotent); unliking shrinks it back.
 
 ## Acceptance criteria
 

@@ -8,17 +8,20 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useState, useMemo } from 'react';
 import Map, { NavigationControl, Layer, Marker } from 'react-map-gl/maplibre';
-import { CheckCircle2, AlertTriangle, AlertOctagon, MapPin, X, Layers } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, AlertOctagon, MapPin, X, Layers, ShieldCheck } from 'lucide-react';
 import { useTheme } from '../../lib/theme.jsx';
 import { ZONE_CENTER, ZONE_ZOOM, getMapStyle, PHILIPPINES_BOUNDS } from '../../lib/maps.js';
 import { segmentStatus } from '../../lib/freshness.js';
 import { nearestDistanceToRoute, hazardsNearRoute, nearestNamedHazard, YELLOW_AVOID_RADIUS_M } from '../../lib/routing.js';
 import { HEATMAP_BASELINE } from '../../data/heatmap-baseline.js';
+import { useAuthUser } from '../../lib/useAuthUser.js';
+import { toggleReportLike } from '../../lib/likes.js';
 import SegmentFlag from './SegmentFlag.jsx';
 import MockLocation from './MockLocation.jsx';
 import DestinationMarker from './DestinationMarker.jsx';
 import RouteLayer from './RouteLayer.jsx';
 import ReportHeatmap from './ReportHeatmap.jsx';
+import SafeHeatmap from './SafeHeatmap.jsx';
 import RouteCheck from '../route-check/RouteCheck.jsx';
 import RiskSummary from '../risk-summary/RiskSummary.jsx';
 import { Skeleton, MapSkeleton } from '../../components/Skeleton.jsx';
@@ -83,6 +86,7 @@ function RouteNotifySkeleton() {
 
 export default function ZoneMap({ segments, latest, reports, selectedId, onSelect, initialDestination = null, destinationLabel = null }) {
   const { theme } = useTheme();
+  const { user } = useAuthUser();
   const [locationA, setLocationA] = useState(INITIAL_A);
   // Pre-place Point B if navigated from Routes page
   const [locationB, setLocationB] = useState(initialDestination);
@@ -94,7 +98,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
   const [showControls, setShowControls] = useState(false);
   const [showHeatmapRed, setShowHeatmapRed] = useState(false);
   const [showHeatmapYellow, setShowHeatmapYellow] = useState(false);
-  const [localLikes, setLocalLikes] = useState({});
+  const [showHeatmapGreen, setShowHeatmapGreen] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // Hazards passed to RouteLayer as avoid zones — reports flagged tonight (live Firestore),
@@ -120,6 +124,10 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
   }, [segments, latest]);
 
   const selectedRouteCoords = routes[selectedRouteIndex]?.coords || null;
+
+  // While a route is being shown, the map already has route bubbles competing for the same
+  // screen space as report heatmap popups — disable heatmap clicks so the two can't overlap.
+  const isRoutingActive = routes.length > 0;
 
   // Segments that sit near the currently selected route — shared by low-concern marker
   // visibility (which just needs the IDs; see SegmentFlag.jsx) and RouteCheck's AI assessment
@@ -166,6 +174,8 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
       return;
     }
 
+    if (isRoutingActive) return;
+
     if (e.features && e.features.length > 0) {
       const feature = e.features.find(f => f.layer.id.startsWith('heatmap-red') || f.layer.id.startsWith('heatmap-yellow'));
       if (feature?.properties?.segmentId) {
@@ -188,6 +198,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
     setRoutes(nextRoutes);
     setSelectedRouteIndex(0);
     setIsConfirmed(false);
+    if (nextRoutes.length > 0) onSelect(null);
   }
 
   return (
@@ -202,6 +213,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
         mapStyle={getMapStyle(theme)}
         cursor={settingB ? 'crosshair' : 'grab'}
         interactiveLayerIds={useMemo(() => {
+          if (isRoutingActive) return [];
           const ids = [];
           if (showHeatmapRed) {
             ids.push('heatmap-red-layer');
@@ -210,7 +222,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
             ids.push('heatmap-yellow-layer');
           }
           return ids;
-        }, [showHeatmapRed, showHeatmapYellow])}
+        }, [showHeatmapRed, showHeatmapYellow, isRoutingActive])}
         onClick={handleMapClick}
         onLoad={() => setMapLoaded(true)}
         attributionControl={false}
@@ -251,7 +263,8 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
           />
         )}
 
-        <ReportHeatmap reports={reports} segments={segments} showRed={showHeatmapRed} showYellow={showHeatmapYellow} localLikes={localLikes} />
+        <ReportHeatmap reports={reports} segments={segments} showRed={showHeatmapRed} showYellow={showHeatmapYellow} />
+        <SafeHeatmap show={showHeatmapGreen} />
 
         {(() => {
           const renderedIds = new Set();
@@ -290,8 +303,13 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
               isOpen={selectedId === seg.segmentId}
               onSelect={onSelect}
               isOnRoute={onRouteSegmentIds.has(seg.segmentId)}
-              isLiked={!!localLikes[seg.segmentId]}
-              onLike={(liked) => setLocalLikes(prev => ({ ...prev, [seg.segmentId]: liked }))}
+              isLiked={!!(user && report?.likedBy?.includes(user.uid))}
+              onLike={(liked) => {
+                if (!report?.id) return; // baseline hotspots have no real doc to like
+                toggleReportLike(report.id, liked).catch((err) => {
+                  console.error('Could not update like:', err.message);
+                });
+              }}
             />
           ));
         })()}
@@ -358,7 +376,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
                           className="btn btn-sm" 
                           style={{ 
                             width: '100%', 
-                            background: i === 0 ? 'var(--okay)' : '#f57f17', 
+                            background: i === 0 ? 'var(--okay)' : '#fbc02d',
                             color: '#fff', 
                             border: 'none',
                             fontWeight: 600
@@ -438,6 +456,13 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
               onClick={() => setShowHeatmapYellow((v) => !v)}
             >
               <AlertTriangle size={18} />
+            </button>
+            <button
+              className={`map-toolbar-btn ${showHeatmapGreen ? 'active-green' : ''}`}
+              title="Toggle Safe Zones"
+              onClick={() => setShowHeatmapGreen((v) => !v)}
+            >
+              <ShieldCheck size={18} />
             </button>
           </div>
         )}

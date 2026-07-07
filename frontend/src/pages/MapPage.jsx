@@ -10,9 +10,7 @@ function useMapHeight() {
   useEffect(() => {
     function update() {
       const headerH = 56;
-      const isMobile = window.innerWidth <= 768;
-      const bottomH = isMobile ? 68 : 0;
-      setHeight(`${window.innerHeight - headerH - bottomH}px`);
+      setHeight(`${window.innerHeight - headerH}px`);
     }
     update();
     window.addEventListener('resize', update);
@@ -30,7 +28,7 @@ export default function MapPage({ segments, latest, reports, selectedId, onSelec
   const destinationLabel   = state?.destinationLabel ?? null;
 
   return (
-    <div style={{ width: '100%', height, position: 'relative', overflow: 'hidden' }}>
+    <div className="map-page-shell" style={{ width: '100%', height, position: 'relative', overflow: 'hidden' }}>
       <ZoneMap
         segments={segments}
         latest={latest}

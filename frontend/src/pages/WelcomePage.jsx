@@ -23,11 +23,11 @@ const COMMUTE_PREFS = [
 ];
 
 const FEATURES = [
-  { icon: Map,         title: 'Zone Safety Map',       body: 'See every flagged segment of the Sta. Mesa zone live. You can tap any flag for its condition, severity, and exact report time.' },
+  { icon: Map,         title: 'Zone Safety Map',       body: 'See every flagged road of the Sta. Mesa zone live. You can tap any flag for its condition, severity, and exact report time.' },
   { icon: Route,       title: 'Route Recommendations', body: 'Get a recommended route plus an alternative to your destination, scored by tonight\'s real reported conditions.' },
   { icon: Bot,         title: 'AI Route Check',        body: 'Ask "Is my route okay tonight?" and get a Gemini-written verdict grounded only in real reports near your path.' },
   { icon: Flag,        title: 'Community Reporting',   body: 'Flag poor lighting, thin crowds, or a recent incident, with a required note and an optional photo.' },
-  { icon: ShieldAlert, title: 'Risk Summary',          body: 'A segment with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
+  { icon: ShieldAlert, title: 'Risk Summary',          body: 'A road with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
   { icon: Layers,      title: 'Incident Heatmap',      body: 'Toggle glowing incident markers for validated reports to see where risk clusters across the zone at a glance.' },
   { icon: BookOpen,    title: 'Safety Tips',           body: 'Zone-specific guidance for before, during, and after your commute, including transport-specific advice.' },
   { icon: Fingerprint, title: 'Conditions-Only Data',  body: 'We describe observable states like lighting, crowds, and incidents. We never use crime labels or place ratings.' },
@@ -451,7 +451,7 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest, guestBus
           </div>
           <div className="hero-stats">
             <div className="hero-stat"><b>{stats.reportsThisMonth.toLocaleString()}</b><span>reports this month</span></div>
-            <div className="hero-stat"><b>{stats.segmentsTracked.toLocaleString()}</b><span>zone segments tracked</span></div>
+            <div className="hero-stat"><b>{stats.segmentsTracked.toLocaleString()}</b><span>zone roads tracked</span></div>
             <div className="hero-stat"><b>{stats.communityMembers.toLocaleString()}</b><span>community members</span></div>
           </div>
         </div>
@@ -501,8 +501,8 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest, guestBus
           </div>
           <div className="how-it-works-grid">
             {[
-              { n: '01', title: 'Check tonight\'s conditions', body: 'See what riders flagged on each segment of the Sta. Mesa zone, including lighting, crowd levels, and recent incidents.' },
-              { n: '02', title: 'Pick your safest route',       body: 'Routes are ranked by condition scores. Choose the one that avoids flagged segments, or the most direct if all is clear.' },
+              { n: '01', title: 'Check tonight\'s conditions', body: 'See what riders flagged on each road of the Sta. Mesa zone, including lighting, crowd levels, and recent incidents.' },
+              { n: '02', title: 'Pick your safest route',       body: 'Routes are ranked by condition scores. Choose the one that avoids flagged roads, or the most direct if all is clear.' },
               { n: '03', title: 'Share what you notice',        body: 'See something off on your commute? Flag it in 20 seconds. Your report helps the next rider make a better call.' },
             ].map(({ n, title, body }) => (
               <div key={n} className="feature-card step-card">

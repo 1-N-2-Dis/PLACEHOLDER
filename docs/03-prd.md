@@ -187,10 +187,15 @@ UJ-004 (multi-route recommendation + AI route check, F-005/F-003/F-008):
   `backend/scripts/seed-auth-users.mjs`, never client-assignable) can view all reports at `/admin`
   and delete any of them (remove-only moderation, no edit).
 - **F-010:** Given at least one report with `severity` yellow or red within the freshness window,
-  toggling "Show incident heatmap" renders one glowing severity-icon marker per flagged segment
-  (red beats yellow; more corroborating reports = a larger, stronger glow); toggling off removes
-  the layer (markers stay hidden until toggled on); green-severity reports never contribute
-  (BR-007 preserved — no new place/neighborhood classification is introduced by aggregation).
+  toggling "Toggle Red/Yellow Zones" renders a soft MapLibre heatmap "cloud" per severity (red
+  beats yellow on a shared segment); toggling off removes the layer (clouds stay hidden until
+  toggled on); green-severity reports never contribute (BR-007 preserved — no new
+  place/neighborhood classification is introduced by aggregation). **Updated (2026-07-08):** cloud
+  size scales with real, cross-user likes (`likedBy`, toggled via `POST /likeReport`) rather than
+  the AI-driven `corroborationCount` — a baseline weight keeps a freshly-flagged segment visible
+  even before anyone's liked it. A separate, static green "Safe Zones" cloud layer
+  (`backend/data/safe/safe-heatmap.json`) shows positive safety landmarks (well-lit streets, 24/7
+  stores, police presence), toggled independently — see `docs/09-data-model.md`.
 
 ## Non-goals
 

@@ -16,6 +16,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import PDFDocument from 'pdfkit';
+import { renderBarangayBriefPdf } from './pdfReport.js';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
@@ -423,6 +424,36 @@ app.post('/submitReport', requireAuth, async (req, res) => {
   res.json({ status: 'created', reportId: ref.id, severity: decision.severity });
 });
 
+// Toggle the caller's like on a report (F-010: cloud size scales with real, cross-user likes,
+// distinct from the AI-driven corroborationCount above). Clients still never write `reports`
+// directly (BR-005, firestore.rules) — this is the one other server-side exception to that,
+// alongside submitReport's corroborationCount increments. arrayUnion/arrayRemove are idempotent,
+// so liking twice from the same uid (or unliking when not liked) is a safe no-op — no separate
+// "already liked" check needed.
+app.post('/likeReport', requireAuth, async (req, res) => {
+  const uid = req.auth.uid;
+  const { reportId, liked } = req.body || {};
+  if (typeof reportId !== 'string' || !reportId) {
+    return sendError(res, 'invalid-argument', 'reportId is required.');
+  }
+  if (typeof liked !== 'boolean') {
+    return sendError(res, 'invalid-argument', 'liked must be a boolean.');
+  }
+
+  const ref = db.collection('reports').doc(reportId);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    return sendError(res, 'invalid-argument', 'Report not found.');
+  }
+
+  await ref.update({
+    likedBy: liked ? FieldValue.arrayUnion(uid) : FieldValue.arrayRemove(uid),
+  });
+  const updated = await ref.get();
+  const likedBy = updated.get('likedBy') || [];
+  res.json({ status: 'ok', reportId, likeCount: likedBy.length, liked: likedBy.includes(uid) });
+});
+
 // Constrained prompt: answer using ONLY the listed reported conditions (BR-006/BR-007 spirit
 // extended to a whole route rather than one segment) — no invented incidents, no crime-category/
 // neighborhood labels, no rescue/dispatch promise (BR-002).
@@ -671,123 +702,7 @@ app.get('/api/v1/analytics/download-pdf', isAdmin, async (req, res) => {
   const doc = new PDFDocument({ margin: 50, size: 'A4' });
   doc.pipe(res);
 
-  // ── Header ────────────────────────────────────────────────────────────────
-  doc
-    .fontSize(22)
-    .font('Helvetica-Bold')
-    .text('GuidHer', { align: 'left' })
-    .fontSize(10)
-    .font('Helvetica')
-    .fillColor('#666666')
-    .text('Community Safety Infrastructure Brief', { align: 'left' })
-    .moveDown(0.3)
-    .text(`Zone: ${location}`, { align: 'left' })
-    .text(`Compiled: ${lastUpdated}`, { align: 'left' })
-    .moveDown(0.5);
-
-  // Horizontal rule
-  doc
-    .moveTo(50, doc.y)
-    .lineTo(545, doc.y)
-    .strokeColor('#cccccc')
-    .lineWidth(1)
-    .stroke()
-    .moveDown(0.8);
-
-  // ── Executive Summary ─────────────────────────────────────────────────────
-  doc
-    .fontSize(13)
-    .font('Helvetica-Bold')
-    .fillColor('#000000')
-    .text('Executive Summary')
-    .moveDown(0.4)
-    .fontSize(10)
-    .font('Helvetica')
-    .text(summary || 'No summary available. Run compile-analytics.mjs to generate AI analysis.', {
-      align: 'justify',
-      lineGap: 2,
-    })
-    .moveDown(1);
-
-  // ── Vulnerability Metrics ─────────────────────────────────────────────────
-  doc
-    .fontSize(13)
-    .font('Helvetica-Bold')
-    .text('Reported Infrastructure Vulnerability Counts')
-    .moveDown(0.5);
-
-  const metricRows = [
-    ['Poor Lighting Incidents', metrics.poor_lighting_count ?? 0],
-    ['Unsafe Infrastructure Reports', metrics.unsafe_infrastructure_count ?? 0],
-    ['Low Foot Traffic / Isolation', metrics.low_foot_traffic_count ?? 0],
-    ['Other Environmental Concerns', metrics.other_scams_count ?? 0],
-  ];
-
-  for (const [label, count] of metricRows) {
-    const barWidth = Math.min(Math.round((count / Math.max(...metricRows.map(([, c]) => c), 1)) * 200), 200);
-    doc
-      .fontSize(10)
-      .font('Helvetica')
-      .text(`${label}`, 50, doc.y, { continued: true, width: 280 })
-      .font('Helvetica-Bold')
-      .text(`${count}`, { align: 'right' })
-      .moveDown(0.15);
-    if (barWidth > 0) {
-      doc
-        .rect(50, doc.y, barWidth, 6)
-        .fillColor('#e53e3e')
-        .fill()
-        .fillColor('#000000');
-    }
-    doc.moveDown(0.6);
-  }
-
-  doc.moveDown(0.5);
-
-  // ── Actionable Mitigations ────────────────────────────────────────────────
-  doc
-    .fontSize(13)
-    .font('Helvetica-Bold')
-    .fillColor('#000000')
-    .text('Recommended Barangay Actions')
-    .moveDown(0.5);
-
-  if (mitigations.length === 0) {
-    doc
-      .fontSize(10)
-      .font('Helvetica')
-      .text('No mitigations available. Run compile-analytics.mjs with a valid GEMINI_API_KEY.');
-  } else {
-    mitigations.forEach((mitigation, i) => {
-      doc
-        .fontSize(11)
-        .font('Helvetica-Bold')
-        .text(`${i + 1}.`, 50, doc.y, { continued: true, width: 30 })
-        .fontSize(10)
-        .font('Helvetica')
-        .text(`  ${mitigation}`, { align: 'justify', lineGap: 2 })
-        .moveDown(0.6);
-    });
-  }
-
-  doc.moveDown(0.5);
-
-  // ── Footer ────────────────────────────────────────────────────────────────
-  doc
-    .moveTo(50, doc.y)
-    .lineTo(545, doc.y)
-    .strokeColor('#cccccc')
-    .lineWidth(1)
-    .stroke()
-    .moveDown(0.5)
-    .fontSize(8)
-    .fillColor('#999999')
-    .font('Helvetica')
-    .text(
-      'This brief was generated from anonymised community-sourced infrastructure reports. It describes observable, fixable conditions — not crime classifications. ' +
-      'For use in local Barangay coordination and public-service improvement requests only.',
-      { align: 'justify', lineGap: 1 },
-    );
+  renderBarangayBriefPdf(doc, { location, lastUpdated, summary, metrics, mitigations });
 
   doc.end();
 });

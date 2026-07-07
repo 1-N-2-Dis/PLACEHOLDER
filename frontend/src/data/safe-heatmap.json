@@ -1,0 +1,5518 @@
+[
+  {
+    "lat": 14.621119,
+    "lng": 121.049863,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.620901,
+    "lng": 121.048225,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.618586,
+    "lng": 121.009695,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.617501,
+    "lng": 121.002216,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Welcome Supermarket"
+  },
+  {
+    "lat": 14.618188,
+    "lng": 121.004952,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Shell"
+  },
+  {
+    "lat": 14.597094,
+    "lng": 121.037958,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Uncle John's"
+  },
+  {
+    "lat": 14.604213,
+    "lng": 121.043946,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger King"
+  },
+  {
+    "lat": 14.611402,
+    "lng": 121.036263,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.624122,
+    "lng": 121.035369,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Baliwag Lechon"
+  },
+  {
+    "lat": 14.610157,
+    "lng": 121.025414,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Shell"
+  },
+  {
+    "lat": 14.603924,
+    "lng": 121.05153,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.620275,
+    "lng": 121.009838,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.620108,
+    "lng": 121.009855,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Banawe Pares King"
+  },
+  {
+    "lat": 14.614673,
+    "lng": 121.005003,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bulaluhan sa N. Ramirez"
+  },
+  {
+    "lat": 14.609902,
+    "lng": 121.004339,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Rose"
+  },
+  {
+    "lat": 14.622503,
+    "lng": 121.051704,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.622631,
+    "lng": 121.05206,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.624565,
+    "lng": 121.05194,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Emily's Place"
+  },
+  {
+    "lat": 14.624795,
+    "lng": 121.051834,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "RA Kambingan Ihaw-ihaw"
+  },
+  {
+    "lat": 14.624898,
+    "lng": 121.051758,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Leo's Canteen"
+  },
+  {
+    "lat": 14.624095,
+    "lng": 121.049245,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.602224,
+    "lng": 121.046589,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.61203,
+    "lng": 121.0319,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.612293,
+    "lng": 121.032378,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Savemore"
+  },
+  {
+    "lat": 14.621512,
+    "lng": 121.019319,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watsons"
+  },
+  {
+    "lat": 14.612349,
+    "lng": 121.032674,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.612143,
+    "lng": 121.032503,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watsons"
+  },
+  {
+    "lat": 14.612204,
+    "lng": 121.032251,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.621068,
+    "lng": 121.022268,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Garcia's"
+  },
+  {
+    "lat": 14.620219,
+    "lng": 121.051117,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.60473,
+    "lng": 121.030074,
+    "weight": 0.5,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "City Government of San Juan"
+  },
+  {
+    "lat": 14.597516,
+    "lng": 121.040497,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.617563,
+    "lng": 121.015711,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bob's Halu-halo"
+  },
+  {
+    "lat": 14.601644,
+    "lng": 121.002181,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.60169,
+    "lng": 121.002854,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.621659,
+    "lng": 121.054049,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.620145,
+    "lng": 121.054807,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Wendy's"
+  },
+  {
+    "lat": 14.619445,
+    "lng": 121.052828,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.622228,
+    "lng": 121.052098,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.62273,
+    "lng": 121.053097,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.619098,
+    "lng": 121.052994,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.618797,
+    "lng": 121.053616,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.622504,
+    "lng": 121.053315,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chopsticks"
+  },
+  {
+    "lat": 14.625986,
+    "lng": 121.011049,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.61912,
+    "lng": 121.053847,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.619636,
+    "lng": 121.016824,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Botika ng Bayan"
+  },
+  {
+    "lat": 14.619278,
+    "lng": 121.016717,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Wilson Pharmacy"
+  },
+  {
+    "lat": 14.606219,
+    "lng": 121.018942,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger King"
+  },
+  {
+    "lat": 14.629651,
+    "lng": 121.028432,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.619695,
+    "lng": 121.050529,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.620015,
+    "lng": 121.050647,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Manson Drug"
+  },
+  {
+    "lat": 14.619425,
+    "lng": 121.050624,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.628764,
+    "lng": 121.013397,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.602394,
+    "lng": 121.051425,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.601047,
+    "lng": 121.049526,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sbarro"
+  },
+  {
+    "lat": 14.602597,
+    "lng": 121.051159,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tropical Hut"
+  },
+  {
+    "lat": 14.603431,
+    "lng": 121.05038,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Papa John's"
+  },
+  {
+    "lat": 14.60529,
+    "lng": 121.023168,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.620588,
+    "lng": 121.019873,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.618291,
+    "lng": 121.014242,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.618318,
+    "lng": 121.013975,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.629559,
+    "lng": 121.033984,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Project Pie"
+  },
+  {
+    "lat": 14.600623,
+    "lng": 121.048679,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Greenhills Shopping Center"
+  },
+  {
+    "lat": 14.601377,
+    "lng": 121.050701,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.604617,
+    "lng": 121.042882,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Madison Street"
+  },
+  {
+    "lat": 14.607119,
+    "lng": 121.039638,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ortigas–Santolan Intersection"
+  },
+  {
+    "lat": 14.603735,
+    "lng": 121.017105,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.621535,
+    "lng": 121.051309,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.598419,
+    "lng": 121.045758,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.610945,
+    "lng": 121.053862,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.617621,
+    "lng": 121.002213,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.617702,
+    "lng": 121.002392,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.607115,
+    "lng": 121.040317,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lunch Box"
+  },
+  {
+    "lat": 14.606521,
+    "lng": 121.018828,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Savemore"
+  },
+  {
+    "lat": 14.628564,
+    "lng": 121.033709,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.625933,
+    "lng": 121.037226,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "K Plaza Supermarket"
+  },
+  {
+    "lat": 14.628433,
+    "lng": 121.038561,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Partners Pares-Mami House"
+  },
+  {
+    "lat": 14.628872,
+    "lng": 121.038679,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lugawan ni Bro"
+  },
+  {
+    "lat": 14.621549,
+    "lng": 121.053617,
+    "weight": 0.5,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Gateway Underground Parking"
+  },
+  {
+    "lat": 14.621707,
+    "lng": 121.024404,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ala Eh Bulalo"
+  },
+  {
+    "lat": 14.624972,
+    "lng": 121.048231,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.613235,
+    "lng": 121.001031,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Uncle John's"
+  },
+  {
+    "lat": 14.62776,
+    "lng": 121.03392,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ilocos Empanada"
+  },
+  {
+    "lat": 14.611097,
+    "lng": 121.00506,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Highmart Supermarket"
+  },
+  {
+    "lat": 14.607011,
+    "lng": 121.002976,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.622003,
+    "lng": 121.024075,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.623406,
+    "lng": 121.048853,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "HM Transport Cubao"
+  },
+  {
+    "lat": 14.618574,
+    "lng": 121.051822,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.624682,
+    "lng": 121.048369,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Daet Express Cubao"
+  },
+  {
+    "lat": 14.629294,
+    "lng": 121.033877,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Amber"
+  },
+  {
+    "lat": 14.628738,
+    "lng": 121.034295,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Teriyaki Boy"
+  },
+  {
+    "lat": 14.62921,
+    "lng": 121.034298,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.600546,
+    "lng": 121.050288,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Subway"
+  },
+  {
+    "lat": 14.628051,
+    "lng": 121.004157,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Max's"
+  },
+  {
+    "lat": 14.627699,
+    "lng": 121.004352,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.627234,
+    "lng": 121.00458,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Razon's"
+  },
+  {
+    "lat": 14.627089,
+    "lng": 121.004256,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Yellow Cab Pizza"
+  },
+  {
+    "lat": 14.627895,
+    "lng": 121.004233,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.617981,
+    "lng": 121.000995,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "SM Hypermarket"
+  },
+  {
+    "lat": 14.610306,
+    "lng": 121.037186,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "D' Amburger Gastro Pub"
+  },
+  {
+    "lat": 14.610672,
+    "lng": 121.037109,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Red Buffalo Wings & Pizza"
+  },
+  {
+    "lat": 14.610285,
+    "lng": 121.03699,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lola Nena's"
+  },
+  {
+    "lat": 14.610486,
+    "lng": 121.037378,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.62233,
+    "lng": 121.0515,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.62897,
+    "lng": 121.034235,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Manang's Chicken"
+  },
+  {
+    "lat": 14.600935,
+    "lng": 121.012935,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.600318,
+    "lng": 121.013492,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.600634,
+    "lng": 121.000024,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.601793,
+    "lng": 121.012642,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.609384,
+    "lng": 121.048388,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.609345,
+    "lng": 121.048954,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Aling Banang's"
+  },
+  {
+    "lat": 14.610411,
+    "lng": 121.052536,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.610372,
+    "lng": 121.052358,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Melvi Pharmacy"
+  },
+  {
+    "lat": 14.623669,
+    "lng": 121.031785,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ersao"
+  },
+  {
+    "lat": 14.595668,
+    "lng": 121.028071,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.613583,
+    "lng": 121.034614,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.605593,
+    "lng": 121.019244,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "abandoned building"
+  },
+  {
+    "lat": 14.611311,
+    "lng": 121.036319,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "The Sandwich Guy"
+  },
+  {
+    "lat": 14.629689,
+    "lng": 121.016156,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Uncle John's"
+  },
+  {
+    "lat": 14.624289,
+    "lng": 121.031659,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Wellcome Supermarket"
+  },
+  {
+    "lat": 14.612161,
+    "lng": 121.031524,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.618046,
+    "lng": 121.001364,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.613378,
+    "lng": 121.034819,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Uncle John's"
+  },
+  {
+    "lat": 14.605245,
+    "lng": 121.023023,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.597348,
+    "lng": 121.046414,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Planet Drugstore"
+  },
+  {
+    "lat": 14.597891,
+    "lng": 121.04638,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tapa King"
+  },
+  {
+    "lat": 14.60088,
+    "lng": 121.0484,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ortigas/Greenhills"
+  },
+  {
+    "lat": 14.595842,
+    "lng": 121.021554,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.622855,
+    "lng": 121.053422,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Isetann Supermarket"
+  },
+  {
+    "lat": 14.622969,
+    "lng": 121.053505,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.606246,
+    "lng": 121.018432,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Yellow Cab Pizza"
+  },
+  {
+    "lat": 14.608828,
+    "lng": 121.003818,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.623441,
+    "lng": 121.008239,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.612258,
+    "lng": 121.008588,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.612187,
+    "lng": 121.008459,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Balic-Balic Turning Point"
+  },
+  {
+    "lat": 14.611994,
+    "lng": 121.008649,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin' Donuts"
+  },
+  {
+    "lat": 14.613055,
+    "lng": 121.007121,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Generika"
+  },
+  {
+    "lat": 14.613458,
+    "lng": 121.007422,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.597662,
+    "lng": 121.037463,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "The Marketplace"
+  },
+  {
+    "lat": 14.597826,
+    "lng": 121.03755,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Nathaniel's"
+  },
+  {
+    "lat": 14.605208,
+    "lng": 121.023169,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Puregold"
+  },
+  {
+    "lat": 14.6278,
+    "lng": 121.004228,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "RSS Drug & General Merchandise"
+  },
+  {
+    "lat": 14.601486,
+    "lng": 121.004708,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.620549,
+    "lng": 121.054605,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Army Navy"
+  },
+  {
+    "lat": 14.621092,
+    "lng": 121.054333,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Inasal Chicken Bacolod"
+  },
+  {
+    "lat": 14.621265,
+    "lng": 121.054246,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "BonChon"
+  },
+  {
+    "lat": 14.620697,
+    "lng": 121.054514,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Zark's Burger"
+  },
+  {
+    "lat": 14.621258,
+    "lng": 121.05327,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Krispy Kreme"
+  },
+  {
+    "lat": 14.59804,
+    "lng": 121.029905,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Police Community Precinct"
+  },
+  {
+    "lat": 14.618044,
+    "lng": 121.051546,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "German Espiritu Liner Cubao"
+  },
+  {
+    "lat": 14.598208,
+    "lng": 121.038454,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Beijing Tong Ren Tang"
+  },
+  {
+    "lat": 14.598379,
+    "lng": 121.038201,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Country Chicken"
+  },
+  {
+    "lat": 14.59812,
+    "lng": 121.045637,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "MedExpress"
+  },
+  {
+    "lat": 14.622733,
+    "lng": 121.052231,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "FamilyMart"
+  },
+  {
+    "lat": 14.622974,
+    "lng": 121.052672,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.623131,
+    "lng": 121.05309,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.59839,
+    "lng": 121.038403,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Soy & Bean"
+  },
+  {
+    "lat": 14.611488,
+    "lng": 121.003199,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Calabash Police Community Precinct"
+  },
+  {
+    "lat": 14.612033,
+    "lng": 121.006463,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Batangas Lomi"
+  },
+  {
+    "lat": 14.606966,
+    "lng": 121.00308,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.610454,
+    "lng": 121.006787,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "ENALIN SIMON SILOG"
+  },
+  {
+    "lat": 14.597328,
+    "lng": 121.039687,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watson's"
+  },
+  {
+    "lat": 14.602512,
+    "lng": 121.047698,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Unimart"
+  },
+  {
+    "lat": 14.623265,
+    "lng": 121.054209,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.623287,
+    "lng": 121.054263,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.597671,
+    "lng": 121.033132,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dada's Fried Itik"
+  },
+  {
+    "lat": 14.597524,
+    "lng": 121.038976,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Little Baguio - Romualdez"
+  },
+  {
+    "lat": 14.595141,
+    "lng": 121.027974,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Romualdez - Little Baguio"
+  },
+  {
+    "lat": 14.602009,
+    "lng": 121.011863,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mightee Mart"
+  },
+  {
+    "lat": 14.60202,
+    "lng": 121.011672,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.623954,
+    "lng": 121.007777,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.604971,
+    "lng": 121.022839,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.620483,
+    "lng": 121.051405,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.621192,
+    "lng": 121.051419,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.622162,
+    "lng": 121.051845,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.62584,
+    "lng": 121.010951,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.618346,
+    "lng": 121.010107,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.600985,
+    "lng": 121.049408,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.619596,
+    "lng": 121.003406,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Elar's Lechon"
+  },
+  {
+    "lat": 14.629638,
+    "lng": 121.0409,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Angus tapa centrale"
+  },
+  {
+    "lat": 14.626231,
+    "lng": 121.044095,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Generous & Joyous Ventures Inc."
+  },
+  {
+    "lat": 14.601222,
+    "lng": 121.000353,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Police Station"
+  },
+  {
+    "lat": 14.622041,
+    "lng": 121.053832,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.600754,
+    "lng": 121.000184,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watsons"
+  },
+  {
+    "lat": 14.600708,
+    "lng": 121.000116,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mr Kimbob"
+  },
+  {
+    "lat": 14.600255,
+    "lng": 121.01358,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Teresa Street"
+  },
+  {
+    "lat": 14.603192,
+    "lng": 121.021281,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Aling Banang"
+  },
+  {
+    "lat": 14.60075,
+    "lng": 121.010344,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Santa Mesa"
+  },
+  {
+    "lat": 14.622377,
+    "lng": 121.054784,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger King"
+  },
+  {
+    "lat": 14.624121,
+    "lng": 121.047387,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "AAA Pharma, Inc."
+  },
+  {
+    "lat": 14.620901,
+    "lng": 121.00947,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.595472,
+    "lng": 121.03892,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.626122,
+    "lng": 121.036672,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "K5 prohealth"
+  },
+  {
+    "lat": 14.613295,
+    "lng": 121.033285,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Gamot Publiko"
+  },
+  {
+    "lat": 14.6175,
+    "lng": 121.00176,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Police Community Precinct 1"
+  },
+  {
+    "lat": 14.61207,
+    "lng": 121.010531,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "M. Peralta"
+  },
+  {
+    "lat": 14.609174,
+    "lng": 121.029038,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Imba Imbang Kainan"
+  },
+  {
+    "lat": 14.609109,
+    "lng": 121.028927,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jasper Store and Eatery"
+  },
+  {
+    "lat": 14.60904,
+    "lng": 121.028858,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.609256,
+    "lng": 121.029429,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.60913,
+    "lng": 121.029274,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Aling Banang"
+  },
+  {
+    "lat": 14.628528,
+    "lng": 121.05467,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "clinsors"
+  },
+  {
+    "lat": 14.598247,
+    "lng": 121.032498,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kuya Allan's Maki"
+  },
+  {
+    "lat": 14.60713,
+    "lng": 121.026284,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pares"
+  },
+  {
+    "lat": 14.604598,
+    "lng": 121.022749,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.601699,
+    "lng": 121.031429,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Police Community Precinct № 8"
+  },
+  {
+    "lat": 14.616472,
+    "lng": 121.051618,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Scott Hamburger"
+  },
+  {
+    "lat": 14.604576,
+    "lng": 121.017199,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Isetann Supermarket"
+  },
+  {
+    "lat": 14.606732,
+    "lng": 121.019175,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger King"
+  },
+  {
+    "lat": 14.62705,
+    "lng": 121.045128,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tapsihan sa Don Egea"
+  },
+  {
+    "lat": 14.628573,
+    "lng": 121.03874,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Kamuning Police Post"
+  },
+  {
+    "lat": 14.626475,
+    "lng": 121.036693,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Kabayans Gotohan"
+  },
+  {
+    "lat": 14.626356,
+    "lng": 121.03699,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tapsihan ni Don Egea"
+  },
+  {
+    "lat": 14.627813,
+    "lng": 121.035181,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.620886,
+    "lng": 121.052929,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.616663,
+    "lng": 121.039148,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin' Donuts"
+  },
+  {
+    "lat": 14.615042,
+    "lng": 121.038174,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Robinsons Supermarket"
+  },
+  {
+    "lat": 14.619036,
+    "lng": 121.053607,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mister Donut"
+  },
+  {
+    "lat": 14.627596,
+    "lng": 121.048094,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Lucky Swerte 88"
+  },
+  {
+    "lat": 14.615913,
+    "lng": 121.000274,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bulalohan sa España"
+  },
+  {
+    "lat": 14.601383,
+    "lng": 121.004239,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.600482,
+    "lng": 121.013341,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.618629,
+    "lng": 121.002924,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "All About Baking"
+  },
+  {
+    "lat": 14.600484,
+    "lng": 121.011127,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Celebrity X Food Kiosk"
+  },
+  {
+    "lat": 14.625521,
+    "lng": 121.010492,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Santo Domingo Church"
+  },
+  {
+    "lat": 14.62374,
+    "lng": 121.008445,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Banawe Street"
+  },
+  {
+    "lat": 14.602606,
+    "lng": 121.047763,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bánh Mì Kitchen"
+  },
+  {
+    "lat": 14.602557,
+    "lng": 121.047787,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Go Salads!"
+  },
+  {
+    "lat": 14.602617,
+    "lng": 121.047745,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chooks To Go"
+  },
+  {
+    "lat": 14.622654,
+    "lng": 121.052922,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin'"
+  },
+  {
+    "lat": 14.597627,
+    "lng": 121.01791,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Puregold"
+  },
+  {
+    "lat": 14.598402,
+    "lng": 121.038401,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ling Nam"
+  },
+  {
+    "lat": 14.60193,
+    "lng": 121.010301,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chef Von"
+  },
+  {
+    "lat": 14.601244,
+    "lng": 121.053706,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Marketplace"
+  },
+  {
+    "lat": 14.599782,
+    "lng": 121.00899,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tatay Pepe's Tapsilogan"
+  },
+  {
+    "lat": 14.600213,
+    "lng": 121.008993,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lugawan sa Hipodromo"
+  },
+  {
+    "lat": 14.601619,
+    "lng": 121.006185,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.604728,
+    "lng": 121.042308,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.604309,
+    "lng": 121.033848,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "The Marketplace"
+  },
+  {
+    "lat": 14.604565,
+    "lng": 121.018363,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "SM Supermarket"
+  },
+  {
+    "lat": 14.601337,
+    "lng": 121.003942,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin'"
+  },
+  {
+    "lat": 14.601348,
+    "lng": 121.003987,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.6108,
+    "lng": 121.054137,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.619501,
+    "lng": 121.054474,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Taco Bell"
+  },
+  {
+    "lat": 14.60502,
+    "lng": 121.036728,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Edm's Canteen"
+  },
+  {
+    "lat": 14.609175,
+    "lng": 121.047601,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Big Mak"
+  },
+  {
+    "lat": 14.6091,
+    "lng": 121.047851,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Potato Corner"
+  },
+  {
+    "lat": 14.599305,
+    "lng": 121.031528,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Botikalyn"
+  },
+  {
+    "lat": 14.598847,
+    "lng": 121.030782,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Loose Leaf"
+  },
+  {
+    "lat": 14.598923,
+    "lng": 121.030747,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dexter's Pizza"
+  },
+  {
+    "lat": 14.602381,
+    "lng": 121.027341,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Conerbricks Barbeque House"
+  },
+  {
+    "lat": 14.623452,
+    "lng": 121.028219,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Nid’s B’alot at Bilao atbp."
+  },
+  {
+    "lat": 14.600563,
+    "lng": 121.020948,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Convenience Store"
+  },
+  {
+    "lat": 14.600551,
+    "lng": 121.018553,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sr. Pedro"
+  },
+  {
+    "lat": 14.60496,
+    "lng": 121.022491,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin'"
+  },
+  {
+    "lat": 14.622158,
+    "lng": 121.05377,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dairy Queen"
+  },
+  {
+    "lat": 14.605078,
+    "lng": 121.022381,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.623391,
+    "lng": 121.028113,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pizza Hut Express"
+  },
+  {
+    "lat": 14.603653,
+    "lng": 121.025813,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Baby Zita's Store"
+  },
+  {
+    "lat": 14.603678,
+    "lng": 121.025775,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Carmen Eatery"
+  },
+  {
+    "lat": 14.603697,
+    "lng": 121.025739,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Mercy Bentelogan"
+  },
+  {
+    "lat": 14.604399,
+    "lng": 121.023139,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.603831,
+    "lng": 121.023,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dan's and Norm's Eatery"
+  },
+  {
+    "lat": 14.604282,
+    "lng": 121.023403,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "king am"
+  },
+  {
+    "lat": 14.603918,
+    "lng": 121.023119,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Boyet's Tapsilogan"
+  },
+  {
+    "lat": 14.614192,
+    "lng": 121.031542,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Connie’s Kitchen Deli"
+  },
+  {
+    "lat": 14.602551,
+    "lng": 121.010154,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Lawson"
+  },
+  {
+    "lat": 14.602516,
+    "lng": 121.010157,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.597428,
+    "lng": 121.027901,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mama Dad's Grill Kitchen"
+  },
+  {
+    "lat": 14.604026,
+    "lng": 121.023026,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Maricor's Tapsilogan"
+  },
+  {
+    "lat": 14.604523,
+    "lng": 121.02333,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "AlJm eatery"
+  },
+  {
+    "lat": 14.604537,
+    "lng": 121.022264,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.609568,
+    "lng": 121.02219,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Aling Paz Store"
+  },
+  {
+    "lat": 14.609677,
+    "lng": 121.023028,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Parkway Store"
+  },
+  {
+    "lat": 14.606496,
+    "lng": 121.024059,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.5997,
+    "lng": 121.021225,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger House"
+  },
+  {
+    "lat": 14.598211,
+    "lng": 121.034381,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Food Hub"
+  },
+  {
+    "lat": 14.602849,
+    "lng": 121.015086,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.604961,
+    "lng": 121.018613,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Zark's Burger"
+  },
+  {
+    "lat": 14.604784,
+    "lng": 121.018838,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watsons"
+  },
+  {
+    "lat": 14.60473,
+    "lng": 121.018769,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tokyo Tokyo"
+  },
+  {
+    "lat": 14.604352,
+    "lng": 121.01798,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.604586,
+    "lng": 121.018587,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.605044,
+    "lng": 121.01869,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.604942,
+    "lng": 121.018835,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Greenwich"
+  },
+  {
+    "lat": 14.604459,
+    "lng": 121.018428,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin' Donuts"
+  },
+  {
+    "lat": 14.604441,
+    "lng": 121.018405,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dairy Queen"
+  },
+  {
+    "lat": 14.604387,
+    "lng": 121.018336,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Classic Savory"
+  },
+  {
+    "lat": 14.604369,
+    "lng": 121.018314,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chowking"
+  },
+  {
+    "lat": 14.604333,
+    "lng": 121.018268,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bonchon"
+  },
+  {
+    "lat": 14.604628,
+    "lng": 121.018445,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Takehome Sushi"
+  },
+  {
+    "lat": 14.603875,
+    "lng": 121.018615,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cinema Snackbar"
+  },
+  {
+    "lat": 14.604595,
+    "lng": 121.018997,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Wendy's"
+  },
+  {
+    "lat": 14.604465,
+    "lng": 121.018621,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Krispy Kreme"
+  },
+  {
+    "lat": 14.619177,
+    "lng": 121.054755,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.597338,
+    "lng": 121.039347,
+    "weight": 0.5,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.604278,
+    "lng": 121.032755,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.604288,
+    "lng": 121.03365,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sunrise Buckets"
+  },
+  {
+    "lat": 14.604307,
+    "lng": 121.033616,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bánh Mì Kitchen"
+  },
+  {
+    "lat": 14.611554,
+    "lng": 121.035252,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Ho-Land"
+  },
+  {
+    "lat": 14.607216,
+    "lng": 121.026409,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bacolod Lapaz Batchoy"
+  },
+  {
+    "lat": 14.611944,
+    "lng": 121.006428,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.601094,
+    "lng": 121.0128,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.60052,
+    "lng": 121.013175,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jolly Friend"
+  },
+  {
+    "lat": 14.618206,
+    "lng": 121.001756,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.620809,
+    "lng": 121.051367,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Sandugo"
+  },
+  {
+    "lat": 14.597729,
+    "lng": 121.044987,
+    "weight": 0.5,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.60815,
+    "lng": 121.048853,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.610301,
+    "lng": 121.052156,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "chooks to go"
+  },
+  {
+    "lat": 14.610275,
+    "lng": 121.052024,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.607004,
+    "lng": 121.025833,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pansit ng taga Malabon"
+  },
+  {
+    "lat": 14.602577,
+    "lng": 121.020822,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "JBLR Food Hun"
+  },
+  {
+    "lat": 14.603417,
+    "lng": 121.038494,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.603027,
+    "lng": 121.038265,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.603621,
+    "lng": 121.037858,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.599362,
+    "lng": 121.031567,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fast Food"
+  },
+  {
+    "lat": 14.595421,
+    "lng": 121.029063,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tapsilugan"
+  },
+  {
+    "lat": 14.628013,
+    "lng": 121.016109,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.602959,
+    "lng": 121.001726,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.603167,
+    "lng": 121.001639,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.604864,
+    "lng": 121.034364,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.610758,
+    "lng": 121.0363,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "GoodAh!"
+  },
+  {
+    "lat": 14.605378,
+    "lng": 121.032419,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Brothers' Burger"
+  },
+  {
+    "lat": 14.62951,
+    "lng": 121.033969,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.620687,
+    "lng": 121.05109,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Super8 Supermarket"
+  },
+  {
+    "lat": 14.600396,
+    "lng": 121.04829,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Greenhills Shopping Center"
+  },
+  {
+    "lat": 14.603688,
+    "lng": 121.044442,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Roosevelt Street"
+  },
+  {
+    "lat": 14.603559,
+    "lng": 121.044285,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Roosevelt Street"
+  },
+  {
+    "lat": 14.605246,
+    "lng": 121.042408,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Madison Street"
+  },
+  {
+    "lat": 14.601995,
+    "lng": 121.046298,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Club Filipino Drive"
+  },
+  {
+    "lat": 14.602165,
+    "lng": 121.046498,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Club Filipino Drive"
+  },
+  {
+    "lat": 14.601358,
+    "lng": 121.047699,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Wilson Street"
+  },
+  {
+    "lat": 14.596123,
+    "lng": 121.054291,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "La Salle Green Hills"
+  },
+  {
+    "lat": 14.597047,
+    "lng": 121.053397,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "La Salle Green Hills"
+  },
+  {
+    "lat": 14.628787,
+    "lng": 121.038352,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Petron"
+  },
+  {
+    "lat": 14.62836,
+    "lng": 121.038276,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Caltex"
+  },
+  {
+    "lat": 14.606372,
+    "lng": 121.019638,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Central Colleges of the Philippines"
+  },
+  {
+    "lat": 14.603811,
+    "lng": 121.016965,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT V. Mapa Station 1"
+  },
+  {
+    "lat": 14.602124,
+    "lng": 121.011068,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Stop n' Shop"
+  },
+  {
+    "lat": 14.601374,
+    "lng": 121.00293,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Magsaysay Boulevard/De Dios Street"
+  },
+  {
+    "lat": 14.614925,
+    "lng": 121.036738,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Doña Hemady Street"
+  },
+  {
+    "lat": 14.612694,
+    "lng": 121.03531,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "1st Street"
+  },
+  {
+    "lat": 14.602583,
+    "lng": 121.015414,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Magsaysay–V. Mapa Intersection"
+  },
+  {
+    "lat": 14.5972,
+    "lng": 121.017959,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "V. Mapa–Valenzuela Intersection"
+  },
+  {
+    "lat": 14.598031,
+    "lng": 121.017552,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "V. Mapa–Valenzuela Intersection"
+  },
+  {
+    "lat": 14.601003,
+    "lng": 121.016628,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Guadalcanal Street"
+  },
+  {
+    "lat": 14.601692,
+    "lng": 121.003777,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pureza Street"
+  },
+  {
+    "lat": 14.625958,
+    "lng": 121.05414,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Columbia–Yale Intersection"
+  },
+  {
+    "lat": 14.615137,
+    "lng": 121.016402,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Goto Tendon"
+  },
+  {
+    "lat": 14.618852,
+    "lng": 121.015256,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.60945,
+    "lng": 121.053553,
+    "weight": 0.5,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Philippine National Police"
+  },
+  {
+    "lat": 14.619419,
+    "lng": 121.049032,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Arayat Turning Point"
+  },
+  {
+    "lat": 14.617395,
+    "lng": 121.045138,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "N. Domingo Street–Mayor I.S. Diaz Street"
+  },
+  {
+    "lat": 14.619572,
+    "lng": 121.047441,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Natib Street"
+  },
+  {
+    "lat": 14.616204,
+    "lng": 121.047829,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mayor Diaz Street"
+  },
+  {
+    "lat": 14.619514,
+    "lng": 121.04562,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Aurora Boulevard–N. Domingo Street"
+  },
+  {
+    "lat": 14.629556,
+    "lng": 121.05072,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ermin Garcia Street"
+  },
+  {
+    "lat": 14.62761,
+    "lng": 121.051848,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "New York–Cambridge Intersection"
+  },
+  {
+    "lat": 14.625653,
+    "lng": 121.05279,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Columbia–Cambridge Intersection"
+  },
+  {
+    "lat": 14.627972,
+    "lng": 121.035864,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "T. Gener Street"
+  },
+  {
+    "lat": 14.629945,
+    "lng": 121.043329,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-E Street"
+  },
+  {
+    "lat": 14.629278,
+    "lng": 121.040413,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "11th Jamboree Street"
+  },
+  {
+    "lat": 14.629417,
+    "lng": 121.041451,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "11th Jamboree Street"
+  },
+  {
+    "lat": 14.628633,
+    "lng": 121.038111,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kamuning–Judge Jimenez Intersection"
+  },
+  {
+    "lat": 14.629279,
+    "lng": 121.030813,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Don Alejandro Roces, Sr. Science and Technology High School"
+  },
+  {
+    "lat": 14.627959,
+    "lng": 121.03365,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Marathon Extension"
+  },
+  {
+    "lat": 14.622738,
+    "lng": 121.052448,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT Araneta Center-Cubao Station 2"
+  },
+  {
+    "lat": 14.622653,
+    "lng": 121.052865,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT Araneta Center-Cubao Station 1"
+  },
+  {
+    "lat": 14.627723,
+    "lng": 121.038785,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Judge D. Jimenez Street"
+  },
+  {
+    "lat": 14.628526,
+    "lng": 121.038731,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kamuning–Judge Jimenez Intersection"
+  },
+  {
+    "lat": 14.628723,
+    "lng": 121.039092,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kamuning–Judge Jimenez Intersection"
+  },
+  {
+    "lat": 14.628111,
+    "lng": 121.036887,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "T. Gener Street"
+  },
+  {
+    "lat": 14.627064,
+    "lng": 121.034384,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "L. Sanghio Intersection"
+  },
+  {
+    "lat": 14.626076,
+    "lng": 121.034867,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-3rd Street"
+  },
+  {
+    "lat": 14.623409,
+    "lng": 121.044638,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "E. Rodriguez Sr. Avenue–New York Street"
+  },
+  {
+    "lat": 14.622845,
+    "lng": 121.045445,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "E. Rodriguez Sr. Avenue–New York Street"
+  },
+  {
+    "lat": 14.622117,
+    "lng": 121.047214,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Monte de Piedad Street"
+  },
+  {
+    "lat": 14.621682,
+    "lng": 121.047707,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Monte de Piedad Street"
+  },
+  {
+    "lat": 14.624758,
+    "lng": 121.041375,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Victory Liner Motorpool"
+  },
+  {
+    "lat": 14.62452,
+    "lng": 121.042078,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Victory Liner Motorpool"
+  },
+  {
+    "lat": 14.624507,
+    "lng": 121.038937,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Betty Go-Belmonte Street"
+  },
+  {
+    "lat": 14.629787,
+    "lng": 121.02929,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Scout Tobias Street"
+  },
+  {
+    "lat": 14.627899,
+    "lng": 121.033844,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Marathon Extension"
+  },
+  {
+    "lat": 14.629396,
+    "lng": 121.034152,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Scout Lozano Street"
+  },
+  {
+    "lat": 14.626013,
+    "lng": 121.036482,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tomas Morato Elementary School"
+  },
+  {
+    "lat": 14.628114,
+    "lng": 121.038484,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-1st Street"
+  },
+  {
+    "lat": 14.62577,
+    "lng": 121.039574,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ermin Garcia Street"
+  },
+  {
+    "lat": 14.619314,
+    "lng": 121.048619,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Arayat Turning Point"
+  },
+  {
+    "lat": 14.599589,
+    "lng": 121.000979,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Master Buffalo"
+  },
+  {
+    "lat": 14.616281,
+    "lng": 121.000518,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.614765,
+    "lng": 121.001505,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tapsilog Avenue"
+  },
+  {
+    "lat": 14.600037,
+    "lng": 121.016246,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Old Santa Mesa Street"
+  },
+  {
+    "lat": 14.598524,
+    "lng": 121.014814,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Paco-Santa Mesa Road"
+  },
+  {
+    "lat": 14.60101,
+    "lng": 121.013144,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Teresa Street"
+  },
+  {
+    "lat": 14.601764,
+    "lng": 121.012134,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Old Santa Mesa/Magsaysay"
+  },
+  {
+    "lat": 14.601469,
+    "lng": 121.001099,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Nagtahan Interchange"
+  },
+  {
+    "lat": 14.602782,
+    "lng": 121.001839,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lardizabal Street"
+  },
+  {
+    "lat": 14.608467,
+    "lng": 121.003616,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Masbate Street"
+  },
+  {
+    "lat": 14.610731,
+    "lng": 121.004863,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Gerardo Street"
+  },
+  {
+    "lat": 14.612262,
+    "lng": 121.006611,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bataan Street"
+  },
+  {
+    "lat": 14.612163,
+    "lng": 121.006638,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bataan Street"
+  },
+  {
+    "lat": 14.610747,
+    "lng": 121.00498,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Gerardo Street"
+  },
+  {
+    "lat": 14.609016,
+    "lng": 121.003852,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Masbate Street"
+  },
+  {
+    "lat": 14.606792,
+    "lng": 121.00297,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Wellcome Balic-Balic"
+  },
+  {
+    "lat": 14.605522,
+    "lng": 121.000686,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "G. Tuazon–Vicente Cruz Intersection"
+  },
+  {
+    "lat": 14.606824,
+    "lng": 121.002851,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Wellcome Balic-Balic"
+  },
+  {
+    "lat": 14.605374,
+    "lng": 121.000954,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "G. Tuazon–Vicente Cruz Intersection"
+  },
+  {
+    "lat": 14.605701,
+    "lng": 121.001142,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "G. Tuazon–Vicente Cruz Intersection"
+  },
+  {
+    "lat": 14.605094,
+    "lng": 121.000374,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "G. Tuazon Street"
+  },
+  {
+    "lat": 14.603056,
+    "lng": 121.001507,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lardizabal Turning Point"
+  },
+  {
+    "lat": 14.613298,
+    "lng": 121.007015,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Giant Taho"
+  },
+  {
+    "lat": 14.595149,
+    "lng": 121.027996,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.595412,
+    "lng": 121.028167,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Angel's Burger"
+  },
+  {
+    "lat": 14.609305,
+    "lng": 121.029207,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.603128,
+    "lng": 121.023574,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jho and JR Canteen"
+  },
+  {
+    "lat": 14.61601,
+    "lng": 121.050562,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Alfamart"
+  },
+  {
+    "lat": 14.628895,
+    "lng": 121.050331,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Cameo"
+  },
+  {
+    "lat": 14.628915,
+    "lng": 121.050375,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Minute Burger"
+  },
+  {
+    "lat": 14.597187,
+    "lng": 121.037723,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Yobe"
+  },
+  {
+    "lat": 14.60147,
+    "lng": 121.035485,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.628711,
+    "lng": 121.003728,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Yellow Cab Pizza"
+  },
+  {
+    "lat": 14.596786,
+    "lng": 121.05399,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "La Salle Green Hills (School Buses Only)"
+  },
+  {
+    "lat": 14.60145,
+    "lng": 121.000648,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chooks to Go"
+  },
+  {
+    "lat": 14.604648,
+    "lng": 121.041877,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "General's Lechon"
+  },
+  {
+    "lat": 14.596989,
+    "lng": 121.037697,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bok Korean Fried Chicken"
+  },
+  {
+    "lat": 14.614253,
+    "lng": 121.053468,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Main Avenue - EDSA Carousel SB"
+  },
+  {
+    "lat": 14.618977,
+    "lng": 121.015559,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "NGCP Doña Imelda Substation"
+  },
+  {
+    "lat": 14.618913,
+    "lng": 121.015529,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Galas Police Station Ⅱ"
+  },
+  {
+    "lat": 14.609789,
+    "lng": 121.030117,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.617832,
+    "lng": 121.054553,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta City Jeepney Terminal"
+  },
+  {
+    "lat": 14.617805,
+    "lng": 121.054517,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta City Jeepney Terminal"
+  },
+  {
+    "lat": 14.617779,
+    "lng": 121.054483,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta City Jeepney Terminal"
+  },
+  {
+    "lat": 14.617749,
+    "lng": 121.054445,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta City Jeepney Terminal"
+  },
+  {
+    "lat": 14.617719,
+    "lng": 121.054401,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta City Jeepney Terminal"
+  },
+  {
+    "lat": 14.617694,
+    "lng": 121.054368,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta City Jeepney Terminal"
+  },
+  {
+    "lat": 14.604651,
+    "lng": 121.041874,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "General's Lechon"
+  },
+  {
+    "lat": 14.623737,
+    "lng": 121.031217,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Papa Johns"
+  },
+  {
+    "lat": 14.623811,
+    "lng": 121.031354,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fariñas Ilocos Empanada"
+  },
+  {
+    "lat": 14.623827,
+    "lng": 121.031402,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Gang Gang Chicken"
+  },
+  {
+    "lat": 14.623781,
+    "lng": 121.032311,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Hackensack"
+  },
+  {
+    "lat": 14.601763,
+    "lng": 121.003989,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.622136,
+    "lng": 121.047211,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sonix Kitchennette"
+  },
+  {
+    "lat": 14.624348,
+    "lng": 121.033213,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin'"
+  },
+  {
+    "lat": 14.624116,
+    "lng": 121.034901,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Julie Naputo Eatery"
+  },
+  {
+    "lat": 14.624407,
+    "lng": 121.035631,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.619531,
+    "lng": 121.044165,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Violy's Kainan & Pancit Cabagan"
+  },
+  {
+    "lat": 14.61051,
+    "lng": 121.030648,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Robinsons Easymart"
+  },
+  {
+    "lat": 14.609221,
+    "lng": 121.047621,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Uncle John's"
+  },
+  {
+    "lat": 14.609467,
+    "lng": 121.048752,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Devil's"
+  },
+  {
+    "lat": 14.599858,
+    "lng": 121.000214,
+    "weight": 0.5,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "HDI Adventures"
+  },
+  {
+    "lat": 14.624714,
+    "lng": 121.016511,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Yvette Pharmacy"
+  },
+  {
+    "lat": 14.624507,
+    "lng": 121.016363,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "The Realmed Pharmacy"
+  },
+  {
+    "lat": 14.619332,
+    "lng": 121.003084,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "24 Chicken"
+  },
+  {
+    "lat": 14.605376,
+    "lng": 121.022907,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "San Juan Plaza Mayor"
+  },
+  {
+    "lat": 14.61001,
+    "lng": 121.036974,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ferino's"
+  },
+  {
+    "lat": 14.613655,
+    "lng": 121.053331,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Yellow Cab Pizza"
+  },
+  {
+    "lat": 14.613702,
+    "lng": 121.05331,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Krispy Kreme"
+  },
+  {
+    "lat": 14.597544,
+    "lng": 121.037665,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fariñas Ilocos Empanada"
+  },
+  {
+    "lat": 14.605959,
+    "lng": 121.001705,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "McDonald's"
+  },
+  {
+    "lat": 14.607191,
+    "lng": 121.026131,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "H. Lozada Street"
+  },
+  {
+    "lat": 14.607378,
+    "lng": 121.026512,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lope K. Santos Street"
+  },
+  {
+    "lat": 14.620347,
+    "lng": 121.004748,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "D. Tuazon Street"
+  },
+  {
+    "lat": 14.618388,
+    "lng": 121.002587,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Welcome Rotonda"
+  },
+  {
+    "lat": 14.608008,
+    "lng": 121.038764,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ortigas–Santolan Intersection"
+  },
+  {
+    "lat": 14.618744,
+    "lng": 121.002479,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Apo Street"
+  },
+  {
+    "lat": 14.627467,
+    "lng": 121.034696,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dr. Jesus C. Delgado Memorial Hospital"
+  },
+  {
+    "lat": 14.620661,
+    "lng": 121.004592,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "D. Tuazon Street"
+  },
+  {
+    "lat": 14.611827,
+    "lng": 121.036352,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "N. Domingo Street/Gilmore Avenue"
+  },
+  {
+    "lat": 14.624231,
+    "lng": 121.035598,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Balete Drive"
+  },
+  {
+    "lat": 14.621804,
+    "lng": 121.024592,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "St. Luke's Medical Center"
+  },
+  {
+    "lat": 14.607102,
+    "lng": 121.038754,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ortigas–Santolan Intersection"
+  },
+  {
+    "lat": 14.623854,
+    "lng": 121.008161,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Banawe Street"
+  },
+  {
+    "lat": 14.619663,
+    "lng": 121.004413,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "D. Tuazon Street"
+  },
+  {
+    "lat": 14.62457,
+    "lng": 121.038432,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Betty Go-Belmonte Street"
+  },
+  {
+    "lat": 14.611766,
+    "lng": 121.035423,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "N. Domingo Street/Gilmore Avenue"
+  },
+  {
+    "lat": 14.621819,
+    "lng": 121.024134,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "St. Luke's Medical Center"
+  },
+  {
+    "lat": 14.607027,
+    "lng": 121.038462,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ortigas–Santolan Intersection"
+  },
+  {
+    "lat": 14.624612,
+    "lng": 121.033094,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tomas Morato Avenue"
+  },
+  {
+    "lat": 14.618527,
+    "lng": 121.005118,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "E. Rodriguez Avenue–D. Tuazon Street"
+  },
+  {
+    "lat": 14.624297,
+    "lng": 121.034496,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Balete Drive"
+  },
+  {
+    "lat": 14.629425,
+    "lng": 121.034052,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Scout Lozano Street"
+  },
+  {
+    "lat": 14.623434,
+    "lng": 121.031887,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Doña Hemady/E. Rodriguez Sr. Avenue"
+  },
+  {
+    "lat": 14.623675,
+    "lng": 121.03001,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Christ the King Mission Seminary"
+  },
+  {
+    "lat": 14.618886,
+    "lng": 121.014082,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta Avenue"
+  },
+  {
+    "lat": 14.61783,
+    "lng": 121.003067,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Welcome Rotonda"
+  },
+  {
+    "lat": 14.623527,
+    "lng": 121.030182,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Christ the King Mission Seminary"
+  },
+  {
+    "lat": 14.6187,
+    "lng": 121.014047,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta Avenue"
+  },
+  {
+    "lat": 14.627669,
+    "lng": 121.034933,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dr. Jesus C. Delgado Memorial Hospital"
+  },
+  {
+    "lat": 14.613666,
+    "lng": 121.037855,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Robinsons Magnolia"
+  },
+  {
+    "lat": 14.628258,
+    "lng": 121.054764,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.621488,
+    "lng": 121.054124,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "The Brewed Buddies"
+  },
+  {
+    "lat": 14.613663,
+    "lng": 121.034144,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT Gilmore Station"
+  },
+  {
+    "lat": 14.613579,
+    "lng": 121.034407,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT Gilmore Station"
+  },
+  {
+    "lat": 14.616998,
+    "lng": 121.039879,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Balete Drive"
+  },
+  {
+    "lat": 14.620157,
+    "lng": 121.046769,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Aurora–N. Domingo Intersection"
+  },
+  {
+    "lat": 14.612382,
+    "lng": 121.031864,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Broadway Avenue"
+  },
+  {
+    "lat": 14.618568,
+    "lng": 121.042889,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT Betty Go-Belmonte Station"
+  },
+  {
+    "lat": 14.620216,
+    "lng": 121.046309,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Aurora–N. Domingo Intersection"
+  },
+  {
+    "lat": 14.612492,
+    "lng": 121.031648,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Broadway Avenue"
+  },
+  {
+    "lat": 14.616893,
+    "lng": 121.040083,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Balete Drive"
+  },
+  {
+    "lat": 14.618705,
+    "lng": 121.042689,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT Betty Go-Belmonte Station"
+  },
+  {
+    "lat": 14.614948,
+    "lng": 121.036447,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "St. Paul University"
+  },
+  {
+    "lat": 14.622074,
+    "lng": 121.053326,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "BLK513"
+  },
+  {
+    "lat": 14.617653,
+    "lng": 121.014334,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "S&R New York Style Pizza"
+  },
+  {
+    "lat": 14.617914,
+    "lng": 121.014264,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.601373,
+    "lng": 121.050942,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Army Navy"
+  },
+  {
+    "lat": 14.599369,
+    "lng": 121.017145,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "V. Mapa Police Community Precint"
+  },
+  {
+    "lat": 14.599897,
+    "lng": 121.020075,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Damka"
+  },
+  {
+    "lat": 14.624231,
+    "lng": 121.048435,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Victory Liner Cubao Terminal"
+  },
+  {
+    "lat": 14.595932,
+    "lng": 121.021259,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.595772,
+    "lng": 121.021652,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.604914,
+    "lng": 121.04302,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "WalterMart"
+  },
+  {
+    "lat": 14.623979,
+    "lng": 121.054672,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.598332,
+    "lng": 121.038202,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Uniku"
+  },
+  {
+    "lat": 14.619484,
+    "lng": 121.051073,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cubao"
+  },
+  {
+    "lat": 14.601456,
+    "lng": 121.0124,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watsons"
+  },
+  {
+    "lat": 14.605486,
+    "lng": 121.032349,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "San Juan City Police Station"
+  },
+  {
+    "lat": 14.602422,
+    "lng": 121.047664,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Luk Yuen"
+  },
+  {
+    "lat": 14.602317,
+    "lng": 121.047889,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mercury Drug"
+  },
+  {
+    "lat": 14.609721,
+    "lng": 121.036836,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "8sticks"
+  },
+  {
+    "lat": 14.61332,
+    "lng": 121.00234,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Junmery's Pharmacy"
+  },
+  {
+    "lat": 14.606167,
+    "lng": 121.002013,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watsons"
+  },
+  {
+    "lat": 14.595555,
+    "lng": 121.021455,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Popeyes"
+  },
+  {
+    "lat": 14.595537,
+    "lng": 121.021953,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "3rd Street"
+  },
+  {
+    "lat": 14.617194,
+    "lng": 121.044398,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Knot for Gain by KEC"
+  },
+  {
+    "lat": 14.596379,
+    "lng": 121.038435,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tama Gogo"
+  },
+  {
+    "lat": 14.596302,
+    "lng": 121.038463,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bun Appétit"
+  },
+  {
+    "lat": 14.600584,
+    "lng": 121.036109,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fat Daddy"
+  },
+  {
+    "lat": 14.595804,
+    "lng": 121.039647,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bun Run"
+  },
+  {
+    "lat": 14.62096,
+    "lng": 121.022015,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.621773,
+    "lng": 121.024709,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Frostea"
+  },
+  {
+    "lat": 14.621792,
+    "lng": 121.024787,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "24 Chicken"
+  },
+  {
+    "lat": 14.62181,
+    "lng": 121.024847,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chooks to Go"
+  },
+  {
+    "lat": 14.6218,
+    "lng": 121.024819,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Nie & Laine Pinoy Food Express"
+  },
+  {
+    "lat": 14.623099,
+    "lng": 121.028047,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Potato Corner"
+  },
+  {
+    "lat": 14.622524,
+    "lng": 121.027165,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mediscount Pharmacy"
+  },
+  {
+    "lat": 14.619119,
+    "lng": 121.050117,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.619314,
+    "lng": 121.050219,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin'"
+  },
+  {
+    "lat": 14.619363,
+    "lng": 121.050181,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Southstar Drug"
+  },
+  {
+    "lat": 14.619651,
+    "lng": 121.050506,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Hong Kong Fried Noodle Express"
+  },
+  {
+    "lat": 14.619551,
+    "lng": 121.050442,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "K2 Pharmacy"
+  },
+  {
+    "lat": 14.619403,
+    "lng": 121.050598,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mang Inasal"
+  },
+  {
+    "lat": 14.619089,
+    "lng": 121.050357,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Joccs Pharmacy"
+  },
+  {
+    "lat": 14.618996,
+    "lng": 121.050378,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chooks to Go"
+  },
+  {
+    "lat": 14.618976,
+    "lng": 121.050392,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Heihei Chicken Burger"
+  },
+  {
+    "lat": 14.627536,
+    "lng": 121.047954,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Shawarma Shack"
+  },
+  {
+    "lat": 14.627459,
+    "lng": 121.047777,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kuya Nath's Goto"
+  },
+  {
+    "lat": 14.627542,
+    "lng": 121.047972,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "happy haus Donuts"
+  },
+  {
+    "lat": 14.627666,
+    "lng": 121.048256,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Siomai King"
+  },
+  {
+    "lat": 14.62776,
+    "lng": 121.048458,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Zane-Star Drugstore"
+  },
+  {
+    "lat": 14.627824,
+    "lng": 121.048585,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Carina's Fresh Buko"
+  },
+  {
+    "lat": 14.628049,
+    "lng": 121.049131,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Super8 Grocery Warehouse"
+  },
+  {
+    "lat": 14.61656,
+    "lng": 121.001923,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Fruitas"
+  },
+  {
+    "lat": 14.616683,
+    "lng": 121.002044,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Minute Burger"
+  },
+  {
+    "lat": 14.616571,
+    "lng": 121.001632,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Oxymed Pharmacy"
+  },
+  {
+    "lat": 14.616623,
+    "lng": 121.001973,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Baliwag"
+  },
+  {
+    "lat": 14.624578,
+    "lng": 121.016238,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Don.C"
+  },
+  {
+    "lat": 14.625636,
+    "lng": 121.017908,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bia Crispy Sisig"
+  },
+  {
+    "lat": 14.625039,
+    "lng": 121.016987,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Al's Pritos"
+  },
+  {
+    "lat": 14.625333,
+    "lng": 121.017443,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Generic Saves! Drugstore"
+  },
+  {
+    "lat": 14.625265,
+    "lng": 121.017344,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tentako"
+  },
+  {
+    "lat": 14.62579,
+    "lng": 121.018118,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "AllEn One"
+  },
+  {
+    "lat": 14.626012,
+    "lng": 121.01847,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Alni Fried Chicken"
+  },
+  {
+    "lat": 14.625884,
+    "lng": 121.017505,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Triple 888 Pharmacy"
+  },
+  {
+    "lat": 14.625944,
+    "lng": 121.017631,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chooks to Go"
+  },
+  {
+    "lat": 14.62587,
+    "lng": 121.011335,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Baliwag"
+  },
+  {
+    "lat": 14.626012,
+    "lng": 121.011224,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Benox Generic Pharmacy"
+  },
+  {
+    "lat": 14.626067,
+    "lng": 121.011134,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin'"
+  },
+  {
+    "lat": 14.628391,
+    "lng": 121.054695,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kapampangan Eatery"
+  },
+  {
+    "lat": 14.628922,
+    "lng": 121.050405,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Ali Raza Pharmacy"
+  },
+  {
+    "lat": 14.629411,
+    "lng": 121.052709,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.629682,
+    "lng": 121.054086,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.628133,
+    "lng": 121.049212,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.622571,
+    "lng": 121.026555,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.621175,
+    "lng": 121.0243,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "New Manila TODA"
+  },
+  {
+    "lat": 14.596351,
+    "lng": 121.038649,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Papeo"
+  },
+  {
+    "lat": 14.596388,
+    "lng": 121.038641,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "La Rotisserie"
+  },
+  {
+    "lat": 14.596292,
+    "lng": 121.038259,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Shari Shari"
+  },
+  {
+    "lat": 14.596344,
+    "lng": 121.038323,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Upper Crust"
+  },
+  {
+    "lat": 14.596372,
+    "lng": 121.038413,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kaokee"
+  },
+  {
+    "lat": 14.628851,
+    "lng": 121.033795,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "7-Eleven"
+  },
+  {
+    "lat": 14.598811,
+    "lng": 121.038342,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Angus Pares"
+  },
+  {
+    "lat": 14.626369,
+    "lng": 121.01143,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Andok's"
+  },
+  {
+    "lat": 14.597118,
+    "lng": 121.037624,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Abuela Cantina"
+  },
+  {
+    "lat": 14.599154,
+    "lng": 121.037906,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Old China"
+  },
+  {
+    "lat": 14.600742,
+    "lng": 121.047339,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Souper Xin Jiang"
+  },
+  {
+    "lat": 14.601385,
+    "lng": 121.049033,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cinnabon"
+  },
+  {
+    "lat": 14.599562,
+    "lng": 121.028316,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.598942,
+    "lng": 121.028292,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Eng Bee Tin"
+  },
+  {
+    "lat": 14.598953,
+    "lng": 121.02831,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chuan Kee Plus"
+  },
+  {
+    "lat": 14.598184,
+    "lng": 121.02973,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Big Man Chibugan"
+  },
+  {
+    "lat": 14.597984,
+    "lng": 121.030136,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.5981,
+    "lng": 121.029923,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.605104,
+    "lng": 121.028412,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pinaglabanan Church"
+  },
+  {
+    "lat": 14.621449,
+    "lng": 121.054923,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Angel's Burger"
+  },
+  {
+    "lat": 14.621762,
+    "lng": 121.054238,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Baksilog Express"
+  },
+  {
+    "lat": 14.622081,
+    "lng": 121.053932,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Popeyes"
+  },
+  {
+    "lat": 14.6206,
+    "lng": 121.052819,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Shake Shack"
+  },
+  {
+    "lat": 14.621102,
+    "lng": 121.053346,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dairy Queen"
+  },
+  {
+    "lat": 14.621417,
+    "lng": 121.052237,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Rhoma's"
+  },
+  {
+    "lat": 14.625302,
+    "lng": 121.006124,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Savemore"
+  },
+  {
+    "lat": 14.601909,
+    "lng": 121.012174,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.609142,
+    "lng": 121.048201,
+    "weight": 1.0,
+    "safety_type": "24/7 Store",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.603508,
+    "lng": 121.030309,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ern's Kainan"
+  },
+  {
+    "lat": 14.599309,
+    "lng": 121.036778,
+    "weight": 1.0,
+    "safety_type": "Security Presence",
+    "landmark_name": "Santa Lucia Police Sub-station"
+  },
+  {
+    "lat": 14.620833,
+    "lng": 121.052606,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Marugame Udon"
+  },
+  {
+    "lat": 14.62967,
+    "lng": 121.012241,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Quezon Ave–Araneta"
+  },
+  {
+    "lat": 14.60655,
+    "lng": 121.024143,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Uncle John's Grocery Store"
+  },
+  {
+    "lat": 14.607524,
+    "lng": 121.02428,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "FairyLuxe Cosmetics"
+  },
+  {
+    "lat": 14.598372,
+    "lng": 121.038407,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Maki Haus"
+  },
+  {
+    "lat": 14.623486,
+    "lng": 121.054525,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Manhattan Parkway"
+  },
+  {
+    "lat": 14.604215,
+    "lng": 121.033878,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mama Empanada"
+  },
+  {
+    "lat": 14.604214,
+    "lng": 121.033891,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Golden Chopsticks"
+  },
+  {
+    "lat": 14.621019,
+    "lng": 121.02198,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Trinity University of Asia"
+  },
+  {
+    "lat": 14.621365,
+    "lng": 121.022615,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Trinity University of Asia"
+  },
+  {
+    "lat": 14.625717,
+    "lng": 121.010258,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Santo Domingo Church"
+  },
+  {
+    "lat": 14.619541,
+    "lng": 121.053065,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Gateway Mall 2"
+  },
+  {
+    "lat": 14.603532,
+    "lng": 121.048546,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Unimart Greenhills"
+  },
+  {
+    "lat": 14.598328,
+    "lng": 121.045289,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cardinal Santos Medical Center"
+  },
+  {
+    "lat": 14.598215,
+    "lng": 121.0454,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cardinal Santos Medical Center"
+  },
+  {
+    "lat": 14.59755,
+    "lng": 121.039944,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "G-Square"
+  },
+  {
+    "lat": 14.597367,
+    "lng": 121.039755,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "G-Square"
+  },
+  {
+    "lat": 14.602263,
+    "lng": 121.046652,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "KFC"
+  },
+  {
+    "lat": 14.602239,
+    "lng": 121.046635,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dunkin'"
+  },
+  {
+    "lat": 14.596868,
+    "lng": 121.039135,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tang's Kitchen"
+  },
+  {
+    "lat": 14.627768,
+    "lng": 121.028716,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Scout Chuatoco Avenue & Scout Tobias Street"
+  },
+  {
+    "lat": 14.627586,
+    "lng": 121.028776,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Scout Chuatoco Avenue & Scout Tobias Street"
+  },
+  {
+    "lat": 14.628806,
+    "lng": 121.02946,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Scout Tobias & Don A. Roces Avenue"
+  },
+  {
+    "lat": 14.60276,
+    "lng": 121.050046,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Greenhills Shopping Center"
+  },
+  {
+    "lat": 14.627143,
+    "lng": 121.047856,
+    "weight": 0.5,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Unknown"
+  },
+  {
+    "lat": 14.604033,
+    "lng": 121.051766,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Founders Donuts"
+  },
+  {
+    "lat": 14.619187,
+    "lng": 121.003599,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Teyon"
+  },
+  {
+    "lat": 14.595961,
+    "lng": 121.02112,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Don Bosco School - Manila"
+  },
+  {
+    "lat": 14.596718,
+    "lng": 121.018878,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "2nd Street"
+  },
+  {
+    "lat": 14.596096,
+    "lng": 121.019562,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "2nd Street"
+  },
+  {
+    "lat": 14.609442,
+    "lng": 121.042319,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Santolan–C. Benitez Intersection"
+  },
+  {
+    "lat": 14.6109,
+    "lng": 121.03626,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Castilla Street"
+  },
+  {
+    "lat": 14.608602,
+    "lng": 121.040444,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Greenhills Barangay Hall"
+  },
+  {
+    "lat": 14.615356,
+    "lng": 121.040737,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Balete Drive"
+  },
+  {
+    "lat": 14.608561,
+    "lng": 121.040653,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Greenhills Barangay Hall"
+  },
+  {
+    "lat": 14.615398,
+    "lng": 121.040961,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Balete Drive"
+  },
+  {
+    "lat": 14.613021,
+    "lng": 121.038781,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Horseshoe"
+  },
+  {
+    "lat": 14.602882,
+    "lng": 121.051212,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Frankie's"
+  },
+  {
+    "lat": 14.60284,
+    "lng": 121.051277,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sweet Ecstasy"
+  },
+  {
+    "lat": 14.602799,
+    "lng": 121.051338,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Panda Express"
+  },
+  {
+    "lat": 14.601114,
+    "lng": 121.050745,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Wendy's"
+  },
+  {
+    "lat": 14.600934,
+    "lng": 121.050609,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tokyo Tokyo"
+  },
+  {
+    "lat": 14.60916,
+    "lng": 121.003895,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Minute Burger"
+  },
+  {
+    "lat": 14.622412,
+    "lng": 121.024538,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Happy N' Healthy - QC"
+  },
+  {
+    "lat": 14.601138,
+    "lng": 121.000792,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Nagtahan Interchange"
+  },
+  {
+    "lat": 14.618267,
+    "lng": 121.00831,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lopez Jaena Street"
+  },
+  {
+    "lat": 14.619327,
+    "lng": 121.008847,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Quezon Institute"
+  },
+  {
+    "lat": 14.618037,
+    "lng": 121.005615,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "E. Rodriguez Avenue–D. Tuazon Street"
+  },
+  {
+    "lat": 14.612142,
+    "lng": 121.000054,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Instruccion Street"
+  },
+  {
+    "lat": 14.613495,
+    "lng": 121.000669,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Plaza Noli"
+  },
+  {
+    "lat": 14.610729,
+    "lng": 121.026859,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT J. Ruiz Station 1"
+  },
+  {
+    "lat": 14.610119,
+    "lng": 121.024965,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "H. Lozada Street"
+  },
+  {
+    "lat": 14.609253,
+    "lng": 121.022552,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "A. Luna Street"
+  },
+  {
+    "lat": 14.601835,
+    "lng": 121.008316,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Magsaysay Railroad Crossing"
+  },
+  {
+    "lat": 14.601587,
+    "lng": 121.004967,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pureza Street"
+  },
+  {
+    "lat": 14.602153,
+    "lng": 121.00764,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Magsaysay Railroad Crossing"
+  },
+  {
+    "lat": 14.602395,
+    "lng": 121.011029,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Stop n' Shop"
+  },
+  {
+    "lat": 14.602758,
+    "lng": 121.015146,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Magsaysay–V. Mapa Intersection"
+  },
+  {
+    "lat": 14.607715,
+    "lng": 121.020975,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "UE Ramon Magsaysay Campus 1"
+  },
+  {
+    "lat": 14.607885,
+    "lng": 121.020759,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "UE Ramon Magsaysay Campus 2"
+  },
+  {
+    "lat": 14.605197,
+    "lng": 121.017997,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from SM City Santa Mesa"
+  },
+  {
+    "lat": 14.603861,
+    "lng": 121.016664,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT V. Mapa Station 2"
+  },
+  {
+    "lat": 14.609358,
+    "lng": 121.022423,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "A. Luna Street"
+  },
+  {
+    "lat": 14.610191,
+    "lng": 121.024745,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "S. Veloso Street"
+  },
+  {
+    "lat": 14.610822,
+    "lng": 121.026659,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "LRT J. Ruiz Station 2"
+  },
+  {
+    "lat": 14.597081,
+    "lng": 121.015828,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cordillera Street"
+  },
+  {
+    "lat": 14.595545,
+    "lng": 121.015233,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tzu Chi 1st"
+  },
+  {
+    "lat": 14.595978,
+    "lng": 121.015283,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tzu Chi 2nd"
+  },
+  {
+    "lat": 14.60793,
+    "lng": 121.017297,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tokyo Tokyo"
+  },
+  {
+    "lat": 14.627254,
+    "lng": 121.03443,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "L. Sanghio Intersection"
+  },
+  {
+    "lat": 14.6272,
+    "lng": 121.036899,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-1st Street"
+  },
+  {
+    "lat": 14.625912,
+    "lng": 121.03651,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Tomas Morato Elementary School"
+  },
+  {
+    "lat": 14.626408,
+    "lng": 121.034691,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-3rd Street"
+  },
+  {
+    "lat": 14.627329,
+    "lng": 121.036553,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-1st Street"
+  },
+  {
+    "lat": 14.625331,
+    "lng": 121.039691,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ermin Garcia Street"
+  },
+  {
+    "lat": 14.623126,
+    "lng": 121.047103,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sergeant J. Catolos Street & Monte de Piedad Street"
+  },
+  {
+    "lat": 14.622948,
+    "lng": 121.044822,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "E. Rodriguez Sr. Avenue–New York Street"
+  },
+  {
+    "lat": 14.62206,
+    "lng": 121.044063,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cubao Cathedral"
+  },
+  {
+    "lat": 14.628359,
+    "lng": 121.038702,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kamuning–Judge Jimenez Intersection"
+  },
+  {
+    "lat": 14.626548,
+    "lng": 121.039256,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-5th Street"
+  },
+  {
+    "lat": 14.626962,
+    "lng": 121.03921,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "K-5th Street"
+  },
+  {
+    "lat": 14.618336,
+    "lng": 121.04476,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Seattle Street"
+  },
+  {
+    "lat": 14.621907,
+    "lng": 121.043641,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Cubao Cathedral"
+  },
+  {
+    "lat": 14.617641,
+    "lng": 121.044908,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "N. Domingo Street–Mayor I.S. Diaz Street"
+  },
+  {
+    "lat": 14.629454,
+    "lng": 121.030854,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Don Alejandro Roces, Sr. Science and Technology High School"
+  },
+  {
+    "lat": 14.62939,
+    "lng": 121.025324,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "District 4 Action Center"
+  },
+  {
+    "lat": 14.629421,
+    "lng": 121.025198,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "District 4 Action Center"
+  },
+  {
+    "lat": 14.622786,
+    "lng": 121.011587,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Apoteka Pharmaceutical"
+  },
+  {
+    "lat": 14.624298,
+    "lng": 121.03401,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Burger Machine"
+  },
+  {
+    "lat": 14.624292,
+    "lng": 121.033923,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "MekiKanto"
+  },
+  {
+    "lat": 14.60437,
+    "lng": 121.023715,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Generika"
+  },
+  {
+    "lat": 14.604404,
+    "lng": 121.023595,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Chooks to Go"
+  },
+  {
+    "lat": 14.597063,
+    "lng": 121.037924,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Thor's"
+  },
+  {
+    "lat": 14.617756,
+    "lng": 121.044884,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Watson's Pharmacy"
+  },
+  {
+    "lat": 14.61642,
+    "lng": 121.044525,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Pharma Choice"
+  },
+  {
+    "lat": 14.616917,
+    "lng": 121.046182,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Mightee Mart"
+  },
+  {
+    "lat": 14.616732,
+    "lng": 121.049741,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dandoy Canteen"
+  },
+  {
+    "lat": 14.619087,
+    "lng": 121.048787,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Angel's Burger"
+  },
+  {
+    "lat": 14.626097,
+    "lng": 121.048308,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Kuya Nath's Goto"
+  },
+  {
+    "lat": 14.623957,
+    "lng": 121.049301,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jollibee"
+  },
+  {
+    "lat": 14.61169,
+    "lng": 121.054938,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Minute Burger"
+  },
+  {
+    "lat": 14.619685,
+    "lng": 121.052158,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "TGP"
+  },
+  {
+    "lat": 14.627048,
+    "lng": 121.036528,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ultimate Burger and Pizza"
+  },
+  {
+    "lat": 14.624038,
+    "lng": 121.048513,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Angel's Pizza"
+  },
+  {
+    "lat": 14.624163,
+    "lng": 121.048559,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lion Cave"
+  },
+  {
+    "lat": 14.624144,
+    "lng": 121.048569,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Moonleaf"
+  },
+  {
+    "lat": 14.624182,
+    "lng": 121.048549,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Mister Donut"
+  },
+  {
+    "lat": 14.624202,
+    "lng": 121.048538,
+    "weight": 0.7,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Potato Corner"
+  },
+  {
+    "lat": 14.606401,
+    "lng": 121.024616,
+    "weight": 0.4,
+    "safety_type": "Well-Lit Zone",
+    "landmark_name": "Generika"
+  },
+  {
+    "lat": 14.625469,
+    "lng": 121.006894,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "M. Cuenco Sr. Street"
+  },
+  {
+    "lat": 14.628371,
+    "lng": 121.00374,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Philippine Orthopedic Hospital"
+  },
+  {
+    "lat": 14.626227,
+    "lng": 121.005345,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dapitan Street"
+  },
+  {
+    "lat": 14.624605,
+    "lng": 121.007236,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "P. Florentino Street"
+  },
+  {
+    "lat": 14.627051,
+    "lng": 121.00453,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Maria Clara Street"
+  },
+  {
+    "lat": 14.62989,
+    "lng": 121.00302,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Calamba Street"
+  },
+  {
+    "lat": 14.626308,
+    "lng": 121.00542,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Dapitan Street"
+  },
+  {
+    "lat": 14.627906,
+    "lng": 121.004085,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Maria Clara Street"
+  },
+  {
+    "lat": 14.629304,
+    "lng": 121.003428,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Simoun Street"
+  },
+  {
+    "lat": 14.625461,
+    "lng": 121.00625,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "M. Cuenco Sr. Street"
+  },
+  {
+    "lat": 14.603099,
+    "lng": 121.02122,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta Avenue"
+  },
+  {
+    "lat": 14.605106,
+    "lng": 121.036477,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Jose Abad Santos Street"
+  },
+  {
+    "lat": 14.605203,
+    "lng": 121.028371,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Pinaglabanan Church"
+  },
+  {
+    "lat": 14.604091,
+    "lng": 121.029907,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pinaglabanan Shrine 2"
+  },
+  {
+    "lat": 14.609486,
+    "lng": 121.029425,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Lieutenant Artiaga Street"
+  },
+  {
+    "lat": 14.609269,
+    "lng": 121.029409,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Lieutenant Artiaga Street"
+  },
+  {
+    "lat": 14.610688,
+    "lng": 121.031069,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Central San Juan Fire Volunteers 2"
+  },
+  {
+    "lat": 14.604897,
+    "lng": 121.033167,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Filoil EcoOil Centre"
+  },
+  {
+    "lat": 14.606683,
+    "lng": 121.025102,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "D. Santiago Street"
+  },
+  {
+    "lat": 14.610626,
+    "lng": 121.031194,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Central San Juan Fire Volunteers 1"
+  },
+  {
+    "lat": 14.604058,
+    "lng": 121.022097,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "N. Domingo–Araneta Intersection"
+  },
+  {
+    "lat": 14.604271,
+    "lng": 121.030042,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Pinaglabanan Shrine 1"
+  },
+  {
+    "lat": 14.606718,
+    "lng": 121.024735,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "BPI San Juan"
+  },
+  {
+    "lat": 14.604707,
+    "lng": 121.032798,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Filoil EcoOil Centre"
+  },
+  {
+    "lat": 14.60516,
+    "lng": 121.036774,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Jose Abad Santos Street"
+  },
+  {
+    "lat": 14.605385,
+    "lng": 121.023083,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Agora Public Market"
+  },
+  {
+    "lat": 14.626151,
+    "lng": 121.054739,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Columbia–Yale Intersection"
+  },
+  {
+    "lat": 14.629576,
+    "lng": 121.050798,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Ermin Garcia Street"
+  },
+  {
+    "lat": 14.627024,
+    "lng": 121.052063,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "New York–Cambridge Intersection"
+  },
+  {
+    "lat": 14.625452,
+    "lng": 121.053208,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Columbia–Cambridge Intersection"
+  },
+  {
+    "lat": 14.615693,
+    "lng": 121.038049,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Robinsons Magnolia"
+  },
+  {
+    "lat": 14.615901,
+    "lng": 121.038056,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Robinsons Magnolia"
+  },
+  {
+    "lat": 14.629587,
+    "lng": 121.012909,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta–P. Florentino"
+  },
+  {
+    "lat": 14.618677,
+    "lng": 121.013733,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Puregold QI Central"
+  },
+  {
+    "lat": 14.605074,
+    "lng": 121.018315,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "SM City Santa Mesa"
+  },
+  {
+    "lat": 14.619211,
+    "lng": 121.015755,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from NGCP Doña Imelda Substation"
+  },
+  {
+    "lat": 14.614723,
+    "lng": 121.016604,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bayani Road"
+  },
+  {
+    "lat": 14.618203,
+    "lng": 121.014838,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta–E. Rodriguez Intersection"
+  },
+  {
+    "lat": 14.627767,
+    "lng": 121.013681,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Quezon Ave–Araneta"
+  },
+  {
+    "lat": 14.618137,
+    "lng": 121.015218,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Araneta–E. Rodriguez Intersection"
+  },
+  {
+    "lat": 14.610974,
+    "lng": 121.01679,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Landargon Street"
+  },
+  {
+    "lat": 14.610983,
+    "lng": 121.017144,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Landargon Street"
+  },
+  {
+    "lat": 14.624008,
+    "lng": 121.015566,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from La Funeraria Paz"
+  },
+  {
+    "lat": 14.606489,
+    "lng": 121.019329,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Central Colleges of the Philippines"
+  },
+  {
+    "lat": 14.607163,
+    "lng": 121.017165,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Arlington Memorial Chapels"
+  },
+  {
+    "lat": 14.623898,
+    "lng": 121.015216,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "La Funeraria Paz"
+  },
+  {
+    "lat": 14.607411,
+    "lng": 121.017441,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Arlington Memorial Chapels"
+  },
+  {
+    "lat": 14.620024,
+    "lng": 121.014769,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Petron Araneta Ave"
+  },
+  {
+    "lat": 14.620439,
+    "lng": 121.01513,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Petron Araneta Ave"
+  },
+  {
+    "lat": 14.61884,
+    "lng": 121.013527,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Puregold QI Central"
+  },
+  {
+    "lat": 14.614654,
+    "lng": 121.016958,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Bayani Road"
+  },
+  {
+    "lat": 14.60886,
+    "lng": 121.046866,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Across from Avida Towers New Manila"
+  },
+  {
+    "lat": 14.608963,
+    "lng": 121.046785,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Avida Towers New Manila"
+  },
+  {
+    "lat": 14.608728,
+    "lng": 121.044955,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sunrise Drive"
+  },
+  {
+    "lat": 14.608865,
+    "lng": 121.044832,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Sunrise Drive"
+  },
+  {
+    "lat": 14.610331,
+    "lng": 121.052419,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Camp Crame Gate 2"
+  },
+  {
+    "lat": 14.610776,
+    "lng": 121.054231,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "EDSA–Santolan Intersection"
+  },
+  {
+    "lat": 14.609843,
+    "lng": 121.050478,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Camp Crame Gate 3"
+  },
+  {
+    "lat": 14.609766,
+    "lng": 121.050569,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Camp Crame Gate 3"
+  },
+  {
+    "lat": 14.609328,
+    "lng": 121.048751,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "3rd West Crame Road"
+  },
+  {
+    "lat": 14.609399,
+    "lng": 121.042543,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Santolan–C. Benitez Intersection"
+  },
+  {
+    "lat": 14.609398,
+    "lng": 121.048583,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "3rd West Crame Road"
+  },
+  {
+    "lat": 14.610254,
+    "lng": 121.0527,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Camp Crame Gate 2"
+  },
+  {
+    "lat": 14.610674,
+    "lng": 121.054508,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "EDSA–Santolan Intersection"
+  },
+  {
+    "lat": 14.603975,
+    "lng": 121.021204,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "N. Domingo–Araneta Intersection"
+  },
+  {
+    "lat": 14.627373,
+    "lng": 121.052222,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "New York–Cambridge Intersection"
+  },
+  {
+    "lat": 14.628291,
+    "lng": 121.054313,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Stanford Street"
+  },
+  {
+    "lat": 14.62725,
+    "lng": 121.051738,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "New York–Cambridge Intersection"
+  },
+  {
+    "lat": 14.628183,
+    "lng": 121.053867,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Stanford Street"
+  },
+  {
+    "lat": 14.627822,
+    "lng": 121.048514,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Nepa Q-Mart"
+  },
+  {
+    "lat": 14.605499,
+    "lng": 121.05045,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "West Crame Barangay Hall"
+  },
+  {
+    "lat": 14.607355,
+    "lng": 121.050687,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Road 2"
+  },
+  {
+    "lat": 14.607316,
+    "lng": 121.050975,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Camp Crame Gate 4"
+  },
+  {
+    "lat": 14.605629,
+    "lng": 121.051616,
+    "weight": 0.8,
+    "safety_type": "High Foot Traffic",
+    "landmark_name": "Camp Crame Elementary School"
+  }
+]

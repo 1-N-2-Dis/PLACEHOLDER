@@ -1,20 +1,21 @@
 // Community heatmap of "condition validated" reports (F-010).
-// Role: build the per-segment incident markers the ZoneMap heatmap layer renders as glowing
-// severity icons.
+// Role: build the per-segment incident markers ReportHeatmap.jsx's cloud layers render.
 // Traces to: docs/03-prd.md F-010, docs/09-data-model.md (no stored `validated` field).
 //
 // "Validated" = severity is yellow or red (AI-assigned, F-006, BR-007) — never green, never
 // user-selectable. Reports are collapsed to one marker per segment: worst severity wins, and the
-// qualifying report count scales the marker's glow so corroborated segments read as "hotter".
+// real, cross-user like count (report.likedBy, from the /likeReport endpoint) scales cloud size —
+// distinct from the AI-driven corroborationCount, which submitReport uses for duplicate merging,
+// not for this visual.
 import { isFlaggedTonight } from './freshness.js';
 
-// One heavily corroborated segment shouldn't swamp the layer — same cap spirit as the old
+// One heavily liked segment shouldn't swamp the layer — same cap spirit as the old
 // density-weight cap.
 export const HEAT_COUNT_CAP = 5;
 
 export function buildIncidentMarkers(reports, segments, now = Date.now()) {
   const segmentById = new Map(segments.map((s) => [s.segmentId, s]));
-  const bySegment = new Map(); // segmentId -> { segmentId, lng, lat, severity, count }
+  const bySegment = new Map(); // segmentId -> { segmentId, lng, lat, severity, likeCount }
 
   for (const report of reports) {
     if (report.severity !== 'yellow' && report.severity !== 'red') continue;
@@ -23,9 +24,10 @@ export function buildIncidentMarkers(reports, segments, now = Date.now()) {
     const segment = segmentById.get(report.segmentId);
     if (!segment?.geo) continue;
 
+    const contribution = report.likedBy?.length || 0;
     const existing = bySegment.get(report.segmentId);
     if (existing) {
-      existing.count = Math.min(existing.count + 1, HEAT_COUNT_CAP);
+      existing.likeCount = Math.min(existing.likeCount + contribution, HEAT_COUNT_CAP);
       if (report.severity === 'red') existing.severity = 'red';
     } else {
       bySegment.set(report.segmentId, {
@@ -33,7 +35,7 @@ export function buildIncidentMarkers(reports, segments, now = Date.now()) {
         lng: segment.geo.lng,
         lat: segment.geo.lat,
         severity: report.severity,
-        count: 1,
+        likeCount: Math.min(contribution, HEAT_COUNT_CAP),
       });
     }
   }

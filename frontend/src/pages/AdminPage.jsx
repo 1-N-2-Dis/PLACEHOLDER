@@ -20,7 +20,7 @@
 // Traces to: docs/03-prd.md F-009, backend/server/index.js admin routes.
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Trash2, ShieldCheck, AlertCircle, Cloud, CloudDrizzle, CloudLightning } from 'lucide-react';
 import RequireAdmin from '../components/RequireAdmin.jsx';
 import AdminPdfExport from '../features/admin/AdminPdfExport.jsx';
 import AdminCompileCache from '../features/admin/AdminCompileCache.jsx';
@@ -31,6 +31,10 @@ import { deleteAdminReport } from '../lib/adminApi.js';
 // Uses the live Firestore subscription (reports prop from App.jsx) so the table
 // updates in real-time without an extra API fetch. Delete calls the new admin
 // endpoint which also atomically decrements platform_transparency_stats.
+
+// Small severity glyphs, echoing the map heatmap's weather-radar visual language — restrained
+// (icon-only, no color reskin) since this is a dense internal moderation table, not a report.
+const SEVERITY_SKY_ICON = { red: CloudLightning, yellow: CloudDrizzle, green: Cloud };
 
 function ModerationTable({ reports, segments }) {
   const [busyId, setBusyId] = useState(null);
@@ -78,9 +82,9 @@ function ModerationTable({ reports, segments }) {
       {reports.map((r) => {
         const meta = CONDITION_META[r.conditionType];
         const CondIcon = meta?.Icon;
-        const severityClass =
-          r.severity === 'red' ? 'badge-red' :
-          r.severity === 'yellow' ? 'badge-yellow' : 'badge-green';
+        const severityKey = r.severity === 'red' ? 'red' : r.severity === 'yellow' ? 'yellow' : 'green';
+        const severityClass = `badge-${severityKey}`;
+        const SkyIcon = SEVERITY_SKY_ICON[severityKey];
 
         return (
           <div key={r.id} role="row" className="admin-table-row">
@@ -116,7 +120,11 @@ function ModerationTable({ reports, segments }) {
 
             {/* Severity badge */}
             <span role="cell" style={{ flex: '0 0 4rem' }}>
-              <span className={`status-badge ${severityClass}`} style={{ fontSize: '0.75rem' }}>
+              <span
+                className={`status-badge ${severityClass}`}
+                style={{ fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+              >
+                <SkyIcon size={11} aria-hidden="true" />
                 {r.severity ?? '—'}
               </span>
             </span>
@@ -159,8 +167,8 @@ function ModerationTable({ reports, segments }) {
 export default function AdminPage({ reports, segments }) {
   return (
     <RequireAdmin>
-      <div className="report-page">
-        <div className="report-page-inner" style={{ maxWidth: '56rem' }}>
+      <div className="page-scroll">
+        <div className="page-scroll-inner" style={{ maxWidth: '56rem' }}>
 
           {/* Page header */}
           <Link to="/dashboard" className="back-link">← Back to dashboard</Link>

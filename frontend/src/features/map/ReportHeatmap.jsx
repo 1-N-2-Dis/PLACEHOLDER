@@ -9,18 +9,27 @@ import { HEATMAP_BASELINE } from '../../data/heatmap-baseline.js';
 // Baseline hotspots carry their own geo (unlike live reports, which only carry a segmentId and
 // are joined against the frontend's static segment list) — so they're turned into markers
 // directly rather than via buildIncidentMarkers, and never drop silently for a location with no
-// SEED_SEGMENTS/WELL_USED_SEGMENTS counterpart (e.g. seg_magsaysay_jeeps).
+// SEED_SEGMENTS/WELL_USED_SEGMENTS counterpart (e.g. seg_magsaysay_jeeps). They're curated seed
+// content, not live user reports, so there's no real "people liking it" signal for them — they
+// keep a static weight from their curated corroborationCount instead of the live likes formula
+// below.
 const BASELINE_MARKERS = HEATMAP_BASELINE.filter((h) => h.severity === 'red' || h.severity === 'yellow').map((h) => ({
   segmentId: h.segmentId,
   lng: h.geo.lng,
   lat: h.geo.lat,
   severity: h.severity,
-  count: Math.min(h.corroborationCount || 1, HEAT_COUNT_CAP),
+  weight: Math.min(h.corroborationCount || 1, HEAT_COUNT_CAP),
 }));
 
-export default function ReportHeatmap({ reports, segments, showRed, showYellow, localLikes = {} }) {
+export default function ReportHeatmap({ reports, segments, showRed, showYellow }) {
   const markers = useMemo(() => {
-    const live = buildIncidentMarkers(reports, segments);
+    // Cloud size scales with real, cross-user likes on the report(s) at this segment — a
+    // baseline weight of 1 keeps a freshly-flagged segment visible even before anyone's liked
+    // it yet, capped so one heavily-liked report can't swamp the whole layer.
+    const live = buildIncidentMarkers(reports, segments).map((m) => ({
+      ...m,
+      weight: Math.min(1 + m.likeCount, HEAT_COUNT_CAP),
+    }));
     const liveIds = new Set(live.map((m) => m.segmentId));
     // A baseline hotspot yields to a live report on the same segment — the live report is the
     // fresher, real signal.
@@ -32,7 +41,7 @@ export default function ReportHeatmap({ reports, segments, showRed, showYellow, 
       type: 'FeatureCollection',
       features: markers.filter(m => m.severity === 'red').map(m => ({
         type: 'Feature',
-        properties: { weight: m.count + (localLikes[m.segmentId] ? 3 : 0), segmentId: m.segmentId },
+        properties: { weight: m.weight, segmentId: m.segmentId },
         geometry: { type: 'Point', coordinates: [m.lng, m.lat] }
       }))
     };
@@ -43,7 +52,7 @@ export default function ReportHeatmap({ reports, segments, showRed, showYellow, 
       type: 'FeatureCollection',
       features: markers.filter(m => m.severity === 'yellow').map(m => ({
         type: 'Feature',
-        properties: { weight: m.count + (localLikes[m.segmentId] ? 3 : 0), segmentId: m.segmentId },
+        properties: { weight: m.weight, segmentId: m.segmentId },
         geometry: { type: 'Point', coordinates: [m.lng, m.lat] }
       }))
     };
@@ -57,7 +66,7 @@ export default function ReportHeatmap({ reports, segments, showRed, showYellow, 
             id="heatmap-red-layer"
             type="heatmap"
             paint={{
-              'heatmap-weight': ['min', ['+', ['get', 'weight'], 1], 10],
+              'heatmap-weight': ['get', 'weight'],
               'heatmap-intensity': [
                 'interpolate', ['linear'], ['zoom'],
                 11, 0.5,
@@ -66,17 +75,22 @@ export default function ReportHeatmap({ reports, segments, showRed, showYellow, 
               'heatmap-color': [
                 'interpolate', ['linear'], ['heatmap-density'],
                 0, 'rgba(0,0,0,0)',
-                0.3, 'rgba(255,180,100,0.1)',
-                0.6, 'rgba(220,80,50,0.25)',
-                0.85, 'rgba(180,20,20,0.5)',
-                1, 'rgba(120,0,0,0.75)'
+                0.15, 'rgba(255,205,150,0.18)',
+                0.35, 'rgba(255,150,115,0.4)',
+                0.6, 'rgba(224,95,75,0.6)',
+                0.85, 'rgba(185,35,35,0.8)',
+                1, 'rgba(130,10,10,0.97)'
               ],
               'heatmap-radius': [
                 'interpolate', ['linear'], ['zoom'],
-                11, 15,
-                15, 45
+                11, 13,
+                15, 40
               ],
-              'heatmap-opacity': 0.85
+              'heatmap-opacity': [
+                'interpolate', ['linear'], ['zoom'],
+                11, 0.9,
+                15, 1.0
+              ]
             }}
           />
         </Source>
@@ -87,7 +101,7 @@ export default function ReportHeatmap({ reports, segments, showRed, showYellow, 
             id="heatmap-yellow-layer"
             type="heatmap"
             paint={{
-              'heatmap-weight': ['min', ['+', ['get', 'weight'], 1], 10],
+              'heatmap-weight': ['get', 'weight'],
               'heatmap-intensity': [
                 'interpolate', ['linear'], ['zoom'],
                 11, 0.5,
@@ -96,17 +110,22 @@ export default function ReportHeatmap({ reports, segments, showRed, showYellow, 
               'heatmap-color': [
                 'interpolate', ['linear'], ['heatmap-density'],
                 0, 'rgba(0,0,0,0)',
-                0.3, 'rgba(255,240,150,0.1)',
-                0.6, 'rgba(255,180,0,0.25)',
-                0.85, 'rgba(220,100,0,0.5)',
-                1, 'rgba(180,60,0,0.75)'
+                0.15, 'rgba(255,245,190,0.18)',
+                0.35, 'rgba(255,215,120,0.4)',
+                0.6, 'rgba(255,180,30,0.6)',
+                0.85, 'rgba(224,120,10,0.8)',
+                1, 'rgba(185,75,0,0.97)'
               ],
               'heatmap-radius': [
                 'interpolate', ['linear'], ['zoom'],
-                11, 15,
-                15, 45
+                11, 13,
+                15, 40
               ],
-              'heatmap-opacity': 0.85
+              'heatmap-opacity': [
+                'interpolate', ['linear'], ['zoom'],
+                11, 0.9,
+                15, 1.0
+              ]
             }}
           />
         </Source>

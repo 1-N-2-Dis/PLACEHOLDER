@@ -28,8 +28,8 @@ export default function RequireAdmin({ children }) {
   // We avoid rendering children while role is null to prevent a flash of admin UI.
   if (role === null && !isAnonymous) {
     return (
-      <div className="report-page">
-        <div className="report-page-inner">
+      <div className="page-scroll">
+        <div className="page-scroll-inner">
           <div className="icon-line" style={{ marginTop: '2rem', color: 'var(--muted)' }}>
             <Shield size={16} />
             <span>Verifying access…</span>

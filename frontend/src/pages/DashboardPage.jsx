@@ -1,11 +1,12 @@
 // guidHER Dashboard — cards, quick actions, zone overview, activity feed.
 import { useState } from 'react';
-import { CheckCircle2, AlertTriangle, AlertOctagon, Flag, Navigation, Lightbulb, ArrowRight } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, AlertOctagon, Flag, Navigation, Lightbulb, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Map from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 import { useAuth } from '../lib/authContext.jsx';
+import { useAuthUser } from '../lib/useAuthUser.js';
 import { useTheme } from '../lib/theme.jsx';
 import { ZONE_CENTER, getMapStyle } from '../lib/maps.js';
 import MockLocation from '../features/map/MockLocation.jsx';
@@ -21,6 +22,7 @@ function statusBadgeClass(status) {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { role } = useAuthUser();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -37,6 +39,15 @@ export default function DashboardPage() {
         <div className="greeting mb-20">
           <div className="text-h1" style={{ margin: 0, fontSize: '2.2rem', color: 'var(--ink)' }}>{greeting}, {firstName}.</div>
           <div className="text-body" style={{ color: 'var(--muted)', marginTop: 8, fontSize: '1.05rem', lineHeight: 1.4 }}>Here is tonight's commute picture for the Sta. Mesa zone.</div>
+          {role === 'admin' && (
+            <button
+              className="btn btn-secondary btn-sm"
+              style={{ marginTop: 14 }}
+              onClick={() => navigate('/admin')}
+            >
+              <ShieldCheck size={14} /> Admin Dashboard
+            </button>
+          )}
         </div>
 
         {/* Owly tip */}
@@ -80,7 +91,7 @@ export default function DashboardPage() {
           <div className="dash-card dash-card--hero">
             <div className="dash-card-label dash-card-label--on-hero">Safety score</div>
             <div className="dash-card-value dash-card-value--gold">72</div>
-            <div className="dash-card-sub dash-card-sub--on-hero">Moderate — 2 flagged segments</div>
+            <div className="dash-card-sub dash-card-sub--on-hero">Moderate — 2 flagged roads</div>
             <AlertTriangle size={52} className="dash-card-accent" />
           </div>
           <div className="dash-card">
@@ -98,7 +109,7 @@ export default function DashboardPage() {
           <div className="dash-card dash-card--surface">
             <div className="dash-card-label">Zone coverage</div>
             <div className="dash-card-value">8</div>
-            <div className="dash-card-sub">Segments tracked tonight</div>
+            <div className="dash-card-sub">Roads tracked tonight</div>
             <Navigation size={52} color="var(--lavender)" className="dash-card-accent" />
           </div>
         </div>

@@ -1,7 +1,7 @@
 // guidHER top navigation header.
 // Navigation: Home · Safety Map · Routes · Reports · Safety Tips + profile button.
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Sun, Moon, User } from 'lucide-react';
+import { Sun, Moon, User, ShieldCheck } from 'lucide-react';
 import { useTheme } from '../lib/theme.jsx';
 import { useAuth } from '../lib/authContext.jsx';
 import { useAuthUser } from '../lib/useAuthUser.js';
@@ -24,10 +24,9 @@ export default function AppHeader({ onBrandClick }) {
   const { user } = useAuth();
   // Separate from the mock-auth `user` above: this reflects the real Firebase Auth session
   // (see lib/useAuthUser.js) that backend/firestore.rules' isAdmin() check relies on. Sign in at
-  // /login with the seeded admin account (backend/scripts/seed-auth-users.mjs) to see this link.
+  // /login with the seeded admin account (backend/scripts/seed-auth-users.mjs) to see the admin button.
   const { role } = useAuthUser();
   const navigate = useNavigate();
-  const navLinks = role === 'admin' ? [...NAV_LINKS, { to: '/admin', label: 'Admin' }] : NAV_LINKS;
 
   return (
     <header className="app-nav">
@@ -41,7 +40,7 @@ export default function AppHeader({ onBrandClick }) {
       </button>
 
       <nav className="desktop-nav-links" aria-label="Main navigation">
-        {navLinks.map(({ to, label }) => (
+        {NAV_LINKS.map(({ to, label }) => (
           <NavLink key={to} to={to} className={({ isActive }) => isActive ? 'active' : ''}>
             {label}
           </NavLink>
@@ -49,6 +48,15 @@ export default function AppHeader({ onBrandClick }) {
       </nav>
 
       <div className="nav-actions">
+        {role === 'admin' && (
+          <button
+            className="btn btn-ghost btn-sm nav-icon-btn"
+            onClick={() => navigate('/admin')}
+            aria-label="Admin dashboard"
+          >
+            <ShieldCheck size={18} />
+          </button>
+        )}
         <button
           className="btn btn-ghost btn-sm nav-icon-btn"
           onClick={toggleTheme}

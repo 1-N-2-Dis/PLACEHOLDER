@@ -21,10 +21,10 @@ const CATEGORIES = [
     iconClass: 'tip-cat-icon-before',
     iconColor: 'var(--primary)',
     tips: [
-      { title: 'Check tonight\'s zone conditions', body: 'Open the Safety Map before you leave. Segment conditions can change hour to hour.' },
+      { title: 'Check tonight\'s zone conditions', body: 'Open the Safety Map before you leave. Road conditions can change hour to hour.' },
       { title: 'Plan your route in advance', body: 'Know which stops and streets you\'ll use. Having a plan means fewer decisions under pressure.' },
       { title: 'Inform someone you trust', body: 'Share your route and estimated arrival time. A 10-second text can matter a lot.' },
-      { title: 'Choose your departure time wisely', body: 'Some segments are safer between 6 to 9 PM. The map shows freshness timestamps for every report.' },
+      { title: 'Choose your departure time wisely', body: 'Some roads are safer between 6 to 9 PM. The map shows freshness timestamps for every report.' },
     ],
   },
   {
