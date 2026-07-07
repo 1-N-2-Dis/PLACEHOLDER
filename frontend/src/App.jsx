@@ -17,6 +17,7 @@ import SafetyTipsPage from './pages/SafetyTipsPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
+import RequireAdmin from './components/RequireAdmin.jsx';
 
 const segments = [...SEED_SEGMENTS, ...WELL_USED_SEGMENTS];
 
@@ -60,7 +61,11 @@ function AuthenticatedApp() {
           <Route path="/tips"      element={<SafetyTipsPage />} />
           <Route path="/profile"   element={<ProfilePage />} />
           <Route path="/login"     element={<AccountPage />} />
-          <Route path="/admin"     element={<AdminPage reports={reports} segments={allSegments} />} />
+          <Route path="/admin"     element={
+            <RequireAdmin>
+              <AdminPage reports={reports} segments={allSegments} />
+            </RequireAdmin>
+          } />
           <Route path="/"   element={<Navigate to="/dashboard" replace />} />
           <Route path="*"   element={<Navigate to="/dashboard" replace />} />
         </Routes>
