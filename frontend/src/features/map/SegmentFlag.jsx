@@ -92,9 +92,9 @@ export default function SegmentFlag({
                 <div className="report-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0' }}>
                   <button 
                     onClick={(e) => { e.stopPropagation(); onLike(!isLiked); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: isLiked ? '#e74c3c' : 'gray', padding: 0, fontSize: '0.85rem' }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: isLiked ? 'var(--sev-red-fg)' : 'var(--muted)', padding: 0, fontSize: '0.85rem' }}
                   >
-                    <ThumbsUp size={14} fill={isLiked ? '#e74c3c' : 'none'} /> 
+                    <ThumbsUp size={14} fill={isLiked ? 'var(--sev-red-fg)' : 'none'} />
                     {report.corroborationCount > 1 
                       ? `Confirmed by ${report.corroborationCount + (isLiked ? 1 : 0)} reports` 
                       : (isLiked ? 'Confirmed by 2 reports' : 'Corroborate')}

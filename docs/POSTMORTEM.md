@@ -42,6 +42,50 @@ SaferRoute; that is a known, tracked migration (see §4 open items), **not** a c
 
 ## 3. Pivots & decisions (newest first)
 
+### 2026-07-07 (impeccable audit pass) — Emergency contacts wired up; accessibility and layout-consistency fixes across the app
+Ran the impeccable skill's `critique`/`audit` flow (static-only — no browser tool in this session,
+disclosed per the skill's own rules) across every page. Findings and fixes:
+- **Real bug, not style**: `ProfilePage.jsx`'s emergency-contacts feature had complete state/handlers/
+  CSS (`.contact-item` etc.) but no render path — added the missing UI.
+- **Real a11y bug**: `SafetyTipsPage.jsx`'s tip-category accordion header was an unfocusable
+  `<div onClick>` with no `aria-expanded` — now a proper `<button>`; hover-state JS style mutation
+  replaced with CSS.
+- **Consistency**: `AccountPage.jsx`/`AdminPage.jsx` were still on an older page-shell pattern
+  (`.report-page`, a literal "←" arrow instead of the lucide `ArrowLeft` icon AGENTS.md mandates)
+  that every other page had already moved past — brought them onto the same `.page-scroll`/
+  `GradientBlobs`/icon-button shell as `ReportPage.jsx`.
+- Removed dead CSS (`.tip-card`/`.tip-card-v2`, an unreferenced older Safety Tips design) and fixed
+  two anti-patterns the skill's deterministic scanner flagged (an accent-border-on-rounded-corner
+  clash, and a left-side accent stripe that turned out to live in that same dead CSS).
+- Minor token-consistency cleanup (dropped a couple of hardcoded colors/shadows that were silently
+  overriding existing theme tokens/classes).
+
+See [Design System §12](./design-system.md#12-change-log-design-decisions) for the full file-level
+breakdown.
+
+### 2026-07-07 — Landing page made theme-aware; dead theme code removed; dark-mode contrast fixes
+- The public landing page (`WelcomePage.jsx`'s `LandingPage`/`LandingNav`) previously stayed a
+  fixed cream/purple brand surface regardless of `data-theme`, per a deliberate earlier call
+  (design-system.md §6). That decision is now superseded: the landing page has a real dark
+  variant (`.landing`, `.landing-nav`, `.land-band-tint`/`-cream`, `.feature-card-v2`, `.eyebrow`
+  all gained `[data-theme="dark"]` overrides in `styles.css`) and `LandingNav` got its own
+  Sun/Moon toggle button (same `useTheme()` pattern as `AppHeader.jsx`), since visitors previously
+  had no way to set a theme preference before logging in. The auth screen (`.auth-screen`'s fixed
+  purple gradient) is unchanged — out of scope for this pass.
+- Fixed a real WCAG-AA contrast failure in dark mode: `SEVERITY_META` (`severity-types.js`) held
+  raw hex colors rendered inline in `SegmentFlag.jsx`'s popup; the severity-red at `#c62828` on
+  the dark `--card` background (`#2A1F45`) measured ~1.7:1, far under the 4.5:1 floor. Switched to
+  the existing dark-mode-safe var refs (`--wellused`, `--sev-yellow-fg`, `--sev-red-fg`) instead —
+  preserves the deliberate "severity green renders purple, not green" decision (§3.B), just routes
+  it through a theme-aware token instead of a hardcoded light-mode value.
+- Removed `frontend/src/context/AuthContext.jsx`: an orphaned, unused duplicate of the real theme
+  provider (`lib/theme.jsx`) that nothing imported.
+- Briefly converted the landing page's glass surfaces (`.landing-nav`, `.land-band-tint`/`-cream`,
+  `.feature-card-v2`) to the app's solid-card system, then reverted on request the same day: the
+  light-mode look stays exactly as it was (translucent-rgba + `backdrop-filter`); only their
+  `[data-theme="dark"]` companion rules are new. See
+  [Design System §5](./design-system.md#5-shape-elevation-spacing-motion).
+
 ### 2026-07-06 — Hackathon context captured; pitch built on a VC-deck method; README de-landmined
 - Added [00-hackathon-context.md](./00-hackathon-context.md) as canonical owner of the SparkFest
   rules, timeline, and **judging rubric** (Technology 25, Relevance 20, Creativity 15, Uniqueness 15,

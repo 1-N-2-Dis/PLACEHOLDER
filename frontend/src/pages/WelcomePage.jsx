@@ -2,11 +2,13 @@
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
 import { useState, useEffect, useRef } from 'react';
-import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
+import { Users, User, Train, Footprints, ChevronRight, Moon, Sun, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
+import { useTheme } from '../lib/theme.jsx';
 import { initGoogleSignIn, cancelGoogleOneTap } from '../lib/googleOneTap.js';
 import Owly from '../components/Owly.jsx';
 import BrandMark from '../components/BrandMark.jsx';
+import CursorTrail from '../components/CursorTrail.jsx';
 import useRevealOnScroll from '../lib/useRevealOnScroll.js';
 
 // ── Static data ───────────────────────────────────────────────────────────────
@@ -44,8 +46,9 @@ function BrandWordmark() {
 }
 
 // ── Landing nav ───────────────────────────────────────────────────────────────
-function LandingNav({ onLogin, onSignup }) {
+function LandingNav({ onLogin, onSignup, onProfile, loggedIn }) {
   const [hidden, setHidden] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     let lastScroll = window.scrollY;
@@ -79,8 +82,23 @@ function LandingNav({ onLogin, onSignup }) {
           </nav>
         </div>
         <div className="landing-nav-actions">
-          <button className="btn btn-secondary btn-sm" onClick={onLogin}>Log In</button>
-          <button className="btn btn-primary btn-sm" onClick={onSignup}>Sign Up</button>
+          <button
+            className="btn btn-ghost btn-sm nav-icon-btn"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          {loggedIn ? (
+            <button className="btn btn-primary btn-sm" onClick={onProfile}>
+              <User size={16} /> My Profile
+            </button>
+          ) : (
+            <>
+              <button className="btn btn-secondary btn-sm" onClick={onLogin}>Log In</button>
+              <button className="btn btn-primary btn-sm" onClick={onSignup}>Sign Up</button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -387,7 +405,7 @@ function SignupView({ onBack, onDone, onLogin }) {
 }
 
 // ── Full landing page ─────────────────────────────────────────────────────────
-function LandingPage({ onLogin, onSignup }) {
+function LandingPage({ onLogin, onSignup, onProfile, loggedIn }) {
   const heroRef = useRevealOnScroll();
   const featuresRef = useRevealOnScroll();
   const howItWorksRef = useRevealOnScroll();
@@ -396,13 +414,14 @@ function LandingPage({ onLogin, onSignup }) {
 
   return (
     <div className="landing">
+      <CursorTrail />
       <div className="landing-bg-abstracts">
         <div className="landing-bg-grid" />
         <div className="landing-blob blob-1" />
         <div className="landing-blob blob-2" />
         <div className="landing-blob blob-3" />
       </div>
-      <LandingNav onLogin={onLogin} onSignup={onSignup} />
+      <LandingNav onLogin={onLogin} onSignup={onSignup} onProfile={onProfile} loggedIn={loggedIn} />
 
       {/* ── Hero ── */}
       <section className="hero-section" id="home" ref={heroRef}>
@@ -470,7 +489,6 @@ function LandingPage({ onLogin, onSignup }) {
       <section className="land-section" id="how-it-works" ref={howItWorksRef}>
         <div className="land-section-inner">
           <div className="land-section-head">
-            <span className="land-tag">How it works</span>
             <h2 className="land-h2">Three steps to a safer commute</h2>
             <p className="land-lead">GuidHer is built around the commute decision moment. It is not a realtime tracker or an SOS tool, but a way to check clear conditions before you leave.</p>
           </div>
@@ -495,7 +513,6 @@ function LandingPage({ onLogin, onSignup }) {
         <div className="land-section-inner">
           <div className="zone-preview-grid">
             <div>
-              <span className="land-tag">Zone data, tonight</span>
               <h2 className="land-h2">See what riders are saying right now</h2>
               <p className="land-lead" style={{ marginBottom: 20 }}>
                 Conditions are submitted by commuters in the zone. Every flag describes an observable state like lighting, crowd level, or a recent incident, but never a crime label.
@@ -506,7 +523,10 @@ function LandingPage({ onLogin, onSignup }) {
             </div>
             <div className="card zone-preview-card">
               <div className="zone-preview-head">
-                <div className="zone-preview-title">Zone overview tonight</div>
+                <div className="zone-preview-title-row">
+                  <span className="live-pulse-dot" aria-hidden="true" />
+                  <div className="zone-preview-title">Zone overview tonight</div>
+                </div>
                 <div className="zone-preview-head-sub">Sta. Mesa commute zone</div>
               </div>
               {ZONE_PREVIEW.map(([loc, level, label]) => (
@@ -580,9 +600,9 @@ function LandingPage({ onLogin, onSignup }) {
 }
 
 // ── Root export ───────────────────────────────────────────────────────────────
-export default function WelcomePage({ onEnter }) {
+export default function WelcomePage({ onEnter, onEnterProfile }) {
   const [view, setView] = useState('landing');
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
   useEffect(() => {
     function handleMouseMove(e) {
@@ -602,5 +622,12 @@ export default function WelcomePage({ onEnter }) {
 
   if (view === 'login')  return <LoginView  onBack={() => setView('landing')} onDone={onEnter} onSignup={() => setView('signup')} />;
   if (view === 'signup') return <SignupView onBack={() => setView('landing')} onDone={onEnter} onLogin={() => setView('login')} />;
-  return <LandingPage onLogin={() => setView('login')} onSignup={() => setView('signup')} />;
+  return (
+    <LandingPage
+      onLogin={() => setView('login')}
+      onSignup={() => setView('signup')}
+      onProfile={onEnterProfile}
+      loggedIn={!!user}
+    />
+  );
 }

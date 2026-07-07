@@ -19,7 +19,7 @@ const NAV_LINKS = [
   { to: '/tips',      label: 'Safety Tips' },
 ];
 
-export default function AppHeader() {
+export default function AppHeader({ onBrandClick }) {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
   // Separate from the mock-auth `user` above: this reflects the real Firebase Auth session
@@ -33,8 +33,8 @@ export default function AppHeader() {
     <header className="app-nav">
       <button
         className="app-nav-brand-btn"
-        onClick={() => navigate('/dashboard')}
-        aria-label="GuidHer home"
+        onClick={onBrandClick}
+        aria-label="Back to GuidHer landing page"
       >
         <BrandMark size={30} />
         <BrandWordmark />

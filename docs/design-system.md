@@ -96,7 +96,10 @@ Source of truth: `:root` in `frontend/src/styles.css`. Dark-mode values under `[
 ### 3.C Dark mode
 Full `[data-theme="dark"]` token set exists (purple lightens, cream text, deep-purple surfaces).
 Theme is user-toggled and persisted (`lib/theme.jsx`, `localStorage` key `guidher_theme`). Every new
-component must be verified in **both** themes before shipping.
+component must be verified in **both** themes before shipping. The public landing page
+(`WelcomePage.jsx`) is theme-aware too, with its own toggle in `LandingNav` — this **supersedes**
+the "fixed brand surface" note that used to live in §6; only the auth screen's purple gradient
+background stays fixed.
 
 ## 4. Typography
 
@@ -122,6 +125,12 @@ Type scale (from `styles.css`): `.text-display` `clamp(1.6rem,4vw,2.2rem)`/800 �
 - **Motion:** subtle. `fadeUp` entrance (0.35s), `spin` spinner, `float`/`heat-pulse` ambient. All
   gated by `prefers-reduced-motion: reduce` (already handled globally). Keep MOTION low — this is a
   trust-first product, not an Awwwards demo.
+- **Landing-page glass surfaces are deliberate, kept in light mode.** `.landing-nav`,
+  `.land-band-tint`/`-cream`, `.feature-card-v2` use translucent-rgba + `backdrop-filter` over the
+  landing page's blob decorations — this is the established light-mode look and is intentionally
+  preserved as-is (2026-07-07, reaffirmed same day after a brief attempt to convert them to solid
+  surfaces). Each has a `[data-theme="dark"]` companion so dark mode still works; don't touch the
+  light-mode rgba values when adjusting dark mode.
 
 ## 6. Core components (existing, in `styles.css`)
 
@@ -138,8 +147,10 @@ Type scale (from `styles.css`): `.text-display` `clamp(1.6rem,4vw,2.2rem)`/800 �
 - **Map surfaces:** `.map-controls`, `.route-option(s)`, `.bottom-center-overlay`/`.overlay-card`
   (the RouteCheck overlay), `.seg-dot--green/yellow/red` markers, `.heat-marker--yellow/red` (F-010
   heatmap, pointer-events:none so it never steals clicks), MapLibre popup theming.
-- **Auth/landing:** `.auth-screen` (firefly SVG + purple gradient), `.auth-card`, `.landing`
-  (cream + animated blobs + grid). These are the most "designed" surfaces — judge-facing.
+- **Auth/landing:** `.auth-screen` (firefly SVG + purple gradient, fixed regardless of theme),
+  `.auth-card` (theme-aware via `var(--card)`), `.landing` (cream in light / deep-purple `--bg` in
+  dark, animated blobs + grid, own toggle in `LandingNav`). These are the most "designed" surfaces —
+  judge-facing.
 
 ## 7. Iconography
 
@@ -191,6 +202,52 @@ keep the deck clean and on-brand, don't over-invest.
 
 ## 12. Change log (design decisions)
 
+- **2026-07-07 (impeccable audit pass)** — Ran a static `critique`/`audit` pass (impeccable skill;
+  browser-overlay assessment skipped, no browser tool in session — disclosed per the skill's rules)
+  across every page/component. Fixes:
+  - **`ProfilePage.jsx`**: emergency contacts were fully wired (state, handlers, `CONTACT_DEFAULTS`,
+    even the icon imports) but never rendered — added the missing card using the already-defined
+    `.contact-item`/`.contact-avatar`/etc. tokens (`styles.css`) that had sat unused.
+  - **`SafetyTipsPage.jsx`**: the tip-category accordion header was a `<div onClick>` — not
+    keyboard-operable, no `aria-expanded`. Now a real `<button>`. Tip-item hover feedback moved from
+    a JS `onMouseEnter`/`onMouseLeave` style-mutation anti-pattern to a CSS `:hover` rule
+    (`.tip-item-modern`, driven by a `--tip-accent` custom property so the per-category color stays
+    dynamic).
+  - **`AccountPage.jsx`/`AdminPage.jsx`**: were on an older `.report-page`/raw-arrow-link layout,
+    inconsistent with every other page's `.page-scroll`/`GradientBlobs`/`ArrowLeft`-button pattern
+    (`ReportPage.jsx` is the reference). Brought both in line; gave AdminPage's non-admin fallback an
+    actual `.card` + icon instead of a bare paragraph. Removed the now-orphaned `.report-page`/
+    `.report-page-inner` CSS.
+  - Removed dead CSS: `.tip-card`/`.tip-card-v2` and friends (an older Safety Tips design, superseded
+    by the accordion, never referenced in JSX) — this also resolved a scanner-flagged "side-tab
+    accent border" anti-pattern by deleting the code that had it, rather than patching unused CSS.
+  - Fixed a second scanner-flagged clash: `.feature-card.step-card`'s 4px accent border against its
+    rounded corners — down to a plain 1px `--secondary` border.
+  - Token cleanup: dropped a redundant `color="#fff"` (inherits from `.dash-card--hero` already),
+    removed several one-off `rgba(0,0,0,X)` Owly drop-shadows that were silently overriding the
+    existing `.owly-flipped`/`.owly-shadow` classes, folded `RoutesPage.jsx`'s inline footer/actions
+    layout into the `.route-card-footer`/`.route-actions`/`.route-conditions` classes.
+  - Considered and rejected: the scanner flagged `font-family: Inter` as "overused" — not changing
+    it, since Inter is a deliberate pairing with Baloo 2 (contrast-axis typography, per impeccable's
+    own rule), not a lazy default.
+- **2026-07-07 (later still)** — Landing page's three content sections ("What GuidHer does",
+  "How it works", "Zone data, tonight") previously repeated the same `land-tag` eyebrow-above-
+  heading formula three times — a documented AI-slop tell (impeccable skill: "an eyebrow on every
+  section is AI grammar"). Kept the tag only on Features (the one earned instance, paired with the
+  glass carousel). "How it works" now leans on its numbered steps alone for identity (`.step-number`
+  bumped 2rem → 2.75rem to carry that weight). "Zone data, tonight" dropped its tag in favor of a
+  `.live-pulse-dot` indicator on the actual `zone-preview-head` panel — reads as a live-status
+  widget instead of a marketing label, without implying real-time tracking/rescue (BR-002 still
+  holds: it signals "these are tonight's reports," not "someone is watching you live").
+- **2026-07-07 (later same day)** — Briefly converted the landing page's glass surfaces
+  (`.landing-nav`, `.land-band-tint`/`-cream`, `.feature-card-v2`) to solid `var(--card)`/
+  `var(--surface)` surfaces, then **reverted on request**: the light-mode look stays exactly as it
+  was: translucent-rgba + `backdrop-filter`. Only the `[data-theme="dark"]` companion rules for
+  each are new. See §5.
+- **2026-07-07** — Landing page (`WelcomePage.jsx`) made theme-aware with its own toggle in
+  `LandingNav`, superseding the earlier "fixed brand surface" call (see §3.C, §6). Report severity
+  colors (`severity-types.js`) switched from raw hex to CSS var refs to fix a dark-mode contrast
+  failure on severity-red. See [POSTMORTEM §3](./POSTMORTEM.md).
 - **2026-07-06** — Doc created, transcribed from the current build (`styles.css` tokens,
   `index.html` fonts, condition/severity modules). Baseline captured so iteration has a reference.
 

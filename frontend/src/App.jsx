@@ -1,7 +1,7 @@
 // guidHER root — auth gate + shared state + routing shell.
 // Traces to: docs/06-system-design.md (React + Vite SPA architecture).
 import { useEffect, useState, useMemo } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { SEED_SEGMENTS, WELL_USED_SEGMENTS } from './data/seed-segments.js';
 import { subscribeReports, latestBySegment } from './lib/reports.js';
 import { parseRoadSegmentId } from './lib/osmRoads.js';
@@ -20,7 +20,7 @@ import AdminPage from './pages/AdminPage.jsx';
 
 const segments = [...SEED_SEGMENTS, ...WELL_USED_SEGMENTS];
 
-function AuthenticatedApp() {
+function AuthenticatedApp({ onExitToLanding }) {
   const [reports, setReports] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const { pathname } = useLocation();
@@ -48,7 +48,7 @@ function AuthenticatedApp() {
 
   return (
     <div className="app">
-      <AppHeader />
+      <AppHeader onBrandClick={onExitToLanding} />
       <main className={`app-main${isMapPage ? ' app-main--map' : ''}`}>
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
@@ -77,13 +77,18 @@ function AuthenticatedApp() {
 
 export default function App() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [entered, setEntered] = useState(!!user);
 
   useEffect(() => { if (user) setEntered(true); }, [user]);
   useEffect(() => { if (!user) setEntered(false); }, [user]);
 
+  function enterApp() { setEntered(true); }
+  function enterProfile() { setEntered(true); navigate('/profile'); }
+  function exitToLanding() { setEntered(false); }
+
   if (!user || !entered) {
-    return <WelcomePage onEnter={() => setEntered(true)} />;
+    return <WelcomePage onEnter={enterApp} onEnterProfile={enterProfile} />;
   }
-  return <AuthenticatedApp />;
+  return <AuthenticatedApp onExitToLanding={exitToLanding} />;
 }

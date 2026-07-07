@@ -42,14 +42,11 @@ export default function DashboardPage() {
             <div className="label">Owly says</div>
             <div className="tip">Always check tonight's conditions before you leave. A 30-second look can make all the difference on your walk home.</div>
           </div>
-          <Owly 
-            size={105} 
-            pose="looks-out" 
+          <Owly
+            size={105}
+            pose="looks-out"
             className="owly-flipped"
-            style={{ 
-              filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.3))',
-              margin: '-24px -12px -24px 0' 
-            }} 
+            style={{ margin: '-24px -12px -24px 0' }}
           />
         </div>
 
@@ -79,7 +76,7 @@ export default function DashboardPage() {
             <div className="dash-card-label dash-card-label--on-hero">Safety score</div>
             <div className="dash-card-value dash-card-value--gold">72</div>
             <div className="dash-card-sub dash-card-sub--on-hero">Moderate — 2 flagged segments</div>
-            <AlertTriangle size={52} color="#fff" className="dash-card-accent" />
+            <AlertTriangle size={52} className="dash-card-accent" />
           </div>
           <div className="dash-card">
             <div className="dash-card-label">Nearby reports</div>

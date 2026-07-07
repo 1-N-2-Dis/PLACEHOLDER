@@ -46,7 +46,6 @@ export default function ProfilePage() {
   const [contacts, setContacts] = useState(CONTACT_DEFAULTS);
   const [addingContact, setAddingContact] = useState(false);
   const [newContact, setNewContact] = useState({ name: '', relationship: '', phone: '' });
-  const [editingContactId, setEditingContactId] = useState(null);
 
   function togglePref(id) {
     setPrefs(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
@@ -164,7 +163,56 @@ export default function ProfilePage() {
           ))}
         </div>
 
-
+        {/* Emergency contacts */}
+        <div className="card mb-14">
+          <div className="flex-between mb-12">
+            <div className="card-title">Emergency contacts</div>
+            <button className="btn btn-secondary btn-sm" onClick={() => setAddingContact(a => !a)}>
+              {addingContact ? 'Cancel' : <><Plus size={13} /> Add</>}
+            </button>
+          </div>
+          {addingContact && (
+            <div className="mb-14">
+              <div className="form-group">
+                <label className="form-label">Name</label>
+                <input type="text" className="form-input" placeholder="Name" value={newContact.name}
+                  onChange={e => setNewContact(c => ({ ...c, name: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Relationship</label>
+                <input type="text" className="form-input" placeholder="e.g. Parent, Friend" value={newContact.relationship}
+                  onChange={e => setNewContact(c => ({ ...c, relationship: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Phone</label>
+                <input type="tel" className="form-input" placeholder="+63 9XX XXX XXXX" value={newContact.phone}
+                  onChange={e => setNewContact(c => ({ ...c, phone: e.target.value }))} />
+              </div>
+              <button className="btn btn-primary btn-sm" onClick={addContact}>
+                <Check size={14} /> Save contact
+              </button>
+            </div>
+          )}
+          {contacts.length === 0 ? (
+            <div className="muted">No emergency contacts saved yet.</div>
+          ) : contacts.map(c => (
+            <div key={c.id} className="contact-item">
+              <div className="contact-avatar">{initials(c.name)}</div>
+              <div>
+                <div className="contact-name">{c.name}</div>
+                <div className="contact-rel">{c.relationship}</div>
+                <div className="contact-phone">
+                  <Phone size={12} style={{ verticalAlign: -1, marginRight: 4 }} />{c.phone}
+                </div>
+              </div>
+              <div className="contact-actions">
+                <button className="btn btn-ghost btn-sm" onClick={() => removeContact(c.id)} aria-label={`Remove ${c.name}`}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Appearance */}
         <div className="card mb-14">
