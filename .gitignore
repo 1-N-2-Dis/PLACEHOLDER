@@ -455,3 +455,6 @@ scratch/
 # Rust build output (frontend/rust/router) — frontend/src/wasm/router (the wasm-pack pkg/ output)
 # is committed since Vercel has no Rust toolchain; this native build cache is not.
 frontend/rust/router/target/
+
+
+context_system.md
