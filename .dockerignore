@@ -1,0 +1,9 @@
+# Keeps the build context small for docker/emulators.Dockerfile (context = repo root; it only
+# needs docker/firebase.docker.json + backend/firestore.rules + backend/firestore.indexes.json).
+node_modules
+**/node_modules
+frontend/dist
+.git
+*.log
+scratch/
+agents/

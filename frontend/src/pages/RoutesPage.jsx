@@ -67,40 +67,46 @@ function statusIcon(status) {
 function RouteCard({ route, isSaved, onSave, onViewMap }) {
   return (
     <div className={`route-card-v2${isSaved ? ' selected' : ''}`}>
-      <div className="route-card-header">
-        <div>
-          <div className="route-name" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {statusIcon(route.status)}
-            {route.from} → {route.to}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <div style={{ marginTop: 2, flexShrink: 0, display: 'flex' }}>
+          {statusIcon(route.status)}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="route-card-header">
+            <div className="route-name">
+              <span style={{ lineHeight: 1.1 }}>{route.from} → {route.to}</span>
+              <div className="route-score-pill" style={{ borderColor: scoreColor(route.score) }}>
+                <span className="route-score-num" style={{ color: scoreColor(route.score) }}>{route.score}</span>
+                <span className="route-score-label">safety</span>
+              </div>
+            </div>
+            <div className="route-via">{route.via}</div>
           </div>
-          <div className="route-via">{route.via}</div>
+          <div className="route-meta">
+            <span><Navigation size={13} />{route.distance}</span>
+            <span><Clock size={13} />{route.time} walk</span>
+          </div>
+          <div className="route-note">"{route.note}"</div>
+          <div className="route-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14, marginTop: 4, paddingTop: 14, borderTop: '1px solid var(--line)' }}>
+            <div className="route-conditions" style={{ marginBottom: 0, flex: '1 1 200px' }}>
+              {route.conditions.map(c => (
+                <span key={c} className="route-condition-chip">{c}</span>
+              ))}
+            </div>
+            <div className="route-actions" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button className="btn btn-primary btn-sm" onClick={() => onViewMap(route)}>
+                <Map size={14} /> View on Safety Map
+              </button>
+              <button
+                className={`btn btn-sm ${isSaved ? 'btn-secondary' : 'btn-outline'}`}
+                onClick={() => onSave(route)}
+              >
+                {isSaved ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                {isSaved ? 'Saved' : 'Save route'}
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="route-score">
-          <div className="route-score-num" style={{ color: scoreColor(route.score) }}>{route.score}</div>
-          <div className="route-score-label">safety</div>
-        </div>
-      </div>
-      <div className="route-meta">
-        <span><Navigation size={13} />{route.distance}</span>
-        <span><Clock size={13} />{route.time} walk</span>
-      </div>
-      <div className="route-note">"{route.note}"</div>
-      <div className="route-conditions">
-        {route.conditions.map(c => (
-          <span key={c} className="route-condition-chip">{c}</span>
-        ))}
-      </div>
-      <div className="route-actions">
-        <button className="btn btn-primary btn-sm" onClick={() => onViewMap(route)}>
-          <Map size={14} /> View on Safety Map
-        </button>
-        <button
-          className={`btn btn-sm ${isSaved ? 'btn-secondary' : 'btn-outline'}`}
-          onClick={() => onSave(route)}
-        >
-          {isSaved ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
-          {isSaved ? 'Saved' : 'Save route'}
-        </button>
       </div>
     </div>
   );

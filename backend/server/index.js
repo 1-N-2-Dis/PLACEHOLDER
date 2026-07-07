@@ -24,8 +24,18 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 // FIREBASE_SERVICE_ACCOUNT_KEY to the full JSON contents of a service account key (Firebase
 // Console -> Project settings -> Service accounts -> Generate new private key). Never commit
 // this file — see DEPLOYMENT_GUIDE.md for how to set it as a Render env var.
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-initializeApp({ credential: cert(serviceAccount) });
+//
+// Against the LOCAL EMULATORS (FIRESTORE_EMULATOR_HOST set — the Docker dev stack in
+// docker-compose.yml, or LOCAL_DEV.md Tier 2) no credential is needed at all: the Admin SDK
+// talks to the emulator with just a projectId, and verifyIdToken accepts the Auth emulator's
+// unsigned tokens when FIREBASE_AUTH_EMULATOR_HOST is set. Same pattern as backend/scripts/
+// seed-segments.mjs.
+if (process.env.FIRESTORE_EMULATOR_HOST) {
+  initializeApp({ projectId: process.env.GCLOUD_PROJECT || 'demo-saferroute' });
+} else {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+  initializeApp({ credential: cert(serviceAccount) });
+}
 const db = getFirestore();
 const auth = getAuth();
 

@@ -3,7 +3,7 @@
 // Traces to: idea.md §7, docs/09-data-model.md, backend/firestore.rules.
 //
 // Run against the LOCAL EMULATOR (no credentials needed) — PowerShell:
-//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; node backend/scripts/seed-segments.mjs
+//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; node backend/scripts/seed-segments.mjs
 // Run against a REAL project (service-account creds, NOT committed):
 //   $env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"; node backend/scripts/seed-segments.mjs
 //

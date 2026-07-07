@@ -92,6 +92,8 @@ GuidHer provides a preventive, community-powered zone safety map that shows wome
 
 ## Installation & Setup
 
+> **Fastest path — Docker:** with Docker Desktop installed, `docker compose up --build` from the repo root starts the whole stack (app on :5173, API on :8080, seeded Firebase emulators) with no Node/Java/firebase-tools setup. See the "Docker quickstart" section in [`docs/LOCAL_DEV.md`](docs/LOCAL_DEV.md).
+
 Test everything locally using the **Firebase Emulator Suite** alongside your local Express API process. Detailed environment specs can be found in the `LOCAL_DEV.md` configuration file.
 
 ### Prerequisites
@@ -160,7 +162,7 @@ Required for actual database commit logic and automated Gemini processing.
 ##### Terminal C — Active API Listening (Run from backend/server):
 
 ```Bash
-$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run dev
+$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; npm run dev
 ```
 
 Ensure VITE_API_BASE_URL=http://localhost:8080 is appended inside your frontend .env.local to securely bridge client actions.
@@ -177,7 +179,7 @@ Local testing operates on a local file array fallback `(frontend/src/data/seed-s
 ```Bash
 cd backend
 npm install
-$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; npm run seed
+$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; npm run seed
 ```
 
 ##### Troubleshooting Sandbox Configurations

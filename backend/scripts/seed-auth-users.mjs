@@ -7,7 +7,7 @@
 // DEMO-ONLY credentials — never reuse this password for a real account.
 //
 // Run against the LOCAL EMULATOR (no credentials needed) — PowerShell:
-//   $env:FIREBASE_AUTH_EMULATOR_HOST="127.0.0.1:9099"; $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; node backend/scripts/seed-auth-users.mjs
+//   $env:FIREBASE_AUTH_EMULATOR_HOST="127.0.0.1:9099"; $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; node backend/scripts/seed-auth-users.mjs
 // Run against a REAL project (service-account creds, NOT committed):
 //   $env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"; node backend/scripts/seed-auth-users.mjs
 import { initializeApp, applicationDefault } from 'firebase-admin/app';

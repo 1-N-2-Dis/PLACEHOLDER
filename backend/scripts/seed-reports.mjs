@@ -8,7 +8,7 @@
 // Deterministic doc ids make reruns idempotent (a rerun refreshes timestamps, no duplicates).
 //
 // Run against the LOCAL EMULATOR (no credentials needed) — PowerShell:
-//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"; node backend/scripts/seed-reports.mjs
+//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; node backend/scripts/seed-reports.mjs
 // Run against a REAL project (service-account creds, NOT committed):
 //   $env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"; node backend/scripts/seed-reports.mjs
 import { initializeApp, applicationDefault } from 'firebase-admin/app';

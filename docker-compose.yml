@@ -1,0 +1,97 @@
+# GuidHer full local dev stack — teammates need only Docker (no Node/Java/firebase-tools).
+#   docker compose up --build
+# Frontend http://localhost:5173 · API http://localhost:8080 · Emulator UI http://localhost:4000
+# See docs/LOCAL_DEV.md ("Docker quickstart") for the port map and seeded demo logins.
+#
+# Frontend/backend run from the plain node:20 image with the source bind-mounted and
+# `npm install` on start, so they always match package.json with no image rebuild. Anonymous
+# /app/node_modules volumes keep Linux dependencies separate from any host (Windows) installs.
+# Emulator data is in-memory: every `up` starts clean and the one-shot `seed` service repopulates
+# it with fresh timestamps (which keeps the 24h "tonight" freshness window valid for the demo).
+
+services:
+  emulators:
+    build:
+      context: .
+      dockerfile: docker/emulators.Dockerfile
+    ports:
+      - "9099:9099" # Auth emulator
+      - "8081:8081" # Firestore emulator
+      - "4000:4000" # Emulator Suite UI
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  # One-shot: seeds segments -> heatmap baseline (needs segments) -> demo auth users, then exits.
+  seed:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      FIRESTORE_EMULATOR_HOST: emulators:8081
+      FIREBASE_AUTH_EMULATOR_HOST: emulators:9099
+      GCLOUD_PROJECT: demo-saferroute
+    command: >
+      sh -c "npm install
+      && node scripts/seed-segments.mjs
+      && node scripts/seed-heatmap-baseline.mjs
+      && node scripts/seed-auth-users.mjs"
+    restart: "no"
+    depends_on:
+      emulators:
+        condition: service_healthy
+
+  backend:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./backend/server:/app
+      - /app/node_modules
+    ports:
+      - "8080:8080"
+    # Compose-set env wins over the bind-mounted .env (dotenv never overrides an existing
+    # process env var), so a dev's local PORT/FIREBASE_* values can't leak into the container.
+    environment:
+      PORT: 8080
+      FIRESTORE_EMULATOR_HOST: emulators:8081
+      FIREBASE_AUTH_EMULATOR_HOST: emulators:9099
+      GCLOUD_PROJECT: demo-saferroute
+      CORS_ORIGIN: http://localhost:5173
+      # Optional — only used once AI_FEATURES_ENABLED is flipped back on (backend/server/index.js).
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      emulators:
+        condition: service_healthy
+
+  frontend:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    # These are read by the BROWSER-side bundle, so hosts are localhost:<published port>, not
+    # compose service names. Process env beats the bind-mounted .env.local (Vite precedence).
+    environment:
+      VITE_USE_EMULATORS: "true"
+      VITE_EMULATOR_HOST: 127.0.0.1
+      VITE_FIRESTORE_EMULATOR_PORT: 8081
+      VITE_API_BASE_URL: http://localhost:8080
+      VITE_FIREBASE_API_KEY: demo-key
+      VITE_FIREBASE_AUTH_DOMAIN: demo-saferroute.firebaseapp.com
+      VITE_FIREBASE_PROJECT_ID: demo-saferroute
+      VITE_FIREBASE_STORAGE_BUCKET: demo-saferroute.appspot.com
+      VITE_FIREBASE_MESSAGING_SENDER_ID: "000000000000"
+      VITE_FIREBASE_APP_ID: 1:000000000000:web:demo
+      # File-watch events don't propagate through Windows/macOS bind mounts — poll instead.
+      CHOKIDAR_USEPOLLING: "true"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend

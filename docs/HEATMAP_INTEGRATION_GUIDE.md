@@ -67,7 +67,7 @@ Run the existing seed-segments script first if segments don't exist in Firestore
 
 ```powershell
 # Against emulator
-$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"
+$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"
 node backend/scripts/seed-segments.mjs
 
 # Against real project
@@ -87,7 +87,7 @@ Create this file at `GuidHer/backend/scripts/seed-heatmap-baseline.mjs`:
 // Run AFTER seed-segments.mjs — requires segment docs to exist.
 //
 // Run against emulator:
-//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"
+//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"
 //   node backend/scripts/seed-heatmap-baseline.mjs
 //
 // Run against real project:
@@ -246,7 +246,7 @@ seed().catch((err) => {
 
 ```powershell
 # From GuidHer root — emulator
-$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"
+$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"
 node backend/scripts/seed-heatmap-baseline.mjs
 
 # From GuidHer root — real project
@@ -296,7 +296,7 @@ checking, reports older than 24h will expire. **Re-run the seed script before th
 
 ```powershell
 # Re-seed reports 30 minutes before demo to ensure all are fresh
-$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"
+$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"
 node backend/scripts/seed-heatmap-baseline.mjs
 ```
 

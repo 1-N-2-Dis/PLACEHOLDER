@@ -28,10 +28,14 @@ export const storage = getStorage(app);
 // Toggled by VITE_USE_EMULATORS=true in .env.local. Must run before any Auth/Firestore use.
 // Gemini-backed calls (backend/server) are no longer Firebase Functions, so there's no
 // Functions emulator to connect to — run backend/server locally instead (see LOCAL_DEV.md).
+// Defaults match firebase.json's emulator ports (Firestore moved to 8081 so the Express API can
+// keep 8080); override via env when the emulators run elsewhere (e.g. the Docker dev stack).
 if (import.meta.env.VITE_USE_EMULATORS === 'true') {
-  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
-  connectFirestoreEmulator(db, '127.0.0.1', 8080);
-  connectStorageEmulator(storage, '127.0.0.1', 9199);
+  const emulatorHost = import.meta.env.VITE_EMULATOR_HOST || '127.0.0.1';
+  const firestorePort = Number(import.meta.env.VITE_FIRESTORE_EMULATOR_PORT || 8081);
+  connectAuthEmulator(auth, `http://${emulatorHost}:9099`, { disableWarnings: true });
+  connectFirestoreEmulator(db, emulatorHost, firestorePort);
+  connectStorageEmulator(storage, emulatorHost, 9199);
   // eslint-disable-next-line no-console
-  console.info('[SaferRoute] Using Firebase emulators (Auth:9099, Firestore:8080, Storage:9199).');
+  console.info(`[SaferRoute] Using Firebase emulators (Auth:9099, Firestore:${firestorePort}, Storage:9199).`);
 }

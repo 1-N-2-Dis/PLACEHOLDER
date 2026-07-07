@@ -6,7 +6,7 @@
 // Deterministic doc IDs make reruns idempotent (re-run before demo to refresh timestamps).
 //
 // Run against LOCAL EMULATOR — PowerShell:
-//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8080"
+//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"
 //   node backend/scripts/seed-heatmap-baseline.mjs
 //
 // Run against REAL project:
