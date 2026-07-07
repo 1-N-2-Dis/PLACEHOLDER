@@ -20,7 +20,7 @@ import AdminPage from './pages/AdminPage.jsx';
 
 const segments = [...SEED_SEGMENTS, ...WELL_USED_SEGMENTS];
 
-function AuthenticatedApp({ onExitToLanding }) {
+function AuthenticatedApp({ onExitToLanding, entryPath }) {
   const [reports, setReports] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const { pathname } = useLocation();
@@ -61,7 +61,7 @@ function AuthenticatedApp({ onExitToLanding }) {
           <Route path="/profile"   element={<ProfilePage />} />
           <Route path="/login"     element={<AccountPage />} />
           <Route path="/admin"     element={<AdminPage reports={reports} segments={allSegments} />} />
-          <Route path="/"   element={<Navigate to="/dashboard" replace />} />
+          <Route path="/"   element={<Navigate to={entryPath} replace />} />
           <Route path="*"   element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </main>
@@ -79,16 +79,23 @@ export default function App() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [entered, setEntered] = useState(!!user);
+  const [entryPath, setEntryPath] = useState('/dashboard');
 
   useEffect(() => { if (user) setEntered(true); }, [user]);
   useEffect(() => { if (!user) setEntered(false); }, [user]);
 
-  function enterApp() { setEntered(true); }
+  // path defaults to the dashboard; callers that want to land somewhere else (e.g. the landing
+  // page's guest map button) pass it explicitly, avoiding a race with AuthenticatedApp's own
+  // "/" redirect that a separate post-mount navigate() call would lose to.
+  function enterApp(path) { if (path) setEntryPath(path); setEntered(true); }
   function enterProfile() { setEntered(true); navigate('/profile'); }
-  function exitToLanding() { setEntered(false); }
+  // Reset the URL back to "/" too — otherwise AuthenticatedApp's <Routes> remounts against
+  // whatever sub-route (e.g. /profile) was still showing underneath, matching that route
+  // directly on next entry instead of respecting entryPath (e.g. the guest map button).
+  function exitToLanding() { navigate('/'); setEntered(false); }
 
   if (!user || !entered) {
     return <WelcomePage onEnter={enterApp} onEnterProfile={enterProfile} />;
   }
-  return <AuthenticatedApp onExitToLanding={exitToLanding} />;
+  return <AuthenticatedApp onExitToLanding={exitToLanding} entryPath={entryPath} />;
 }

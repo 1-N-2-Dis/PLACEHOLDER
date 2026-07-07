@@ -4,8 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const TABS = [
   { path: '/dashboard', label: 'Home',    Icon: Home },
-  { path: '/map',       label: 'Map',     Icon: Map },
   { path: '/routes',    label: 'Routes',  Icon: Navigation },
+  { path: '/map',       label: 'Map',     Icon: Map },
   { path: '/report',    label: 'Reports', Icon: Flag },
   { path: '/tips',      label: 'Tips',    Icon: BookOpen },
 ];

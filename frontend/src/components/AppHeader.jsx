@@ -13,8 +13,8 @@ function BrandWordmark() {
 
 const NAV_LINKS = [
   { to: '/dashboard', label: 'Home' },
-  { to: '/map',       label: 'Safety Map' },
   { to: '/routes',    label: 'Routes' },
+  { to: '/map',       label: 'Safety Map' },
   { to: '/report',    label: 'Reports' },
   { to: '/tips',      label: 'Safety Tips' },
 ];

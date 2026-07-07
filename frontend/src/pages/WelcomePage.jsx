@@ -1,11 +1,13 @@
 // guidHER — public landing page + auth gate.
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Users, User, Train, Footprints, ChevronRight, Moon, Sun, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
 import { useTheme } from '../lib/theme.jsx';
 import { initGoogleSignIn, cancelGoogleOneTap } from '../lib/googleOneTap.js';
+import { subscribeReports } from '../lib/reports.js';
+import { computeLandingStats } from '../lib/stats.js';
 import Owly from '../components/Owly.jsx';
 import BrandMark from '../components/BrandMark.jsx';
 import CursorTrail from '../components/CursorTrail.jsx';
@@ -108,7 +110,7 @@ function LandingNav({ onLogin, onSignup, onProfile, loggedIn }) {
 // ── Google One Tap + button (shared by login/signup) ─────────────────────────
 // Shows the One Tap prompt on mount and renders the official "Continue with Google" button.
 // Renders nothing when VITE_GOOGLE_CLIENT_ID is unset or the GIS script is blocked.
-function GoogleSignIn({ onDone, onError, onBusy }) {
+function GoogleSignIn({ onDone, onError, onBusy, dividerPosition = 'before' }) {
   const { loginWithGoogle } = useAuth();
   const btnRef = useRef(null);
   const [available, setAvailable] = useState(false);
@@ -138,8 +140,9 @@ function GoogleSignIn({ onDone, onError, onBusy }) {
 
   return (
     <div style={available ? undefined : { display: 'none' }}>
-      <div className="auth-divider">or</div>
+      {dividerPosition === 'before' && <div className="auth-divider">or</div>}
       <div ref={btnRef} style={{ display: 'flex', justifyContent: 'center' }} />
+      {dividerPosition === 'after' && <div className="auth-divider">or</div>}
     </div>
   );
 }
@@ -207,6 +210,7 @@ function LoginView({ onBack, onDone, onSignup }) {
             Welcome back! {typedMsg}<span className="cursor-blink">|</span>
           </p>
         </div>
+        <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} dividerPosition="after" />
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label" htmlFor="l-email">Email</label>
@@ -239,7 +243,6 @@ function LoginView({ onBack, onDone, onSignup }) {
             {busy ? <span className="spinner" /> : 'Log In'}
           </button>
         </form>
-        <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} />
         <p className="auth-footer">No account? <span className="auth-link" onClick={onSignup}>Sign up</span></p>
         <p style={{ textAlign: 'center', marginTop: 8 }}>
           <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to home</span>
@@ -329,6 +332,7 @@ function SignupView({ onBack, onDone, onLogin }) {
                 {typedMsg}<span className="cursor-blink">|</span>
               </p>
             </div>
+            <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} dividerPosition="after" />
             <form onSubmit={nextStep}>
               <div className="form-group">
                 <label className="form-label" htmlFor="su-name">Full name</label>
@@ -369,7 +373,6 @@ function SignupView({ onBack, onDone, onLogin }) {
                 Next: Commute preferences <ArrowRight size={16} />
               </button>
             </form>
-            <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} />
           </>
         ) : (
           <>
@@ -405,12 +408,16 @@ function SignupView({ onBack, onDone, onLogin }) {
 }
 
 // ── Full landing page ─────────────────────────────────────────────────────────
-function LandingPage({ onLogin, onSignup, onProfile, loggedIn }) {
+function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest, guestBusy }) {
   const heroRef = useRevealOnScroll();
   const featuresRef = useRevealOnScroll();
   const howItWorksRef = useRevealOnScroll();
   const zonePreviewRef = useRevealOnScroll();
   const communityRef = useRevealOnScroll();
+
+  const [reports, setReports] = useState([]);
+  useEffect(() => subscribeReports(setReports), []);
+  const stats = useMemo(() => computeLandingStats(reports), [reports]);
 
   return (
     <div className="landing">
@@ -438,14 +445,14 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn }) {
             <button className="btn btn-primary btn-lg" onClick={onSignup}>
               <Users size={18} /> Join GuidHer
             </button>
-            <button className="btn btn-secondary btn-lg" onClick={onLogin}>
-              Log in to your account
+            <button className="btn btn-secondary btn-lg" onClick={onGuest} disabled={guestBusy}>
+              {guestBusy ? <span className="spinner" /> : <><Map size={18} /> View Safety Map</>}
             </button>
           </div>
           <div className="hero-stats">
-            <div className="hero-stat"><b>412</b><span>reports this month</span></div>
-            <div className="hero-stat"><b>8</b><span>zone segments tracked</span></div>
-            <div className="hero-stat"><b>3,140</b><span>community members</span></div>
+            <div className="hero-stat"><b>{stats.reportsThisMonth.toLocaleString()}</b><span>reports this month</span></div>
+            <div className="hero-stat"><b>{stats.segmentsTracked.toLocaleString()}</b><span>zone segments tracked</span></div>
+            <div className="hero-stat"><b>{stats.communityMembers.toLocaleString()}</b><span>community members</span></div>
           </div>
         </div>
       </section>
@@ -602,6 +609,7 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn }) {
 // ── Root export ───────────────────────────────────────────────────────────────
 export default function WelcomePage({ onEnter, onEnterProfile }) {
   const [view, setView] = useState('landing');
+  const [guestBusy, setGuestBusy] = useState(false);
   const { login, user } = useAuth();
 
   useEffect(() => {
@@ -616,8 +624,13 @@ export default function WelcomePage({ onEnter, onEnterProfile }) {
   }, []);
 
   async function handleGuest() {
-    await login({ email: 'guest@guidher.app' });
-    onEnter();
+    setGuestBusy(true);
+    try {
+      await login({ email: 'guest@guidher.app' });
+      onEnter('/map');
+    } finally {
+      setGuestBusy(false);
+    }
   }
 
   if (view === 'login')  return <LoginView  onBack={() => setView('landing')} onDone={onEnter} onSignup={() => setView('signup')} />;
@@ -628,6 +641,8 @@ export default function WelcomePage({ onEnter, onEnterProfile }) {
       onSignup={() => setView('signup')}
       onProfile={onEnterProfile}
       loggedIn={!!user}
+      onGuest={handleGuest}
+      guestBusy={guestBusy}
     />
   );
 }

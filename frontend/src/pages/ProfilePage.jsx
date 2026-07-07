@@ -1,6 +1,6 @@
 // guidHER Profile — user info, saved routes, submitted reports, emergency contacts, theme.
 import { useState } from 'react';
-import { Moon, Sun, Train, Footprints, MapPin, LogOut, ChevronRight, Moon as MoonIcon, Phone, Plus, Trash2, Edit2, Check, AlertTriangle, Lightbulb, AlertOctagon, User } from 'lucide-react';
+import { Moon, Sun, Train, Footprints, MapPin, LogOut, ChevronRight, Moon as MoonIcon, Phone, Plus, Trash2, Edit2, Check, User } from 'lucide-react';
 import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 import { useAuth } from '../lib/authContext.jsx';
 import { useTheme } from '../lib/theme.jsx';
@@ -11,19 +11,6 @@ const COMMUTE_PREFS = [
   { id: 'walking', label: 'Walking routes', Icon: Footprints },
   { id: 'night', label: 'Night commute', Icon: MoonIcon },
 ];
-
-const MOCK_REPORTS = [
-  { id: 'r1', type: 'poor_lighting', location: 'Teresa Street', date: 'Jul 1, 2026', status: 'active' },
-  { id: 'r2', type: 'no_crowd', location: 'Pureza Station approach', date: 'Jun 29, 2026', status: 'active' },
-];
-
-const CONDITION_LABELS = { poor_lighting: 'Poor lighting', no_crowd: 'No crowd', recent_incident: 'Recent incident' };
-
-function conditionIcon(type) {
-  if (type === 'poor_lighting') return <Lightbulb size={14} />;
-  if (type === 'no_crowd') return <AlertTriangle size={14} />;
-  return <AlertOctagon size={14} />;
-}
 
 function initials(name) {
   if (!name) return '?';
@@ -87,7 +74,7 @@ export default function ProfilePage() {
 
         {/* Stats */}
         <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-          {[['Reports submitted', user?.reportsCount || MOCK_REPORTS.length, 'var(--primary)'], ['Saved routes', (user?.savedRoutes||[]).length || 1, 'var(--secondary)']].map(([lbl, val, col]) => (
+          {[['Reports submitted', user?.reportsCount || 0, 'var(--primary)'], ['Saved routes', (user?.savedRoutes||[]).length || 1, 'var(--secondary)']].map(([lbl, val, col]) => (
             <div key={lbl} className="card card-sm" style={{ flex: 1, textAlign: 'center' }}>
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: col }}>{val}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{lbl}</div>
@@ -142,25 +129,6 @@ export default function ProfilePage() {
               )}
             </div>
           )}
-        </div>
-
-        {/* Submitted reports */}
-        <div className="card mb-14">
-          <div className="card-title mb-12">Your reports</div>
-          {MOCK_REPORTS.length === 0 ? (
-            <div className="muted">No reports submitted yet.</div>
-          ) : MOCK_REPORTS.map(r => (
-            <div key={r.id} className="report-row">
-              <div className="report-row-icon">
-                {conditionIcon(r.type)}
-              </div>
-              <div className="report-row-body">
-                <div className="report-row-title">{CONDITION_LABELS[r.type]}</div>
-                <div className="report-row-sub">{r.location} · {r.date}</div>
-              </div>
-              <span className="status-badge badge-green" style={{ flexShrink: 0 }}>{r.status}</span>
-            </div>
-          ))}
         </div>
 
         {/* Emergency contacts */}

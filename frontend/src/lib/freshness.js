@@ -10,7 +10,7 @@
 export const FRESHNESS_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 // Normalize a Firestore Timestamp | Date | millis to epoch millis. Returns null if absent.
-function toMillis(createdAt) {
+export function toMillis(createdAt) {
   if (!createdAt) return null;
   if (typeof createdAt.toMillis === 'function') return createdAt.toMillis();
   if (createdAt instanceof Date) return createdAt.getTime();

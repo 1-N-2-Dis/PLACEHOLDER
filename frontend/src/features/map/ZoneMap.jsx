@@ -21,6 +21,7 @@ import RouteLayer from './RouteLayer.jsx';
 import ReportHeatmap from './ReportHeatmap.jsx';
 import RouteCheck from '../route-check/RouteCheck.jsx';
 import RiskSummary from '../risk-summary/RiskSummary.jsx';
+import { Skeleton, MapSkeleton } from '../../components/Skeleton.jsx';
 
 const INITIAL_A = [ZONE_CENTER.lat, ZONE_CENTER.lng];
 
@@ -53,6 +54,33 @@ function routeNoteCopy(route, hazards) {
   return meta ? meta.copy : route.status;
 }
 
+// Top-of-map notification — replaces a plain status line with an icon + tone (caution when the
+// shortest path forces a tradeoff, safe when there's nothing to trade off) so the recommendation
+// reads as a system message rather than a caption.
+function RouteNotify({ tone, children }) {
+  const Icon = tone === 'caution' ? AlertTriangle : CheckCircle2;
+  return (
+    <div className={`route-notify route-notify--${tone}`} role="status">
+      <Icon size={17} className="route-notify-icon" />
+      <span className="route-notify-text">{children}</span>
+    </div>
+  );
+}
+
+// Shown in the same slot while the WASM engine is still computing a route, so a slow device or
+// a large graph fetch reads as "working on it" instead of leaving the top of the map blank.
+function RouteNotifySkeleton() {
+  return (
+    <div className="route-notify route-notify--loading" aria-hidden="true">
+      <Skeleton className="route-notify-icon-skeleton" width={17} height={17} radius="50%" />
+      <span className="route-notify-text-skeleton">
+        <Skeleton width="78%" height={10} />
+        <Skeleton width="52%" height={10} />
+      </span>
+    </div>
+  );
+}
+
 export default function ZoneMap({ segments, latest, reports, selectedId, onSelect, initialDestination = null, destinationLabel = null }) {
   const { theme } = useTheme();
   const [locationA, setLocationA] = useState(INITIAL_A);
@@ -67,6 +95,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
   const [showHeatmapRed, setShowHeatmapRed] = useState(false);
   const [showHeatmapYellow, setShowHeatmapYellow] = useState(false);
   const [localLikes, setLocalLikes] = useState({});
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   // Hazards passed to RouteLayer as avoid zones — reports flagged tonight (live Firestore),
   // merged with the baked-in heatmap-baseline.json hotspots (backend/data/heatmap-baseline.json,
@@ -107,19 +136,28 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
     [onRouteSegments],
   );
 
-  // One-line comparison of the two routes' hazard exposure, shown above the route picker so the
-  // safest recommendation is explicit rather than left to the per-route badges alone.
+  // One-line comparison of the two routes' hazard exposure, shown as the top-of-map notification
+  // so the safest recommendation is explicit rather than left to the per-route badges alone.
+  // `tone` drives the notification's color: 'caution' when picking Safest trades off distance,
+  // 'safe' when there's nothing to trade off.
   const routeSummary = useMemo(() => {
     if (routes.length < 2) {
-      if (routes.length === 1 && routes[0].status === 'safe') return 'The safest route is completely clear.';
-      return 'Showing the safest available route — no shorter alternative found.';
+      if (routes.length === 1 && routes[0].status === 'safe') {
+        return { tone: 'safe', message: 'The safest route is completely clear.' };
+      }
+      return { tone: 'safe', message: 'Showing the safest available route — no shorter alternative found.' };
     }
-    const [safest, shortest] = routes;
+    const [, shortest] = routes;
     if (shortest.status === 'safe' || shortest.status === 'caution-highway') {
-      return 'Both routes avoid all known flagged areas.';
+      return { tone: 'safe', message: 'Both routes avoid all known flagged areas.' };
     }
-    return 'We recommend the Safest route. The Shortest path passes through flagged areas.';
+    return { tone: 'caution', message: 'We recommend the Safest route — the Shortest path passes through flagged areas.' };
   }, [routes]);
+
+  // True from the moment Point B is placed until the client-side WASM engine's fetchSafeRoutes
+  // resolves (success or failure) — the window a slow connection/device would otherwise render
+  // as a blank top-of-map area.
+  const isComputingRoute = !!locationB && routes.length === 0 && !routeError;
 
   function handleMapClick(e) {
     if (settingB) {
@@ -174,6 +212,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
           return ids;
         }, [showHeatmapRed, showHeatmapYellow])}
         onClick={handleMapClick}
+        onLoad={() => setMapLoaded(true)}
         attributionControl={false}
         maxBounds={PHILIPPINES_BOUNDS}
         minZoom={5}
@@ -342,6 +381,8 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
         })}
       </Map>
 
+      <MapSkeleton hidden={mapLoaded} />
+
       {/* Neat Map Controls Toolbar */}
       <div className="map-toolbar">
         {/* Destination & Options Group */}
@@ -402,12 +443,16 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
         )}
       </div>
 
-      {/* Floating Status & Errors (Top Center) */}
-      <div style={{ position: 'absolute', top: '16px', left: '0', right: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', pointerEvents: 'none', zIndex: 1000 }}>
+      {/* Floating Status & Notifications (Top Center) */}
+      <div className="map-top-stack">
         {destinationLabel && locationB && (
           <span className="map-ctrl-safe" style={{ fontWeight: 600, width: 'auto', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow-sm)' }}>
             Destination: {destinationLabel}
           </span>
+        )}
+        {isComputingRoute && <RouteNotifySkeleton />}
+        {!isComputingRoute && routes.length > 0 && (
+          <RouteNotify tone={routeSummary.tone}>{routeSummary.message}</RouteNotify>
         )}
         {settingB && (
           <span className="map-ctrl-hint" style={{ width: 'auto', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow-sm)' }}>
@@ -418,15 +463,6 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
           <span className="map-ctrl-error" style={{ width: 'auto', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow-sm)' }}>
             {routeError}
           </span>
-        )}
-      </div>
-
-      <div className="map-controls" style={{ top: 'auto', bottom: '110px', left: '10px', right: '10px', maxWidth: 'none', alignItems: 'center' }}>
-        {/* Route summary message (if any) moved here */}
-        {routes.length > 0 && routeSummary && (
-          <div style={{ pointerEvents: 'auto', background: 'var(--card)', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow-md)', marginBottom: '16px' }}>
-            <p className="route-summary" style={{ margin: 0, fontSize: '0.85rem', color: 'var(--ink)', fontWeight: 600 }}>{routeSummary}</p>
-          </div>
         )}
       </div>
 

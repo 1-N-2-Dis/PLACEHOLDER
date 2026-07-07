@@ -1,4 +1,5 @@
 // guidHER Dashboard — cards, quick actions, zone overview, activity feed.
+import { useState } from 'react';
 import { CheckCircle2, AlertTriangle, AlertOctagon, Flag, Navigation, Lightbulb, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Map from 'react-map-gl/maplibre';
@@ -9,6 +10,7 @@ import { useTheme } from '../lib/theme.jsx';
 import { ZONE_CENTER, getMapStyle } from '../lib/maps.js';
 import MockLocation from '../features/map/MockLocation.jsx';
 import Owly from '../components/Owly.jsx';
+import { MapSkeleton } from '../components/Skeleton.jsx';
 
 
 function statusBadgeClass(status) {
@@ -21,6 +23,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const [mapLoaded, setMapLoaded] = useState(false);
   const firstName = user?.name?.split(' ')[0] || 'Commuter';
   const hour = new Date().getHours();
   const greeting = hour < 5 ? 'Goodnight' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : hour < 21 ? 'Good evening' : 'Goodnight';
@@ -64,9 +67,11 @@ export default function DashboardPage() {
               mapStyle={getMapStyle(theme)}
               interactive={false}
               attributionControl={false}
+              onLoad={() => setMapLoaded(true)}
             >
               <MockLocation position={[ZONE_CENTER.lat, ZONE_CENTER.lng]} onMove={() => {}} />
             </Map>
+            <MapSkeleton hidden={mapLoaded} />
           </div>
         </div>
 
