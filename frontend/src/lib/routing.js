@@ -68,10 +68,10 @@ function describeStatus({ crossedRed, crossedYellow, usedHighway, redUnavoidable
   return 'safe';
 }
 
-const TIER_BY_RANK = ['recommended', 'alternative'];
+const TIER_BY_RANK = ['safest', 'shortest'];
 
-// Fetches exactly 2 severity-tiered route candidates — recommended (rank 0) + alternative
-// (rank 1) — whenever a second path exists at all; 1 only when the recommended path is the sole
+// Fetches exactly 2 severity-tiered route candidates — safest (rank 0) + shortest
+// (rank 1) — whenever a second path exists at all; 1 only when the safest path is the sole
 // way through. Never 3.
 export async function fetchSafeRoutes(a, b, flaggedReports) {
   const routes = await requestRoutes(a, b, flaggedReports);
@@ -103,4 +103,33 @@ export function nearestDistanceToRoute(routeCoords, point) {
     if (d < min) min = d;
   }
   return min;
+}
+
+// Named hazards (each { segmentId, geo, severity, title }) that sit within their own severity's
+// avoid radius of a route — used both to name a specific incident in a route's status note
+// (instead of a generic phrase) and to compare two routes' exposure. Grounded only in real
+// report/hotspot data (title), never invented (BR-006's spirit, applied client-side).
+export function hazardsNearRoute(routeCoords, hazards) {
+  return hazards.filter((hazard) => {
+    if (hazard.severity !== 'red' && hazard.severity !== 'yellow') return false;
+    const radius = hazard.severity === 'red' ? RED_AVOID_RADIUS_M : YELLOW_AVOID_RADIUS_M;
+    return nearestDistanceToRoute(routeCoords, hazard.geo) <= radius;
+  });
+}
+
+// The single closest named hazard of a given severity within radius — for picking which
+// incident's title to surface in a route's note (closest wins when more than one qualifies).
+export function nearestNamedHazard(routeCoords, hazards, severity) {
+  const radius = severity === 'red' ? RED_AVOID_RADIUS_M : YELLOW_AVOID_RADIUS_M;
+  let nearest = null;
+  let nearestDist = Infinity;
+  for (const hazard of hazards) {
+    if (hazard.severity !== severity || !hazard.title) continue;
+    const dist = nearestDistanceToRoute(routeCoords, hazard.geo);
+    if (dist <= radius && dist < nearestDist) {
+      nearest = hazard;
+      nearestDist = dist;
+    }
+  }
+  return nearest;
 }

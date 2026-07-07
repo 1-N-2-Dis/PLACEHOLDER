@@ -14,6 +14,7 @@ import {
   signOut,
   linkWithPopup,
   signInWithPopup,
+  signInWithCredential,
   linkWithCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -66,6 +67,25 @@ export async function signInWithGoogle() {
     }
   }
   if (!result) result = await signInWithPopup(auth, provider);
+  await ensureUserDoc(result.user.uid, result.user.email);
+  return result;
+}
+
+// Google One Tap variant of signInWithGoogle: exchanges a Google ID token (from Google Identity
+// Services — see googleOneTap.js) for a Firebase session, with the same anonymous-uid-preserving
+// link-first behavior. Falls back to a plain credential sign-in when that Google account is
+// already linked to a different Firebase user.
+export async function signInWithGoogleIdToken(idToken) {
+  const credential = GoogleAuthProvider.credential(idToken);
+  let result;
+  if (auth.currentUser?.isAnonymous) {
+    try {
+      result = await linkWithCredential(auth.currentUser, credential);
+    } catch (err) {
+      if (err.code !== 'auth/credential-already-in-use') throw err;
+    }
+  }
+  if (!result) result = await signInWithCredential(auth, credential);
   await ensureUserDoc(result.user.uid, result.user.email);
   return result;
 }

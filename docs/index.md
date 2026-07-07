@@ -68,8 +68,8 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
 | Mentor Synthesis (Jerico + Troy) | [analysis/mentor-synthesis.md](analysis/mentor-synthesis.md) | current | 2026-07-06 |
 | Competitive Analysis (ALAITAPTAP) | [analysis/competitive-analysis.md](analysis/competitive-analysis.md) | current | 2026-07-06 |
 | Design System | [design-system.md](design-system.md) | current — Helena owns, iterate freely | 2026-07-06 |
-| Deployment Guide | [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | current | 2026-07-02 |
-| Deploy Quick Reference | [deploy.md](deploy.md) | current — condensed checklist, links back to DEPLOYMENT_GUIDE.md for rationale | 2026-07-02 |
+| Deployment Guide | [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | current — v2 (client-side WASM routing assets, heatmap baseline seed) | 2026-07-06 |
+| Deploy Quick Reference | [deploy.md](deploy.md) | current — condensed checklist, links back to DEPLOYMENT_GUIDE.md for rationale | 2026-07-06 |
 | Local Dev Guide | [LOCAL_DEV.md](LOCAL_DEV.md) | current | 2026-07-02 |
 
 > Note: BRD ([01-brd.md](01-brd.md)), MRD ([02-mrd.md](02-mrd.md)), and Release/GTM

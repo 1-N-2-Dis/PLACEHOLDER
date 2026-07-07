@@ -1,6 +1,7 @@
 // guidHER auth context — wraps mockAuth.js so any component can read/update the current user.
 import { createContext, useContext, useState, useCallback } from 'react';
-import { getStoredUser, signIn, signUp, signOut, updateProfile } from './mockAuth.js';
+import { getStoredUser, signIn, signUp, signOut, updateProfile, signInWithProfile } from './mockAuth.js';
+import { signInWithGoogleIdToken } from './auth.js';
 
 const AuthContext = createContext(null);
 
@@ -19,6 +20,16 @@ export function AuthProvider({ children }) {
     return u;
   }, []);
 
+  // Google One Tap / button sign-in: exchange the Google ID token for a Firebase session
+  // (preserving an anonymous reporter uid via account linking), then mirror the Google profile
+  // into the mock UX identity so the rest of the app sees a logged-in user.
+  const loginWithGoogle = useCallback(async (idToken) => {
+    const { user: fbUser } = await signInWithGoogleIdToken(idToken);
+    const u = await signInWithProfile({ name: fbUser.displayName, email: fbUser.email });
+    setUser(u);
+    return u;
+  }, []);
+
   const logout = useCallback(() => {
     signOut();
     setUser(null);
@@ -31,7 +42,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, update }}>
+    <AuthContext.Provider value={{ user, login, register, loginWithGoogle, logout, update }}>
       {children}
     </AuthContext.Provider>
   );

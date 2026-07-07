@@ -49,16 +49,29 @@ firebase deploy --only firestore:rules,firestore:indexes
 
 ## 5. Deploy the frontend to Vercel
 
-1. Import repo into a new Vercel project (`vercel.json` already sets build/output).
+1. Import repo into a new Vercel project; **Root Directory:** `frontend` (`vercel.json` supplies
+   build command / output dir / SPA rewrite).
 2. Set env vars: `VITE_USE_EMULATORS=false`, `VITE_FIREBASE_*` (from Firebase Console),
    `VITE_API_BASE_URL=<your-render-url>`.
-3. Deploy.
+3. Deploy. The routing graph + WASM router are committed prebuilt — nothing extra to build.
 
 ## 6. Lock down CORS
 
 Back in Render → Environment → set `CORS_ORIGIN=<your-vercel-url>` → redeploy.
 
-## 7. Post-deploy checklist
+## 7. Seed the demo heatmap baseline
+
+```powershell
+cd backend
+npm install
+npm run seed
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"
+node scripts/seed-heatmap-baseline.mjs
+```
+
+Idempotent — **re-run within 24 h of the demo** (freshness window).
+
+## 8. Post-deploy checklist
 
 - [ ] Firestore rules deployed; direct client writes to `reports` denied
 - [ ] `/health` on Render responds
@@ -66,6 +79,8 @@ Back in Render → Environment → set `CORS_ORIGIN=<your-vercel-url>` → redep
 - [ ] `CORS_ORIGIN` on Render = real Vercel URL (not permissive)
 - [ ] Smoke test: sign in → submit report → appears in Firestore
 - [ ] Smoke test: route check (`assessRoute`)
+- [ ] Smoke test: origin → destination returns 2 routes, no external routing API in Network tab
+- [ ] Smoke test: heatmap markers render (baseline seeded < 24 h ago)
 - [ ] No secrets committed to the repo
 
 Full detail, rationale, and troubleshooting: [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md).

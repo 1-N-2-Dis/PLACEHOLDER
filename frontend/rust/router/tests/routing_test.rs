@@ -150,19 +150,20 @@ fn mid_edge_pins_snap_to_the_projected_point_not_the_node() {
 }
 
 #[test]
-fn alternative_route_is_distinct_on_a_grid_graph() {
-    let graph = grid_graph(4);
-    let penalties = Penalties::none(graph.edges.len());
+fn shortest_route_ignores_penalties_while_safest_avoids_them() {
+    let graph = line_with_detour_graph();
+    let reports = vec![ReportInput { lat: BASE_LAT, lng: BASE_LNG + 0.001, severity: "red".into() }]; // at B
+    let penalties = Penalties::from_reports(&graph, &reports);
 
-    let start = (BASE_LAT, BASE_LNG);
-    let end = (BASE_LAT + 0.003, BASE_LNG + 0.003); // opposite corners of the 4x4 grid
+    let out = find_routes_internal(&graph, &penalties, BASE_LAT, BASE_LNG, BASE_LAT, BASE_LNG + 0.002)
+        .expect("route should be found");
 
-    let out: FindRoutesOut =
-        find_routes_internal(&graph, &penalties, start.0, start.1, end.0, end.1).expect("route should be found");
+    assert_eq!(out.routes.len(), 2, "should return the safest detour and the shorter straight line");
+    
+    let safest = &out.routes[0];
+    let shortest = &out.routes[1];
 
-    assert_eq!(out.routes.len(), 2, "a grid graph should always yield a distinct alternative");
-    assert_ne!(
-        out.routes[0].coords, out.routes[1].coords,
-        "recommended and alternative should be geometrically different paths"
-    );
+    assert!(!safest.crossed_red, "safest route should reroute around the red report");
+    assert!(shortest.crossed_red, "shortest route ignores penalties and crosses the red report");
+    assert_ne!(safest.coords, shortest.coords);
 }

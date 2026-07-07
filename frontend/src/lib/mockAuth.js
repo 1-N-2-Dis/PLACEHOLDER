@@ -21,6 +21,16 @@ export async function signIn({ email }) {
   save(user); return user;
 }
 
+// Google sign-in bridge: like signIn but takes the real display name from the Google profile
+// instead of deriving it from the email prefix. No artificial delay — the Firebase credential
+// exchange already provided the wait.
+export async function signInWithProfile({ name, email }) {
+  const existing = load();
+  if (existing && existing.email === email) return existing;
+  const user = { uid: `u_${Date.now()}`, name: name || email.split('@')[0], email, campus: 'PUP Main Campus', commutePrefs: [], createdAt: new Date().toISOString(), savedRoutes: [], reportsCount: 0, homeLocation: '', destination: '', theme: 'light' };
+  save(user); return user;
+}
+
 export async function updateProfile(updates) {
   await delay(300);
   const u = { ...load(), ...updates };

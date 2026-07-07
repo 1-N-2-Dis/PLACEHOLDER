@@ -1,9 +1,10 @@
 // guidHER — public landing page + auth gate.
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
+import { initGoogleSignIn, cancelGoogleOneTap } from '../lib/googleOneTap.js';
 import Owly from '../components/Owly.jsx';
 import BrandMark from '../components/BrandMark.jsx';
 import useRevealOnScroll from '../lib/useRevealOnScroll.js';
@@ -82,6 +83,45 @@ function LandingNav({ onLogin, onSignup }) {
           <button className="btn btn-primary btn-sm" onClick={onSignup}>Sign Up</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Google One Tap + button (shared by login/signup) ─────────────────────────
+// Shows the One Tap prompt on mount and renders the official "Continue with Google" button.
+// Renders nothing when VITE_GOOGLE_CLIENT_ID is unset or the GIS script is blocked.
+function GoogleSignIn({ onDone, onError, onBusy }) {
+  const { loginWithGoogle } = useAuth();
+  const btnRef = useRef(null);
+  const [available, setAvailable] = useState(false);
+  // Keep latest callbacks without re-running the GIS init effect.
+  const cbRef = useRef({ onDone, onError, onBusy });
+  cbRef.current = { onDone, onError, onBusy };
+
+  useEffect(() => {
+    let active = true;
+    initGoogleSignIn({
+      buttonEl: btnRef.current,
+      onIdToken: async (idToken) => {
+        cbRef.current.onBusy(true);
+        try {
+          await loginWithGoogle(idToken);
+          cbRef.current.onDone();
+        } catch {
+          cbRef.current.onError('Google sign-in did not complete. Please try again.');
+        } finally {
+          cbRef.current.onBusy(false);
+        }
+      },
+    }).then((ok) => { if (active && ok) setAvailable(true); });
+    return () => { active = false; cancelGoogleOneTap(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div style={available ? undefined : { display: 'none' }}>
+      <div className="auth-divider">or</div>
+      <div ref={btnRef} style={{ display: 'flex', justifyContent: 'center' }} />
     </div>
   );
 }
@@ -181,6 +221,7 @@ function LoginView({ onBack, onDone, onSignup }) {
             {busy ? <span className="spinner" /> : 'Log In'}
           </button>
         </form>
+        <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} />
         <p className="auth-footer">No account? <span className="auth-link" onClick={onSignup}>Sign up</span></p>
         <p style={{ textAlign: 'center', marginTop: 8 }}>
           <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to home</span>
@@ -310,6 +351,7 @@ function SignupView({ onBack, onDone, onLogin }) {
                 Next: Commute preferences <ArrowRight size={16} />
               </button>
             </form>
+            <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} />
           </>
         ) : (
           <>

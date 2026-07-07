@@ -17,13 +17,7 @@ use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use wasm_bindgen::prelude::*;
 
-// A second route counts as a genuine alternative only if it shares less than this fraction of
-// edges with the recommended route.
-const DISTINCT_EDGE_OVERLAP_THRESHOLD: f64 = 0.7;
-// Multiplier applied to the recommended route's own edges when searching for an alternative —
-// the "penalty method": cheap enough that a short, mostly-shared detour still wins if that's
-// truly the only reasonable path, expensive enough to push toward a different street pattern.
-const ALTERNATIVE_EDGE_PENALTY: f64 = 2.0;
+
 // Below this distance, a projected start/end point is treated as coincident with the adjacent
 // path node and isn't duplicated in `coords` — avoids a zero-length spike when a pin lands
 // exactly on an intersection (e.g. in tests, or a user tapping a corner).
@@ -118,51 +112,7 @@ fn extend_to_exact_pin(coords: &mut Vec<[f64; 2]>, exact_start: [f64; 2], exact_
     }
 }
 
-fn edge_overlap_fraction(a: &[u32], b: &[u32]) -> f64 {
-    if a.is_empty() {
-        return 1.0;
-    }
-    let b_set: HashSet<u32> = b.iter().copied().collect();
-    let shared = a.iter().filter(|e| b_set.contains(e)).count();
-    shared as f64 / a.len() as f64
-}
 
-fn find_alternative(
-    graph: &Graph,
-    penalties: &Penalties,
-    recommended: &astar::PathResult,
-    start: u32,
-    goal: u32,
-) -> Option<astar::PathResult> {
-    let mut extra: HashMap<u32, f64> = HashMap::new();
-    for &e in &recommended.edge_path {
-        extra.insert(e, ALTERNATIVE_EDGE_PENALTY);
-    }
-
-    let penalized = astar::shortest_path(graph, penalties, Some(&extra), start, goal);
-    if let Some(candidate) = &penalized {
-        if edge_overlap_fraction(&candidate.edge_path, &recommended.edge_path) < DISTINCT_EDGE_OVERLAP_THRESHOLD {
-            return penalized;
-        }
-    }
-
-    // Not distinct enough — relax yellow avoidance too (the old "red-only tier" semantics) on
-    // top of the same detour penalty, and try once more.
-    let relaxed = Penalties { red: penalties.red.clone(), yellow: vec![false; penalties.yellow.len()] };
-    let relaxed_candidate = astar::shortest_path(graph, &relaxed, Some(&extra), start, goal);
-    if let Some(candidate) = &relaxed_candidate {
-        if edge_overlap_fraction(&candidate.edge_path, &recommended.edge_path) < DISTINCT_EDGE_OVERLAP_THRESHOLD {
-            return relaxed_candidate;
-        }
-    }
-
-    // Neither candidate cleared the distinctness bar, but a second route should still be shown
-    // whenever one is mathematically possible at all — fall back to whichever candidate differs
-    // from the recommended path by at least one edge, even if the two mostly overlap.
-    relaxed_candidate
-        .filter(|c| c.edge_path != recommended.edge_path)
-        .or_else(|| penalized.filter(|c| c.edge_path != recommended.edge_path))
-}
 
 /// Of an edge's two endpoints, the one closer to (lat, lng) — used to pick an A* routing target
 /// from a `nearest_edge` snap, since the search itself still runs node-to-node.
@@ -205,10 +155,15 @@ pub fn find_routes_internal(
     let mut routes = vec![route_from_path(graph, penalties, &recommended, proj_start, proj_end)];
     extend_to_exact_pin(&mut routes[0].coords, exact_start, exact_end);
 
-    if let Some(alt) = find_alternative(graph, penalties, &recommended, start, goal) {
-        let mut alt_route = route_from_path(graph, penalties, &alt, proj_start, proj_end);
-        extend_to_exact_pin(&mut alt_route.coords, exact_start, exact_end);
-        routes.push(alt_route);
+    let zero_penalties = Penalties::none(graph.edges.len());
+    let shortest = astar::shortest_path(graph, &zero_penalties, None, start, goal);
+
+    if let Some(alt) = shortest {
+        if alt.edge_path != recommended.edge_path {
+            let mut alt_route = route_from_path(graph, penalties, &alt, proj_start, proj_end);
+            extend_to_exact_pin(&mut alt_route.coords, exact_start, exact_end);
+            routes.push(alt_route);
+        }
     }
 
     Ok(FindRoutesOut { routes })
