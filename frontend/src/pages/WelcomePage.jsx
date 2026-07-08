@@ -1,7 +1,7 @@
 // guidHER — public landing page + auth gate.
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Users, User, Train, Footprints, ChevronRight, Moon, Sun, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
 import { useTheme } from '../lib/theme.jsx';
@@ -11,6 +11,9 @@ import { computeLandingStats } from '../lib/stats.js';
 import Owly from '../components/Owly.jsx';
 import BrandMark from '../components/BrandMark.jsx';
 import CursorTrail from '../components/CursorTrail.jsx';
+import CursorGlow from '../components/CursorGlow.jsx';
+import LegalModal from '../components/LegalModal.jsx';
+import { TERMS_OF_SERVICE, PRIVACY_NOTICE } from '../lib/legalContent.js';
 import useRevealOnScroll from '../lib/useRevealOnScroll.js';
 
 // ── Static data ───────────────────────────────────────────────────────────────
@@ -42,6 +45,43 @@ const ZONE_PREVIEW = [
   ['SM Sta. Mesa',     'green',  'Well-lit'],
 ];
 
+// ── Dark-mode background sparkles ────────────────────────────────────────────
+const SPARKLE_POSITIONS = [
+  { top: '8%',  left: '12%',  size: 6,  delay: 0 },
+  { top: '15%', left: '72%',  size: 4,  delay: 0.6 },
+  { top: '28%', left: '88%',  size: 8,  delay: 1.2 },
+  { top: '42%', left: '5%',   size: 5,  delay: 0.3 },
+  { top: '55%', left: '55%',  size: 7,  delay: 1.8 },
+  { top: '65%', left: '22%',  size: 4,  delay: 0.9 },
+  { top: '72%', left: '80%',  size: 9,  delay: 2.1 },
+  { top: '82%', left: '40%',  size: 5,  delay: 0.4 },
+  { top: '90%', left: '65%',  size: 6,  delay: 1.5 },
+  { top: '35%', left: '45%',  size: 3,  delay: 2.4 },
+  { top: '20%', left: '30%',  size: 7,  delay: 0.7 },
+  { top: '78%', left: '10%',  size: 4,  delay: 1.1 },
+];
+
+function DarkSparkles({ active }) {
+  if (!active) return null;
+  return (
+    <div className="dark-sparkles" aria-hidden="true">
+      {SPARKLE_POSITIONS.map((s, i) => (
+        <span
+          key={i}
+          className="dark-spark"
+          style={{
+            top: s.top,
+            left: s.left,
+            width: s.size,
+            height: s.size,
+            '--delay': `${s.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 // ── Brand wordmark ────────────────────────────────────────────────────────────
 function BrandWordmark() {
   return <span className="brand-wordmark">Guid<span className="accent">Her</span></span>;
@@ -50,7 +90,14 @@ function BrandWordmark() {
 // ── Landing nav ───────────────────────────────────────────────────────────────
 function LandingNav({ onLogin, onSignup, onProfile, loggedIn }) {
   const [hidden, setHidden] = useState(false);
+  const [moonBurst, setMoonBurst] = useState(false);
   const { theme, toggleTheme } = useTheme();
+
+  const handleToggle = useCallback(() => {
+    toggleTheme();
+    setMoonBurst(true);
+    setTimeout(() => setMoonBurst(false), 700);
+  }, [toggleTheme]);
 
   useEffect(() => {
     let lastScroll = window.scrollY;
@@ -85,11 +132,14 @@ function LandingNav({ onLogin, onSignup, onProfile, loggedIn }) {
         </div>
         <div className="landing-nav-actions">
           <button
-            className="btn btn-ghost btn-sm nav-icon-btn"
-            onClick={toggleTheme}
+            className={`btn btn-ghost btn-sm nav-icon-btn theme-toggle-btn${moonBurst ? ' moon-burst' : ''}`}
+            onClick={handleToggle}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {moonBurst && theme === 'light' && (
+              <span className="moon-fly" aria-hidden="true">🌙</span>
+            )}
           </button>
           {loggedIn ? (
             <button className="btn btn-primary btn-sm" onClick={onProfile}>
@@ -262,6 +312,8 @@ function SignupView({ onBack, onDone, onLogin, backLabel = 'home' }) {
   const [typedMsg, setTypedMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [legalModal, setLegalModal] = useState(null); // 'tos' | 'privacy' | null
 
   useEffect(() => {
     const msg = "Let's get you set up for safer commutes.";
@@ -300,6 +352,7 @@ function SignupView({ onBack, onDone, onLogin, backLabel = 'home' }) {
     if (!form.email.trim()) { setErr('Email is required.'); return; }
     if (form.password.length < 6) { setErr('Password must be at least 6 characters.'); return; }
     if (form.password !== form.confirm) { setErr('Passwords do not match.'); return; }
+    if (!agreed) { setErr('You must agree to the Terms of Service and Privacy Notice to continue.'); return; }
     setErr(''); setStep(2);
   }
 
@@ -368,8 +421,38 @@ function SignupView({ onBack, onDone, onLogin, backLabel = 'home' }) {
                   </button>
                 </div>
               </div>
+              {/* ── Consent checkbox ── */}
+              <div className="consent-row">
+                <input
+                  id="su-consent"
+                  type="checkbox"
+                  className="consent-checkbox"
+                  checked={agreed}
+                  onChange={e => { setAgreed(e.target.checked); if (err) setErr(''); }}
+                />
+                <label htmlFor="su-consent" className="consent-label">
+                  I agree to the{' '}
+                  <button
+                    type="button"
+                    className="consent-link"
+                    onClick={() => setLegalModal('tos')}
+                  >
+                    Terms of Service
+                  </button>
+                  {' '}and have read and understood the{' '}
+                  <button
+                    type="button"
+                    className="consent-link"
+                    onClick={() => setLegalModal('privacy')}
+                  >
+                    Privacy Notice
+                  </button>
+                  {' '}regarding how my personal data is collected, processed, and stored.
+                  <span className="consent-required" aria-hidden="true"> *</span>
+                </label>
+              </div>
               {err && <p className="status-err" style={{ marginBottom: 12 }}>{err}</p>}
-              <button type="submit" className="btn btn-primary btn-full">
+              <button type="submit" className="btn btn-primary btn-full" disabled={!agreed}>
                 Next: Commute preferences <ArrowRight size={16} />
               </button>
             </form>
@@ -403,6 +486,10 @@ function SignupView({ onBack, onDone, onLogin, backLabel = 'home' }) {
           <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to {backLabel}</span>
         </p>
       </div>
+
+      {/* ── Legal modals (portaled to body) ── */}
+      {legalModal === 'tos'     && <LegalModal doc={TERMS_OF_SERVICE} onClose={() => setLegalModal(null)} />}
+      {legalModal === 'privacy' && <LegalModal doc={PRIVACY_NOTICE}   onClose={() => setLegalModal(null)} />}
     </div>
   );
 }
@@ -414,6 +501,7 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest }) {
   const howItWorksRef = useRevealOnScroll();
   const zonePreviewRef = useRevealOnScroll();
   const communityRef = useRevealOnScroll();
+  const { theme } = useTheme();
 
   const [reports, setReports] = useState([]);
   useEffect(() => subscribeReports(setReports), []);
@@ -422,6 +510,8 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest }) {
   return (
     <div className="landing">
       <CursorTrail />
+      <CursorGlow />
+      <DarkSparkles active={theme === 'dark'} />
       <div className="landing-bg-abstracts">
         <div className="landing-bg-grid" />
         <div className="landing-blob blob-1" />
@@ -515,36 +605,22 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest }) {
         </div>
       </section>
 
-      {/* ── Zone overview preview (no interactive map — just static data) ── */}
-      <section className="land-section land-band-tint" id="zone-preview" ref={zonePreviewRef}>
-        <div className="land-section-inner">
-          <div className="zone-preview-grid">
-            <div>
-              <h2 className="land-h2">See what riders are saying right now</h2>
-              <p className="land-lead" style={{ marginBottom: 20 }}>
-                Conditions are submitted by commuters in the zone. Every flag describes an observable state like lighting, crowd level, or a recent incident, but never a crime label.
-              </p>
-              <button className="btn btn-primary" onClick={onSignup}>
-                <ArrowRight size={16} /> Sign up to see full conditions
-              </button>
+      {/* ── Supporters ── */}
+      <section className="land-section land-band-tint" id="supporters" ref={zonePreviewRef}>
+        <div className="land-section-inner text-center">
+          <div className="land-section-head">
+            <h2 className="land-h2">Supported by these organizations and community</h2>
+            <p className="land-lead">Working together to build a safer commute for every student in the Sta. Mesa zone.</p>
+          </div>
+          <div className="supporters-grid">
+            <div className="supporter-logo">
+              <img src="/bahaghari.png" alt="Bahaghari PUP logo" className="supporter-img" />
             </div>
-            <div className="card zone-preview-card">
-              <div className="zone-preview-head">
-                <div className="zone-preview-title-row">
-                  <span className="live-pulse-dot" aria-hidden="true" />
-                  <div className="zone-preview-title">Zone overview tonight</div>
-                </div>
-                <div className="zone-preview-head-sub">Sta. Mesa commute zone</div>
-              </div>
-              {ZONE_PREVIEW.map(([loc, level, label]) => (
-                <div key={loc} className="zone-preview-row">
-                  <span>{loc}</span>
-                  <span className={`status-badge badge-${level}`}>{label}</span>
-                </div>
-              ))}
-              <div className="zone-preview-foot">
-                Conditions only. No crime labels (BR-001)
-              </div>
+            <div className="supporter-logo">
+              <img src="/angat-iskolar.png" alt="Angat Iskolar PUP logo" className="supporter-img" />
+            </div>
+            <div className="supporter-logo">
+              <img src="/pup-codi.png" alt="PUP CODI logo" className="supporter-img" />
             </div>
           </div>
         </div>

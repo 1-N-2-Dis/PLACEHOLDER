@@ -170,6 +170,17 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="contact-actions">
+                {c.phone && (
+                  <a
+                    href={`tel:${c.phone.replace(/\s+/g, '')}`}
+                    className="btn contact-call-btn btn-sm"
+                    aria-label={`Call ${c.name}`}
+                    title={`Call ${c.name}`}
+                  >
+                    <Phone size={14} />
+                    Call
+                  </a>
+                )}
                 <button className="btn btn-ghost btn-sm" onClick={() => removeContact(c.id)} aria-label={`Remove ${c.name}`}>
                   <Trash2 size={14} />
                 </button>

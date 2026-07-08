@@ -82,8 +82,12 @@ Secondary rider (trans woman): same stories; same zone and conditions.
 - **BR-001** — Reports may only describe **fixable/observable conditions** (lighting, crowd
   density, recent incident); the system must not render or store neighborhood "crime zone"
   profiling labels (idea §9 regulatory kill-criterion, §10).
-- **BR-002** — The product makes **no real-time rescue / SOS / dispatch promise** anywhere in
-  UI or copy (idea §10).
+- **BR-002** — The product makes **no in-app real-time rescue, SOS dispatch, or emergency-tracking
+  promise** anywhere in UI or copy (idea §10). **Amended (2026-07-08, post-interview):** a
+  `tel:911` quick-dial shortcut is permitted as a passive UI utility — it hands control to the
+  device's native dialer and makes no promise that GuidHer itself dispatches help, tracks the
+  user, or provides in-the-moment rescue. The shortcut must be labelled as an emergency-services
+  shortcut, not an in-app SOS system, and must include a misclick-protection dialog (F-011).
 - **BR-003** — Coverage is restricted to the single **PUP Sta. Mesa commute zone**; no
   metro-wide expansion in the MVP (idea §10).
 - **BR-004** — A segment flag must carry a condition type and a timestamp so "tonight" /
@@ -196,11 +200,21 @@ UJ-004 (multi-route recommendation + AI route check, F-005/F-003/F-008):
   even before anyone's liked it. A separate, static green "Safe Zones" cloud layer
   (`backend/data/safe/safe-heatmap.json`) shows positive safety landmarks (well-lit streets, 24/7
   stores, police presence), toggled independently — see `docs/09-data-model.md`.
+- **F-011 — Quick-dial 911 shortcut (P1, post-interview):** a persistent SOS button on the map
+  page lets the user open the device's native phone dialer pre-filled with 911. A 8-second
+  misclick-protection dialog ("Did you mean to call?") gives the user a cancel window before the
+  `tel:911` link is followed. No in-app dispatch, tracking, or rescue promise is made (BR-002).
+  The button is a frontend-only, client-side `<a href="tel:911">` wrapped in a confirmation
+  dialog — no backend change, no new Firestore field, no Gemini call. Acceptance criterion:
+  tapping the SOS button shows the confirmation dialog with an 8-second countdown; tapping
+  "Cancel" dismisses without dialing; the countdown reaching zero OR tapping "Call 911" opens
+  `tel:911`; no in-app rescue UI appears after dialing.
 
 ## Non-goals
 
 (Mirrors idea §10.)
-- No real-time rescue, SOS dispatch, or in-the-moment intervention.
+- No in-app real-time rescue, SOS dispatch system, or in-the-moment intervention (a passive
+  `tel:911` quick-dial shortcut is permitted per BR-002 amendment — see F-011).
 - No metro-wide coverage before the Sta. Mesa zone is proven.
 - No physical-accessibility routing for seniors/PWDs (different problem).
 - No B2B/B2G compliance product for operators in this build.

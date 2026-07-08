@@ -24,15 +24,22 @@ export default function PhotoStep({ photoFile, onChange }) {
   }
 
   return (
-    <section className="report-step">
-      <h2>Add a photo (optional)</h2>
-      <p className="muted">A photo helps others trust the report, but isn't required.</p>
+    <section className="report-section-card">
+      <div className="report-section-header">
+        <div className="report-section-icon">
+          <Camera size={24} />
+        </div>
+        <div>
+          <h3 className="report-section-title">Photo (Optional)</h3>
+          <p className="report-section-desc">A photo helps others trust the report, but isn't required.</p>
+        </div>
+      </div>
 
-      <div className="photo-pick-buttons">
-        <button type="button" className="btn btn-secondary btn-sm" onClick={() => cameraInputRef.current?.click()}>
+      <div className="photo-pick-buttons" style={{ display: 'flex', gap: '12px' }}>
+        <button type="button" className="btn btn-secondary btn-sm" onClick={() => cameraInputRef.current?.click()} style={{ flex: 1, justifyContent: 'center' }}>
           <Camera size={14} /> Take a photo
         </button>
-        <button type="button" className="btn btn-secondary btn-sm" onClick={() => galleryInputRef.current?.click()}>
+        <button type="button" className="btn btn-secondary btn-sm" onClick={() => galleryInputRef.current?.click()} style={{ flex: 1, justifyContent: 'center' }}>
           <Image size={14} /> Choose from gallery
         </button>
       </div>
@@ -53,7 +60,11 @@ export default function PhotoStep({ photoFile, onChange }) {
         onChange={handlePicked}
       />
 
-      {previewUrl && <img className="photo-preview" src={previewUrl} alt="Selected report evidence" />}
+      {previewUrl && (
+        <div style={{ marginTop: '16px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--line)' }}>
+          <img className="photo-preview" src={previewUrl} alt="Selected report evidence" style={{ width: '100%', display: 'block', maxHeight: '300px', objectFit: 'cover' }} />
+        </div>
+      )}
     </section>
   );
 }

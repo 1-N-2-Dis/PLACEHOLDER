@@ -64,7 +64,7 @@ export default function DashboardPage({ segments = [], latest = new Map(), repor
 
         {/* Greeting */}
         <div className="greeting mb-20">
-          <div className="text-h1" style={{ margin: 0, fontSize: '2.2rem', color: 'var(--ink)' }}>{greeting}, {firstName}.</div>
+          <div className="text-h1" style={{ margin: 0, fontSize: '2.2rem', color: 'var(--ink)' }}>{greeting}, <span className="greeting-name">{firstName}</span>.</div>
           <div className="text-body" style={{ color: 'var(--muted)', marginTop: 8, fontSize: '1.05rem', lineHeight: 1.4 }}>Here is tonight's commute picture for the Sta. Mesa zone.</div>
           {role === 'admin' && (
             <button
@@ -109,6 +109,15 @@ export default function DashboardPage({ segments = [], latest = new Map(), repor
             >
               <MockLocation position={[ZONE_CENTER.lat, ZONE_CENTER.lng]} onMove={() => {}} />
             </Map>
+
+            {/* Speech-bubble hint — inside the map frame, pointing down at the dot */}
+            <div className="location-dot-bubble" aria-label="You are here. Drag the dot in the Safety Map to adjust your location.">
+              <span className="location-dot-bubble-text">
+                📍 You are here — drag the dot on the Safety Map to adjust
+              </span>
+              <span className="location-dot-bubble-tail" aria-hidden="true" />
+            </div>
+
             <MapSkeleton hidden={mapLoaded} />
           </div>
         </div>

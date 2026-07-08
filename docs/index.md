@@ -29,7 +29,7 @@ until the loser is reconciled.
 | Change history · pivots · naming · what is TRUE vs UNVALIDATED | [POSTMORTEM](POSTMORTEM.md) | append-only change/decision log; the anti-hallucination anchor. If history disagrees, this wins |
 | Competition rules · timeline · judging rubric · pitch format | [Hackathon Context](00-hackathon-context.md) | SparkFest 2026 brief; owns the rubric weights, the 5-min pitch + 15-min Q&A format, the Google-tech + community-sector requirements |
 | Vision · problem · who it's for | [idea.md](./idea.md) | the brief; origin of the `F-###` spine (F-001..F-008 MVP, F-101..F-103 final) |
-| What we build (features `F-###`, journeys `UJ-###`, business rules `BR-###`) | [PRD](03-prd.md) | stable IDs; F-001..F-008, UJ-001..004, BR-001..008 |
+| What we build (features `F-###`, journeys `UJ-###`, business rules `BR-###`) | [PRD](03-prd.md) | stable IDs; F-001..F-011 (F-011 added 2026-07-08 post-interview — quick-dial 911), UJ-001..004, BR-001..008 (BR-002 amended 2026-07-08) |
 | How it's built (architecture, components, **map/routing stack**, server-side writes) | [System Design](06-system-design.md) | owns MapLibre/OpenFreeMap + the client-side Rust/WASM routing engine (ADR-0003, replaces ORS) + the `submitReport`/`assessRoute` design |
 | Data schema · entities · Storage objects · Firestore rules shape | [Data Model](09-data-model.md) | segment/report fields, `severity`/`photoPath`, indexes |
 | Tests · traceability (every `F-###` → ≥1 test) | [QA Test Plan](11-qa-test-plan.md) | TC-001..TC-030; the traceability home |
@@ -78,7 +78,7 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
 
 ## 2. Health check (run before calling the suite "done")
 
-- [ ] Every `F-###` (F-001..F-008) in the PRD has ≥1 test in the QA plan (consistency-checker T1).
+- [ ] Every `F-###` (F-001..F-011) in the PRD has ≥ 1 test in the QA plan (consistency-checker T1). **Gap: F-011 has no QA test yet — frontend-only, to be added.**
 - [ ] No doc restates a fact owned by another (§0 respected) — esp. the map/routing stack.
 - [ ] Every network-exposed surface declares auth/authz: Firestore (client writes denied, F-006),
       Firebase Auth, routing graph asset (keyless static file, ADR-0003 — no ORS key exists
