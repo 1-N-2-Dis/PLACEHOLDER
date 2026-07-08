@@ -71,134 +71,168 @@ GuidHer provides a preventive, community-powered zone safety map that shows wome
 
 ## Features
 
-* **Zone Safety Map** — Crowdsourced segment flags showing current conditions on a MapLibre GL + OpenFreeMap rendered map
-* **One-Tap Reporting** — File a condition report (poor lighting, no crowd, recent incident) with optional photo evidence (EXIF metadata stripped automatically)
+* **Zone Safety Map** — Crowdsourced segment flags showing current conditions on a MapLibre GL + OpenFreeMap rendered map (keyless, non-Google)
+* **Client-Side Smart Routing** — Rust/WebAssembly A* engine running in a Web Worker — no external API, no key, no quota. Returns exactly 2 routes: "Recommended" (safest found, avoiding red/yellow segments) and "Alternative" (shortest path) when both exist
+* **One-Tap Reporting** — File a condition report (poor lighting, no crowd, recent incident) with optional photo evidence (EXIF metadata stripped automatically; photo upload currently disabled on free tier)
 * **Pre-Trip Route Check** — AI-assessed "Is my route okay tonight?" verdict grounded in real, current reports
-* **Smart Route Recommendations** — Severity-tiered multi-route alternatives with red hard-avoid and yellow soft-avoid logic
 * **AI Moderation & Summaries** — Gemini-powered report classification, spam rejection, duplicate corroboration, and structured risk summarization
-* **Community Heatmap** — Visual layer showing where validated reports cluster
+* **Community Heatmap** — Visual layer showing where validated reports cluster (red/yellow severity markers)
+* **Admin Control Panel** — Restricted dashboard (`/admin`) for report moderation, barangay PDF export, and analytics cache management
+* **Barangay PDF Briefs** — Downloadable infrastructure summary reports with AI-generated mitigations for local government coordination
+* **Analytics Dashboard** — Aggregated zone metrics and platform transparency counters
 
 ---
 
 ## Tech Stack
 
-* **Frontend:** React, Vite, MapLibre GL, OpenFreeMap, Rust/WebAssembly (client-side routing engine — [ADR-0003](docs/adr/ADR-0003-client-side-wasm-routing.md))
-* **Backend:** Node.js (Express)
-* **Database:** Cloud Firestore (Firebase Storage code present but **disabled** — [ADR-0002](docs/adr/ADR-0002-hosting-compute-split.md))
-* **AI / ML:** Gemini API
-* **Tools & Authentication:** Firebase Auth, Git/GitHub, Render (Backend Hosting), Vercel (Frontend Hosting)
+* **Frontend:** React 18.3, Vite 6, MapLibre GL 5.24, OpenFreeMap (keyless vector tiles), Rust/WebAssembly routing engine ([ADR-0003](docs/adr/ADR-0003-client-side-wasm-routing.md))
+* **Backend:** Node.js 20 (Express 4.21)
+* **Database:** Supabase (PostgreSQL) for reports/analytics + Cloud Firestore for Auth/users ([ADR-0004](docs/adr/ADR-0004-supabase-reports-analytics.md))
+* **AI / ML:** Google Gemini API (gemini-2.5-flash)
+* **Authentication:** Firebase Auth (anonymous by default, optional Google/email sign-in)
+* **Deployment:** Vercel (frontend), Render (backend API)
+* **Dev Tools:** Docker Compose (full local stack), Firebase Emulator Suite, pdfkit (server-side PDF generation)
 
 ---
 
 ## Installation & Setup
 
-> **Fastest path — Docker:** with Docker Desktop installed, `docker compose up --build` from the repo root starts the whole stack (app on :5173, API on :8080, seeded Firebase emulators) with no Node/Java/firebase-tools setup. See the "Docker quickstart" section in [`docs/LOCAL_DEV.md`](docs/LOCAL_DEV.md).
+> **Fastest path — Docker:** with Docker Desktop installed, `docker compose up --build` from the repo root starts the whole stack (app on :5173, API on :8080, seeded Firebase emulators) with no Node/Java/firebase-tools setup. See [`docs/LOCAL_DEV.md`](docs/LOCAL_DEV.md) for the full Docker quickstart.
 
-Test everything locally using the **Firebase Emulator Suite** alongside your local Express API process. Detailed environment specs can be found in the `LOCAL_DEV.md` configuration file.
+Test everything locally using the **Firebase Emulator Suite** (Auth + Firestore only; reports/analytics use Supabase in production but fall back to Firestore in local dev) alongside your local Express API process.
 
 ### Prerequisites
 * **Node 20+** — Check version using `node -v`.
-* **Java (JDK 21+)** — Required natively by the Firestore emulator engine. Check version with `java -version`. (Install via [Adoptium](https://adoptium.net) if absent).
+* **Java (JDK 21+)** — Required by the Firestore emulator. Check version with `java -version`. (Install via [Adoptium](https://adoptium.net) if absent).
 * **Firebase CLI** — Install globally:
   ```bash
   npm install -g firebase-tools
   ```
-  
+* **Docker Desktop (optional but recommended)** — for the zero-setup local stack
+
+### Quick Start (Docker)
+
+```bash
+git clone https://github.com/1-N-2-Dis/GuidHer.git
+cd GuidHer
+docker compose up --build
+```
+
+Navigate to:
+- **Frontend:** http://localhost:5173
+- **API:** http://localhost:8080
+- **Emulator UI:** http://localhost:4000
+
+The seed service automatically populates demo data on every `docker compose up`, including:
+- 8 zone segments
+- 9 baseline heatmap reports (4 red, 5 yellow)
+- 3 demo accounts: `admin@gmail.com`, `user1@gmail.com`, `user2@gmail.com` (password: `Passw0rd!`)
+
+### Manual Setup (No Docker)
+
 #### 1. Clone the Repository
-```Bash
-git clone [https://github.com/1-N-2-Dis/GuidHer.git](https://github.com/1-N-2-Dis/GuidHer.git)
+```bash
+git clone https://github.com/1-N-2-Dis/GuidHer.git
 cd GuidHer
 ```
 
-#### 2. Set Up Frontend App Environment
-```Bash
+#### 2. Set Up Frontend
+```bash
 cd frontend
 npm install
 ```
 
-Note: Your local frontend/.env.local contains pre-mapped settings (VITE_USE_EMULATORS=true), linking local execution ports automatically to your sandboxed mock environment.
+Your local `frontend/.env.local` contains pre-mapped settings (`VITE_USE_EMULATORS=true`), linking local execution ports automatically to your sandboxed mock environment.
 
-
-#### 3. Set Up Backend Workspace
-```Bash
+#### 3. Set Up Backend
+```bash
 cd ../backend/server
 npm install
 ```
 
-Generate an environment container file by duplicating backend/server/.env.example into backend/server/.env and append your variables:
+Create `backend/server/.env` from `backend/server/.env.example`:
 
-```Code snippet
+```env
 FIREBASE_SERVICE_ACCOUNT_KEY={"project_id":"demo-saferroute", ...}
 GEMINI_API_KEY=your-gemini-key-here
 CORS_ORIGIN=http://localhost:5173
+# Optional for local dev with Supabase:
+SUPABASE_URL=your-project-url
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
-> Placeholder Service Account configurations work fine against the local emulator environment as long as your terminal specifies an operational FIRESTORE_EMULATOR_HOST target address.
 
-### Running & Testing Tiers
+> Against the local emulator, placeholder Service Account configurations work fine as long as `FIRESTORE_EMULATOR_HOST` is set.
 
+### Running Locally
 
-#### Tier 1 — Core Offline Features (No API Keys Needed)
-
-Tests routing parameters, localized security rule configurations, and reporting panels.
-
-##### Terminal A — Fire Up Emulators (Run from repo root level):
-
-```Bash
+#### Terminal A — Start Emulators (from repo root):
+```bash
 firebase emulators:start --project demo-saferroute --only "auth,firestore"
 ```
-(Monitor database reads/writes via the graphic terminal console dashboard at http://localhost:4000).
 
-##### Terminal B — Build the Frontend Interface (Run from /frontend workspace):
+Monitor at http://localhost:4000
 
-```Bash
+#### Terminal B — Start Frontend (from `/frontend`):
+```bash
 cd frontend
 npm run dev
-Navigate to http://localhost:5173. Your browser developer inspector console will output [SaferRoute] Using Firebase emulators.
 ```
 
-#### Tier 2 — Operational API Server (Required for Full Report Submission)
-Required for actual database commit logic and automated Gemini processing.
+Navigate to http://localhost:5173
 
-##### Terminal C — Active API Listening (Run from backend/server):
-
-```Bash
+#### Terminal C — Start API Server (from `/backend/server`):
+```bash
 $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; npm run dev
 ```
 
-Ensure VITE_API_BASE_URL=http://localhost:8080 is appended inside your frontend .env.local to securely bridge client actions.
+Ensure `VITE_API_BASE_URL=http://localhost:8080` is in your `frontend/.env.local`.
 
-> **Note on maps:** GuidHer renders maps with **MapLibre GL + OpenFreeMap**, which are keyless and
-> require **no Google Maps API key** (see [ADR-0001](docs/adr/ADR-0001-maps-stack.md)). There is no
-> `VITE_MAPS_API_KEY` and no Google Maps setup step — the Google-technology requirement is met by
-> Firebase + Gemini, not the map layer.
+### Seeding Production Firestore
 
-##### Seeding Standalone Production Datastores
+To initialize default segment nodes into live production:
 
-Local testing operates on a local file array fallback `(frontend/src/data/seed-segments.js)`. To deploy or initialize the default segment nodes into live production instances:
-
-```Bash
+```bash
 cd backend
 npm install
-$env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; npm run seed
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"
+node scripts/seed-segments.mjs
+node scripts/seed-heatmap-baseline.mjs
+node scripts/seed-admin-role.mjs  # For admin account setup
+node scripts/compile-analytics.mjs  # For analytics cache
 ```
 
-##### Troubleshooting Sandbox Configurations
-* Java Compilation Flags Missing: Confirm path indicators match your updated JDK setup, then reopen terminal tabs.
-
-* Port Lockups/Errors: Kill conflicting execution threads or customize assignments inside firebase.json.
-
-* Firestore Write Access Denied: Check if your front end successfully issued an anonymous authentication handshake.
-
-* Network Execution Failure: Ensure your backend directory process is active and verify matching port variables across files.
+### Troubleshooting
+* **Java Compilation Flags Missing:** Confirm path matches your JDK setup, reopen terminal
+* **Port Conflicts:** Kill conflicting processes or customize ports in `firebase.json`
+* **Firestore Write Access Denied:** Check if frontend issued anonymous auth handshake
+* **Network Execution Failure:** Ensure backend process is active, verify matching port variables
 
 ---
 
-## How to Use:
-* Check Your Route: Before leaving campus, input your starting point and destination in the PUP Sta. Mesa zone.
+## How to Use
 
-* Review Warnings: Look out for red (hard-avoid) and yellow (soft-avoid) segments highlighted on the map accompanied by the Gemini AI risk summary.
+* **Check Your Route:** Before leaving campus, input your starting point and destination in the PUP Sta. Mesa zone. The client-side routing engine instantly computes up to 2 routes: "Recommended" (safest, avoiding red/yellow segments) and "Alternative" (shortest path).
 
-* Contribute a Report: Spot a broken street light or an unsafely isolated street? Use the One-Tap Reporting tool to flag it and keep fellow commuters safe.
+* **Review Warnings:** Look out for red (hard-avoid) and yellow (soft-avoid) segments highlighted on the map, accompanied by Gemini AI risk summaries.
+
+* **Contribute a Report:** Spot a broken street light or an unsafely isolated street? Use the One-Tap Reporting tool to flag it and keep fellow commuters safe.
+
+* **Admin Functions** (admin accounts only): Access the Admin Control Panel at `/admin` to moderate reports, export barangay PDF briefs for 25 target zones, and force-recompile the analytics cache.
+
+## Admin Access
+
+**Production Admin Account:**
+- Email: `admin@gmail.com`
+- UID: `AFgvOssPLXePCPIIv2HqP5xTHzhn`
+- Role doc: `users/AFgvOssPLXePCPIIv2HqP5xTHzhn` → `{ email: "admin@gmail.com", role: "admin" }`
+
+To activate admin access in production:
+```bash
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"
+node backend/scripts/seed-admin-role.mjs
+```
+
+See [`data/ADMIN_INTERFACE_NOTES.md`](../data/ADMIN_INTERFACE_NOTES.md) for full admin dashboard documentation.
 
 ---
 
