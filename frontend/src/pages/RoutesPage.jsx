@@ -4,6 +4,7 @@ import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations
 import { CheckCircle2, AlertTriangle, AlertOctagon, Navigation, Clock, Map, Bookmark, BookmarkCheck, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Owly from '../components/Owly.jsx';
+import { PUREZA_STATION } from '../lib/maps.js';
 
 const RECOMMENDED = [
   {
@@ -12,8 +13,7 @@ const RECOMMENDED = [
     distance: '1.2 km', time: '14 min',
     note: 'Most commuters use this route. Well-lit main road with active jeepney flow.',
     conditions: ['Well-lit path', 'Active foot traffic', 'Near commercial areas'],
-    // OSM-sourced coords for Pureza LRT-2 station
-    destCoords: [14.60167, 121.00519],
+    destCoords: [PUREZA_STATION.lat, PUREZA_STATION.lng],
   },
   {
     id: 'rec2', from: 'PUP Main Campus', to: 'LRT-2 Legarda Station',
