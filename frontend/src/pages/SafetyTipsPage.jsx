@@ -21,10 +21,10 @@ const CATEGORIES = [
     iconClass: 'tip-cat-icon-before',
     iconColor: 'var(--primary)',
     tips: [
-      { title: 'Check tonight\'s zone conditions', body: 'Open the Safety Map before you leave. Segment conditions can change hour to hour.' },
+      { title: 'Check tonight\'s zone conditions', body: 'Open the Safety Map before you leave. Road conditions can change hour to hour.' },
       { title: 'Plan your route in advance', body: 'Know which stops and streets you\'ll use. Having a plan means fewer decisions under pressure.' },
       { title: 'Inform someone you trust', body: 'Share your route and estimated arrival time. A 10-second text can matter a lot.' },
-      { title: 'Choose your departure time wisely', body: 'Some segments are safer between 6 to 9 PM. The map shows freshness timestamps for every report.' },
+      { title: 'Choose your departure time wisely', body: 'Some roads are safer between 6 to 9 PM. The map shows freshness timestamps for every report.' },
     ],
   },
   {
@@ -95,14 +95,17 @@ export default function SafetyTipsPage() {
                 borderColor: isOpen ? iconColor : 'var(--line)',
                 transition: 'all 0.3s ease'
               }}>
-                <div 
-                  onClick={() => setActiveCategory(isOpen ? null : id)} 
-                  style={{ 
-                    padding: '16px', 
-                    margin: 0, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 12, 
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  onClick={() => setActiveCategory(isOpen ? null : id)}
+                  style={{
+                    width: '100%', border: 'none', font: 'inherit', textAlign: 'left',
+                    padding: '16px',
+                    margin: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
                     cursor: 'pointer',
                     background: isOpen ? `color-mix(in srgb, ${iconColor} 8%, transparent)` : 'transparent',
                     transition: 'background 0.3s ease'
@@ -113,7 +116,7 @@ export default function SafetyTipsPage() {
                   </span>
                   <span style={{ flex: 1, fontWeight: 700, color: isOpen ? iconColor : 'var(--ink)', transition: 'color 0.2s' }}>{label}</span>
                   <ChevronRight size={20} color={isOpen ? iconColor : 'var(--muted)'} style={{ transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'all 0.3s ease' }} />
-                </div>
+                </button>
                 <div 
                   style={{ 
                     display: 'grid', 
@@ -124,29 +127,18 @@ export default function SafetyTipsPage() {
                   <div style={{ overflow: 'hidden' }}>
                     <div className="tips-list" style={{ padding: '12px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12, opacity: isOpen ? 1 : 0, transition: 'opacity 0.3s ease-out', transitionDelay: isOpen ? '0.1s' : '0s' }}>
                       {tips.map(tip => (
-                        <div 
-                          key={tip.title} 
+                        <div
+                          key={tip.title}
                           className="tip-item-modern"
-                          style={{ 
-                            display: 'flex', 
-                            gap: '14px', 
+                          style={{
+                            '--tip-accent': iconColor,
+                            display: 'flex',
+                            gap: '14px',
                             alignItems: 'flex-start',
-                            background: 'var(--bg)', 
-                            padding: '16px', 
+                            background: 'var(--bg)',
+                            padding: '16px',
                             borderRadius: '16px',
                             border: '1px solid var(--line)',
-                            transition: 'all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                            cursor: 'default'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = iconColor;
-                            e.currentTarget.style.transform = 'translateX(4px)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'var(--line)';
-                            e.currentTarget.style.transform = 'translateX(0)';
-                            e.currentTarget.style.boxShadow = 'none';
                           }}
                         >
                           <div style={{ padding: '6px', background: 'var(--surface)', borderRadius: '10px', display: 'flex', flexShrink: 0 }}>
@@ -175,8 +167,8 @@ export default function SafetyTipsPage() {
               <RefreshCw size={13} /> Next tip
             </button>
           </div>
-          <div style={{ marginTop: -30, marginBottom: -30, marginRight: -10, filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.4))' }}>
-            <Owly size={140} pose="protect" />
+          <div style={{ marginTop: -30, marginBottom: -30, marginRight: -10 }}>
+            <Owly size={140} pose="protect" className="owly-shadow" />
           </div>
         </div>
 

@@ -1,12 +1,16 @@
 // guidHER — public landing page + auth gate.
 // Views: 'landing' | 'login' | 'signup'
 // Safety Map removed. BR-001/002 compliant copy throughout.
-import { useState, useEffect, useRef } from 'react';
-import { Users, Train, Footprints, ChevronRight, Moon, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Users, User, Train, Footprints, ChevronRight, Moon, Sun, ArrowRight, Map, Route, Bot, Flag, ShieldAlert, Layers, BookOpen, Fingerprint, PhoneCall, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../lib/authContext.jsx';
+import { useTheme } from '../lib/theme.jsx';
 import { initGoogleSignIn, cancelGoogleOneTap } from '../lib/googleOneTap.js';
+import { subscribeReports } from '../lib/reports.js';
+import { computeLandingStats } from '../lib/stats.js';
 import Owly from '../components/Owly.jsx';
 import BrandMark from '../components/BrandMark.jsx';
+import CursorTrail from '../components/CursorTrail.jsx';
 import useRevealOnScroll from '../lib/useRevealOnScroll.js';
 
 // ── Static data ───────────────────────────────────────────────────────────────
@@ -19,11 +23,11 @@ const COMMUTE_PREFS = [
 ];
 
 const FEATURES = [
-  { icon: Map,         title: 'Zone Safety Map',       body: 'See every flagged segment of the Sta. Mesa zone live. You can tap any flag for its condition, severity, and exact report time.' },
+  { icon: Map,         title: 'Zone Safety Map',       body: 'See every flagged road of the Sta. Mesa zone live. You can tap any flag for its condition, severity, and exact report time.' },
   { icon: Route,       title: 'Route Recommendations', body: 'Get a recommended route plus an alternative to your destination, scored by tonight\'s real reported conditions.' },
   { icon: Bot,         title: 'AI Route Check',        body: 'Ask "Is my route okay tonight?" and get a Gemini-written verdict grounded only in real reports near your path.' },
   { icon: Flag,        title: 'Community Reporting',   body: 'Flag poor lighting, thin crowds, or a recent incident, with a required note and an optional photo.' },
-  { icon: ShieldAlert, title: 'Risk Summary',          body: 'A segment with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
+  { icon: ShieldAlert, title: 'Risk Summary',          body: 'A road with several reports gets a clean, deduplicated AI summary instead of a wall of raw notes.' },
   { icon: Layers,      title: 'Incident Heatmap',      body: 'Toggle glowing incident markers for validated reports to see where risk clusters across the zone at a glance.' },
   { icon: BookOpen,    title: 'Safety Tips',           body: 'Zone-specific guidance for before, during, and after your commute, including transport-specific advice.' },
   { icon: Fingerprint, title: 'Conditions-Only Data',  body: 'We describe observable states like lighting, crowds, and incidents. We never use crime labels or place ratings.' },
@@ -44,8 +48,9 @@ function BrandWordmark() {
 }
 
 // ── Landing nav ───────────────────────────────────────────────────────────────
-function LandingNav({ onLogin, onSignup }) {
+function LandingNav({ onLogin, onSignup, onProfile, loggedIn }) {
   const [hidden, setHidden] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     let lastScroll = window.scrollY;
@@ -79,8 +84,23 @@ function LandingNav({ onLogin, onSignup }) {
           </nav>
         </div>
         <div className="landing-nav-actions">
-          <button className="btn btn-secondary btn-sm" onClick={onLogin}>Log In</button>
-          <button className="btn btn-primary btn-sm" onClick={onSignup}>Sign Up</button>
+          <button
+            className="btn btn-ghost btn-sm nav-icon-btn"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          {loggedIn ? (
+            <button className="btn btn-primary btn-sm" onClick={onProfile}>
+              <User size={16} /> My Profile
+            </button>
+          ) : (
+            <>
+              <button className="btn btn-secondary btn-sm" onClick={onLogin}>Log In</button>
+              <button className="btn btn-primary btn-sm" onClick={onSignup}>Sign Up</button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -90,7 +110,7 @@ function LandingNav({ onLogin, onSignup }) {
 // ── Google One Tap + button (shared by login/signup) ─────────────────────────
 // Shows the One Tap prompt on mount and renders the official "Continue with Google" button.
 // Renders nothing when VITE_GOOGLE_CLIENT_ID is unset or the GIS script is blocked.
-function GoogleSignIn({ onDone, onError, onBusy }) {
+function GoogleSignIn({ onDone, onError, onBusy, dividerPosition = 'before' }) {
   const { loginWithGoogle } = useAuth();
   const btnRef = useRef(null);
   const [available, setAvailable] = useState(false);
@@ -120,8 +140,9 @@ function GoogleSignIn({ onDone, onError, onBusy }) {
 
   return (
     <div style={available ? undefined : { display: 'none' }}>
-      <div className="auth-divider">or</div>
+      {dividerPosition === 'before' && <div className="auth-divider">or</div>}
       <div ref={btnRef} style={{ display: 'flex', justifyContent: 'center' }} />
+      {dividerPosition === 'after' && <div className="auth-divider">or</div>}
     </div>
   );
 }
@@ -189,6 +210,7 @@ function LoginView({ onBack, onDone, onSignup }) {
             Welcome back! {typedMsg}<span className="cursor-blink">|</span>
           </p>
         </div>
+        <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} dividerPosition="after" />
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label" htmlFor="l-email">Email</label>
@@ -221,7 +243,6 @@ function LoginView({ onBack, onDone, onSignup }) {
             {busy ? <span className="spinner" /> : 'Log In'}
           </button>
         </form>
-        <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} />
         <p className="auth-footer">No account? <span className="auth-link" onClick={onSignup}>Sign up</span></p>
         <p style={{ textAlign: 'center', marginTop: 8 }}>
           <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to home</span>
@@ -311,6 +332,7 @@ function SignupView({ onBack, onDone, onLogin }) {
                 {typedMsg}<span className="cursor-blink">|</span>
               </p>
             </div>
+            <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} dividerPosition="after" />
             <form onSubmit={nextStep}>
               <div className="form-group">
                 <label className="form-label" htmlFor="su-name">Full name</label>
@@ -351,7 +373,6 @@ function SignupView({ onBack, onDone, onLogin }) {
                 Next: Commute preferences <ArrowRight size={16} />
               </button>
             </form>
-            <GoogleSignIn onDone={onDone} onError={setErr} onBusy={setBusy} />
           </>
         ) : (
           <>
@@ -387,22 +408,27 @@ function SignupView({ onBack, onDone, onLogin }) {
 }
 
 // ── Full landing page ─────────────────────────────────────────────────────────
-function LandingPage({ onLogin, onSignup }) {
+function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest }) {
   const heroRef = useRevealOnScroll();
   const featuresRef = useRevealOnScroll();
   const howItWorksRef = useRevealOnScroll();
   const zonePreviewRef = useRevealOnScroll();
   const communityRef = useRevealOnScroll();
 
+  const [reports, setReports] = useState([]);
+  useEffect(() => subscribeReports(setReports), []);
+  const stats = useMemo(() => computeLandingStats(reports), [reports]);
+
   return (
     <div className="landing">
+      <CursorTrail />
       <div className="landing-bg-abstracts">
         <div className="landing-bg-grid" />
         <div className="landing-blob blob-1" />
         <div className="landing-blob blob-2" />
         <div className="landing-blob blob-3" />
       </div>
-      <LandingNav onLogin={onLogin} onSignup={onSignup} />
+      <LandingNav onLogin={onLogin} onSignup={onSignup} onProfile={onProfile} loggedIn={loggedIn} />
 
       {/* ── Hero ── */}
       <section className="hero-section" id="home" ref={heroRef}>
@@ -419,14 +445,14 @@ function LandingPage({ onLogin, onSignup }) {
             <button className="btn btn-primary btn-lg" onClick={onSignup}>
               <Users size={18} /> Join GuidHer
             </button>
-            <button className="btn btn-secondary btn-lg" onClick={onLogin}>
-              Log in to your account
+            <button className="btn btn-secondary btn-lg" onClick={onGuest}>
+              <Map size={18} /> View Safety Map
             </button>
           </div>
           <div className="hero-stats">
-            <div className="hero-stat"><b>412</b><span>reports this month</span></div>
-            <div className="hero-stat"><b>8</b><span>zone segments tracked</span></div>
-            <div className="hero-stat"><b>3,140</b><span>community members</span></div>
+            <div className="hero-stat"><b>{stats.reportsThisMonth.toLocaleString()}</b><span>reports this month</span></div>
+            <div className="hero-stat"><b>{stats.segmentsTracked.toLocaleString()}</b><span>zone roads tracked</span></div>
+            <div className="hero-stat"><b>{stats.communityMembers.toLocaleString()}</b><span>community members</span></div>
           </div>
         </div>
       </section>
@@ -470,14 +496,13 @@ function LandingPage({ onLogin, onSignup }) {
       <section className="land-section" id="how-it-works" ref={howItWorksRef}>
         <div className="land-section-inner">
           <div className="land-section-head">
-            <span className="land-tag">How it works</span>
             <h2 className="land-h2">Three steps to a safer commute</h2>
             <p className="land-lead">GuidHer is built around the commute decision moment. It is not a realtime tracker or an SOS tool, but a way to check clear conditions before you leave.</p>
           </div>
           <div className="how-it-works-grid">
             {[
-              { n: '01', title: 'Check tonight\'s conditions', body: 'See what riders flagged on each segment of the Sta. Mesa zone, including lighting, crowd levels, and recent incidents.' },
-              { n: '02', title: 'Pick your safest route',       body: 'Routes are ranked by condition scores. Choose the one that avoids flagged segments, or the most direct if all is clear.' },
+              { n: '01', title: 'Check tonight\'s conditions', body: 'See what riders flagged on each road of the Sta. Mesa zone, including lighting, crowd levels, and recent incidents.' },
+              { n: '02', title: 'Pick your safest route',       body: 'Routes are ranked by condition scores. Choose the one that avoids flagged roads, or the most direct if all is clear.' },
               { n: '03', title: 'Share what you notice',        body: 'See something off on your commute? Flag it in 20 seconds. Your report helps the next rider make a better call.' },
             ].map(({ n, title, body }) => (
               <div key={n} className="feature-card step-card">
@@ -495,7 +520,6 @@ function LandingPage({ onLogin, onSignup }) {
         <div className="land-section-inner">
           <div className="zone-preview-grid">
             <div>
-              <span className="land-tag">Zone data, tonight</span>
               <h2 className="land-h2">See what riders are saying right now</h2>
               <p className="land-lead" style={{ marginBottom: 20 }}>
                 Conditions are submitted by commuters in the zone. Every flag describes an observable state like lighting, crowd level, or a recent incident, but never a crime label.
@@ -506,7 +530,10 @@ function LandingPage({ onLogin, onSignup }) {
             </div>
             <div className="card zone-preview-card">
               <div className="zone-preview-head">
-                <div className="zone-preview-title">Zone overview tonight</div>
+                <div className="zone-preview-title-row">
+                  <span className="live-pulse-dot" aria-hidden="true" />
+                  <div className="zone-preview-title">Zone overview tonight</div>
+                </div>
                 <div className="zone-preview-head-sub">Sta. Mesa commute zone</div>
               </div>
               {ZONE_PREVIEW.map(([loc, level, label]) => (
@@ -580,9 +607,9 @@ function LandingPage({ onLogin, onSignup }) {
 }
 
 // ── Root export ───────────────────────────────────────────────────────────────
-export default function WelcomePage({ onEnter }) {
-  const [view, setView] = useState('landing');
-  const { login } = useAuth();
+export default function WelcomePage({ onEnter, onEnterProfile, onGuest, initialView }) {
+  const [view, setView] = useState(initialView === 'login' ? 'login' : 'landing');
+  const { user } = useAuth();
 
   useEffect(() => {
     function handleMouseMove(e) {
@@ -595,12 +622,15 @@ export default function WelcomePage({ onEnter }) {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  async function handleGuest() {
-    await login({ email: 'guest@guidher.app' });
-    onEnter();
-  }
-
   if (view === 'login')  return <LoginView  onBack={() => setView('landing')} onDone={onEnter} onSignup={() => setView('signup')} />;
   if (view === 'signup') return <SignupView onBack={() => setView('landing')} onDone={onEnter} onLogin={() => setView('login')} />;
-  return <LandingPage onLogin={() => setView('login')} onSignup={() => setView('signup')} />;
+  return (
+    <LandingPage
+      onLogin={() => setView('login')}
+      onSignup={() => setView('signup')}
+      onProfile={onEnterProfile}
+      loggedIn={!!user}
+      onGuest={onGuest}
+    />
+  );
 }

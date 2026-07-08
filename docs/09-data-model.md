@@ -119,6 +119,7 @@ F-004 (notes → Gemini).
 | `title` | string | No | — | **Required (F-006).** Short free-text headline, max 60 chars. Validated by `submitReport`'s Gemini classify (title + note must coherently describe the `conditionType`; crime-label/people-classification text is rejected — BR-001). Legacy docs written before this field may lack it; readers render it only when present. |
 | `note` | string | **Yes (optional)** | — | Optional free text. Feeds F-004's Gemini summary (BR-006) and `submitReport`'s classify prompt (BR-007). Not a condition/crime label; not rendered as a classification. |
 | `photoPath` | string | **Yes (optional)** | — | **Optional (F-007).** Firebase Storage object path (`reports/{uid}/...`); resolved to a display URL at render time, not stored as a URL. EXIF-stripped client-side before upload (BR-008). |
+| `likedBy` | array\<string\> | **Yes (optional, absent on legacy docs)** | `[]` | **Added (2026-07-08, F-010).** Firebase Auth UIDs of users who liked this report, toggled via `POST /likeReport` (`backend/server/index.js`, Admin SDK `arrayUnion`/`arrayRemove` — clients still never write `reports` directly, BR-005). `likedBy.length` is the real, cross-user "how many people confirmed this" signal that sizes the community-heatmap cloud (`frontend/src/lib/heatmap.js`) — distinct from `corroborationCount` above, which is an AI-driven duplicate-merge signal, not a user reaction. |
 
 > **No** `crimeType`, `neighborhoodRating`, `dangerLabel`, or any crime/neighborhood-classification field
 > anywhere (BR-001). The enum is the only condition vocabulary. `severity` is a distinct,
@@ -128,6 +129,15 @@ F-004 (notes → Gemini).
 > heatmap is a derived, client-side-only concept: `severity in {yellow, red}`. This reuses
 > BR-007's existing per-report `severity` semantics and introduces no new schema, field, or
 > Firestore index.
+
+> **Added (2026-07-08): safe-zone data mirror.** `backend/data/safe/safe-heatmap.json` (~500 static
+> landmark points — `lat`, `lng`, `weight` 0.4–1.0, `safety_type`, `landmark_name` — 24/7 stores,
+> well-lit streets, high foot traffic, police presence) is mirrored verbatim into
+> `frontend/src/data/safe-heatmap.json` and rendered as a green "Safe Zones" MapLibre heatmap layer
+> (`frontend/src/features/map/SafeHeatmap.jsx`), toggled independently of the red/yellow report
+> layers. It has no relationship to the `reports` collection and carries no `corroborationCount` —
+> it's static reference data, not a crowd-sourced signal. `backend/data/safe-spaces/safe-heatmap.json`
+> is a byte-identical duplicate, unused by the frontend.
 
 ### user (`users/{uid}`, F-009)
 
@@ -233,7 +243,9 @@ ownership) has moved into `submitReport`'s code (`backend/server/index.js`, Expr
 ADR-0002), which writes via the Admin SDK — a path that bypasses Rules by design. The `false`
 lines below document intent; they are not what stops a malicious write (that code's own logic,
 and the fact that only its service-account credential can perform an Admin SDK write, are what
-actually enforce this).
+actually enforce this). **Added (2026-07-08):** `POST /likeReport` (same file) is the one other
+Admin-SDK write path onto an existing `reports` doc, scoped to only the `likedBy` field via
+`arrayUnion`/`arrayRemove` — it does not touch any other field.
 
 ```
 match /reports/{id} {

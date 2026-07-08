@@ -1,6 +1,6 @@
 // guidHER Profile — user info, saved routes, submitted reports, emergency contacts, theme.
 import { useState } from 'react';
-import { Moon, Sun, Train, Footprints, MapPin, LogOut, ChevronRight, Moon as MoonIcon, Phone, Plus, Trash2, Edit2, Check, AlertTriangle, Lightbulb, AlertOctagon, User } from 'lucide-react';
+import { Moon, Sun, Train, Footprints, MapPin, LogOut, ChevronRight, Moon as MoonIcon, Phone, Plus, Trash2, Edit2, Check, User } from 'lucide-react';
 import { TriangleMesh, GradientBlobs } from '../components/BackgroundDecorations.jsx';
 import { useAuth } from '../lib/authContext.jsx';
 import { useTheme } from '../lib/theme.jsx';
@@ -12,27 +12,10 @@ const COMMUTE_PREFS = [
   { id: 'night', label: 'Night commute', Icon: MoonIcon },
 ];
 
-const MOCK_REPORTS = [
-  { id: 'r1', type: 'poor_lighting', location: 'Teresa Street', date: 'Jul 1, 2026', status: 'active' },
-  { id: 'r2', type: 'no_crowd', location: 'Pureza Station approach', date: 'Jun 29, 2026', status: 'active' },
-];
-
-const CONDITION_LABELS = { poor_lighting: 'Poor lighting', no_crowd: 'No crowd', recent_incident: 'Recent incident' };
-
-function conditionIcon(type) {
-  if (type === 'poor_lighting') return <Lightbulb size={14} />;
-  if (type === 'no_crowd') return <AlertTriangle size={14} />;
-  return <AlertOctagon size={14} />;
-}
-
 function initials(name) {
   if (!name) return '?';
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 }
-
-const CONTACT_DEFAULTS = [
-  { id: 'c1', name: 'Mom', relationship: 'Parent', phone: '+63 912 345 6789' },
-];
 
 export default function ProfilePage() {
   const { user, logout, update } = useAuth();
@@ -43,10 +26,9 @@ export default function ProfilePage() {
   const [prefs, setPrefs] = useState(user?.commutePrefs || []);
   const [saving, setSaving] = useState(false);
 
-  const [contacts, setContacts] = useState(CONTACT_DEFAULTS);
+  const [contacts, setContacts] = useState([]);
   const [addingContact, setAddingContact] = useState(false);
   const [newContact, setNewContact] = useState({ name: '', relationship: '', phone: '' });
-  const [editingContactId, setEditingContactId] = useState(null);
 
   function togglePref(id) {
     setPrefs(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
@@ -88,7 +70,7 @@ export default function ProfilePage() {
 
         {/* Stats */}
         <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-          {[['Reports submitted', user?.reportsCount || MOCK_REPORTS.length, 'var(--primary)'], ['Saved routes', (user?.savedRoutes||[]).length || 1, 'var(--secondary)']].map(([lbl, val, col]) => (
+          {[['Reports submitted', user?.reportsCount || 0, 'var(--primary)'], ['Saved routes', (user?.savedRoutes||[]).length || 1, 'var(--secondary)']].map(([lbl, val, col]) => (
             <div key={lbl} className="card card-sm" style={{ flex: 1, textAlign: 'center' }}>
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: col }}>{val}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{lbl}</div>
@@ -145,26 +127,56 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Submitted reports */}
+        {/* Emergency contacts */}
         <div className="card mb-14">
-          <div className="card-title mb-12">Your reports</div>
-          {MOCK_REPORTS.length === 0 ? (
-            <div className="muted">No reports submitted yet.</div>
-          ) : MOCK_REPORTS.map(r => (
-            <div key={r.id} className="report-row">
-              <div className="report-row-icon">
-                {conditionIcon(r.type)}
+          <div className="flex-between mb-12">
+            <div className="card-title">Emergency contacts</div>
+            <button className="btn btn-secondary btn-sm" onClick={() => setAddingContact(a => !a)}>
+              {addingContact ? 'Cancel' : <><Plus size={13} /> Add</>}
+            </button>
+          </div>
+          {addingContact && (
+            <div className="mb-14">
+              <div className="form-group">
+                <label className="form-label">Name</label>
+                <input type="text" className="form-input" placeholder="Name" value={newContact.name}
+                  onChange={e => setNewContact(c => ({ ...c, name: e.target.value }))} />
               </div>
-              <div className="report-row-body">
-                <div className="report-row-title">{CONDITION_LABELS[r.type]}</div>
-                <div className="report-row-sub">{r.location} · {r.date}</div>
+              <div className="form-group">
+                <label className="form-label">Relationship</label>
+                <input type="text" className="form-input" placeholder="e.g. Parent, Friend" value={newContact.relationship}
+                  onChange={e => setNewContact(c => ({ ...c, relationship: e.target.value }))} />
               </div>
-              <span className="status-badge badge-green" style={{ flexShrink: 0 }}>{r.status}</span>
+              <div className="form-group">
+                <label className="form-label">Phone</label>
+                <input type="tel" className="form-input" placeholder="+63 9XX XXX XXXX" value={newContact.phone}
+                  onChange={e => setNewContact(c => ({ ...c, phone: e.target.value }))} />
+              </div>
+              <button className="btn btn-primary btn-sm" onClick={addContact}>
+                <Check size={14} /> Save contact
+              </button>
+            </div>
+          )}
+          {contacts.length === 0 ? (
+            <div className="muted">No emergency contacts saved yet.</div>
+          ) : contacts.map(c => (
+            <div key={c.id} className="contact-item">
+              <div className="contact-avatar">{initials(c.name)}</div>
+              <div>
+                <div className="contact-name">{c.name}</div>
+                <div className="contact-rel">{c.relationship}</div>
+                <div className="contact-phone">
+                  <Phone size={12} style={{ verticalAlign: -1, marginRight: 4 }} />{c.phone}
+                </div>
+              </div>
+              <div className="contact-actions">
+                <button className="btn btn-ghost btn-sm" onClick={() => removeContact(c.id)} aria-label={`Remove ${c.name}`}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
-
-
 
         {/* Appearance */}
         <div className="card mb-14">

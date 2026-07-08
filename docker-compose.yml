@@ -41,7 +41,9 @@ services:
       sh -c "npm install
       && node scripts/seed-segments.mjs
       && node scripts/seed-heatmap-baseline.mjs
-      && node scripts/seed-auth-users.mjs"
+      && node scripts/seed-auth-users.mjs
+      && node scripts/seed-admin-role.mjs
+      && node scripts/compile-analytics.mjs"
     restart: "no"
     depends_on:
       emulators:

@@ -9,6 +9,7 @@
     "seed:reports": "node scripts/seed-reports.mjs"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "firebase-admin": "^13.0.1"
   }
 }

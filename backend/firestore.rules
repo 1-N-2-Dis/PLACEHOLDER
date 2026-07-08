@@ -33,6 +33,22 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // barangay_analytics_cache — pre-computed zone metrics and Gemini-generated mitigations.
+    // Written only by the Admin SDK (compile-analytics.mjs batch script) — never by clients.
+    // Public read so the dashboard and PDF download routes can serve data without auth.
+    match /barangay_analytics_cache/{locationId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // platform_transparency_stats — single-document aggregate counters (total reports, spam
+    // rejected, duplicates merged, briefs generated). Written only by compile-analytics.mjs.
+    // Public read so GET /api/v1/transparency/stats requires no auth token.
+    match /platform_transparency_stats/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // users — role record for F-009 (email/password signup + admin moderation). A signed-in
     // user may read their own doc or (if admin) any doc; may only ever self-create as 'role: user'
     // (privilege escalation is blocked — 'admin' is assignable only out-of-band, via

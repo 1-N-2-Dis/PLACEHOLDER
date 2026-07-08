@@ -89,17 +89,19 @@ export default function SegmentFlag({
                   <severityMeta.Icon size={14} /> {severityMeta.label}
                 </div>
                 <div className="muted">Reported: {formatTimestamp(report.createdAt) || '—'}</div>
-                <div className="report-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0' }}>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); onLike(!isLiked); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: isLiked ? '#e74c3c' : 'gray', padding: 0, fontSize: '0.85rem' }}
-                  >
-                    <ThumbsUp size={14} fill={isLiked ? '#e74c3c' : 'none'} /> 
-                    {report.corroborationCount > 1 
-                      ? `Confirmed by ${report.corroborationCount + (isLiked ? 1 : 0)} reports` 
-                      : (isLiked ? 'Confirmed by 2 reports' : 'Corroborate')}
-                  </button>
-                </div>
+                {/* Baseline (seed) hotspots have no real Firestore doc to like against — hide the
+                    control rather than let it silently do nothing. */}
+                {report.id && (
+                  <div className="report-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0' }}>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onLike(!isLiked); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: isLiked ? 'var(--sev-red-fg)' : 'var(--muted)', padding: 0, fontSize: '0.85rem' }}
+                    >
+                      <ThumbsUp size={14} fill={isLiked ? 'var(--sev-red-fg)' : 'none'} />
+                      {report.likedBy?.length > 0 ? `Liked by ${report.likedBy.length}` : 'Like'}
+                    </button>
+                  </div>
+                )}
                 {report.note ? <div className="note">"{report.note}"</div> : null}
                 {PHOTO_UPLOAD_ENABLED && report.photoPath && (
                   photoUrl

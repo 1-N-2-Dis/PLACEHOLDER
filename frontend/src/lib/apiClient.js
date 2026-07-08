@@ -9,7 +9,8 @@ import { ensureSignedIn } from './auth.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// path: one of '/submitReport', '/summarizeSegment', '/assessRoute' (see backend/server/index.js).
+// path: one of '/submitReport', '/summarizeSegment', '/assessRoute', '/likeReport' (see
+// backend/server/index.js).
 // Returns the parsed JSON body on success. Throws on any non-2xx response or network failure —
 // callers already handle a thrown Error the same way they handled a rejected httpsCallable call.
 export async function callApi(path, payload) {

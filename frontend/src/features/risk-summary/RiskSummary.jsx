@@ -64,7 +64,7 @@ export default function RiskSummary({ segments, selectedId, reports }) {
       </div>
 
       {!segment ? (
-        <p className="muted">Select a segment to see its summary.</p>
+        <p className="muted">Select a road to see its summary.</p>
       ) : (
         <>
           <button type="button" className="btn btn-primary btn-sm btn-full" onClick={requestSummary} disabled={busy}>
@@ -78,7 +78,7 @@ export default function RiskSummary({ segments, selectedId, reports }) {
             <div className="summary-fallback">
               {error && <p className="status-err">Summary unavailable — showing raw reports.</p>}
               {segReports.length === 0 ? (
-                <p className="muted">No reports for this segment yet.</p>
+                <p className="muted">No reports for this road yet.</p>
               ) : (
                 <ul>
                   {segReports.map((r) => {

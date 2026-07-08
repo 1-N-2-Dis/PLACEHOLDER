@@ -14,10 +14,11 @@ export const SEVERITY_VALUES = ['green', 'yellow', 'red'];
 export const SEVERITY_META = {
   // Purple-ish rather than green, on request — distinct from the "safe route" green used
   // elsewhere (route lines, success messages), which is a different concept (routing outcome,
-  // not report severity).
-  green: { label: 'Low concern', Icon: CheckCircle2, color: '#8b5cf6' },
-  yellow: { label: 'Caution', Icon: AlertTriangle, color: '#f9a825' },
-  red: { label: 'Dangerous', Icon: AlertOctagon, color: '#c62828' },
+  // not report severity). CSS var refs (not raw hex) so these stay WCAG-AA in dark mode too —
+  // --wellused and --sev-red-fg already carry dark-mode-safe values for these exact colors.
+  green: { label: 'Low concern', Icon: CheckCircle2, color: 'var(--wellused)' },
+  yellow: { label: 'Caution', Icon: AlertTriangle, color: 'var(--sev-yellow-fg)' },
+  red: { label: 'Dangerous', Icon: AlertOctagon, color: 'var(--sev-red-fg)' },
 };
 
 export function isValidSeverity(value) {
