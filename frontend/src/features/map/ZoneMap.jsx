@@ -6,11 +6,12 @@
 // Routing: client-side Rust/WASM A* engine (ADR-0003), safety-first — avoids flagged segments,
 // falls back if no safe path exists. See frontend/src/lib/routing.js.
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import Map, { NavigationControl, Layer, Marker } from 'react-map-gl/maplibre';
 import { CheckCircle2, AlertTriangle, AlertOctagon, MapPin, X, Layers, ShieldCheck } from 'lucide-react';
 import { useTheme } from '../../lib/theme.jsx';
 import { ZONE_CENTER, ZONE_ZOOM, getMapStyle, PHILIPPINES_BOUNDS } from '../../lib/maps.js';
+import { isWithinCoverage, snapToRenderedRoad, ROAD_FILTER } from '../../lib/osmRoads.js';
 import { segmentStatus } from '../../lib/freshness.js';
 import { nearestDistanceToRoute, hazardsNearRoute, nearestNamedHazard, YELLOW_AVOID_RADIUS_M } from '../../lib/routing.js';
 import { HEATMAP_BASELINE } from '../../data/heatmap-baseline.js';
@@ -29,6 +30,14 @@ import RiskSummary from '../risk-summary/RiskSummary.jsx';
 import { OwlyMapLoader, OwlyRouteNotifyLoading } from './MapLoading.jsx';
 
 const INITIAL_A = [ZONE_CENTER.lat, ZONE_CENTER.lng];
+
+// Query-only layers so Point B can only be placed by snapping onto a real road (mirrors the
+// report wizard's PinMap.jsx) — otherwise a click on a rooftop/courtyard silently became a route
+// with a straight-line "spike" from the pin to the nearest street (see the WASM router's
+// extend_to_exact_pin, frontend/rust/router/src/lib.rs). Opacity 0: purely for hit-testing via
+// queryRenderedFeatures, not rendered.
+const DESTINATION_ROAD_LAYER_ID = 'route-b-roads';
+const DESTINATION_ROAD_NAME_LAYER_ID = 'route-b-road-names';
 
 // Route note copy — names the specific report/hotspot a route passes near instead of a generic
 // phrase, when one is known (grounded in real data; falls back to STATUS_META's generic copy
@@ -65,10 +74,13 @@ function RouteNotify({ tone, children }) {
 export default function ZoneMap({ segments, latest, reports, selectedId, onSelect, initialDestination = null, destinationLabel = null }) {
   const { theme } = useTheme();
   const { user } = useAuthUser();
+  const mapRef = useRef(null);
   const [locationA, setLocationA] = useState(INITIAL_A);
   // Pre-place Point B if navigated from Routes page
   const [locationB, setLocationB] = useState(initialDestination);
   const [settingB, setSettingB] = useState(false);
+  // 'coverage' | 'miss' | null — why the last settingB tap didn't place Point B.
+  const [destinationHint, setDestinationHint] = useState(null);
   const [routeError, setRouteError] = useState(null);
   const [routes, setRoutes] = useState([]); // Array<{ coords, status, tier }>, safest first
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
@@ -78,6 +90,9 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
   const [showHeatmapYellow, setShowHeatmapYellow] = useState(false);
   const [showHeatmapGreen, setShowHeatmapGreen] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  // The basemap's vector source id, detected on load (liberty's is 'openmaptiles') — the
+  // destination road-query layers reference it directly, same pattern as report/PinMap.jsx.
+  const [roadSourceId, setRoadSourceId] = useState(null);
 
   // Hazards passed to RouteLayer as avoid zones — reports flagged tonight (live Firestore),
   // merged with the baked-in heatmap-baseline.json hotspots (backend/data/heatmap-baseline.json,
@@ -135,7 +150,27 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
 
   function handleMapClick(e) {
     if (settingB) {
-      setLocationB([e.lngLat.lat, e.lngLat.lng]);
+      const tapPoint = { lat: e.lngLat.lat, lng: e.lngLat.lng };
+
+      if (!isWithinCoverage(tapPoint)) {
+        setDestinationHint('coverage');
+        return;
+      }
+
+      const map = mapRef.current?.getMap();
+      const snapped = map && roadSourceId
+        ? snapToRenderedRoad(map, e.point, tapPoint, {
+            roadLayerId: DESTINATION_ROAD_LAYER_ID,
+            nameLayerId: DESTINATION_ROAD_NAME_LAYER_ID,
+          })
+        : null;
+      if (!snapped) {
+        setDestinationHint('miss');
+        return;
+      }
+
+      setDestinationHint(null);
+      setLocationB([snapped.point.lat, snapped.point.lng]);
       setSettingB(false);
       return;
     }
@@ -154,6 +189,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
   function clearDestination() {
     setLocationB(null);
     setSettingB(false);
+    setDestinationHint(null);
     setRouteError(null);
     setRoutes([]);
     setSelectedRouteIndex(0);
@@ -167,9 +203,17 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
     if (nextRoutes.length > 0) onSelect(null);
   }
 
+  const handleMapLoad = useCallback((e) => {
+    setMapLoaded(true);
+    const sources = e.target.getStyle().sources || {};
+    const vectorId = Object.keys(sources).find((id) => sources[id].type === 'vector');
+    if (vectorId) setRoadSourceId(vectorId);
+  }, []);
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Map
+        ref={mapRef}
         initialViewState={{
           longitude: initialDestination ? initialDestination[1] : ZONE_CENTER.lng,
           latitude: initialDestination ? initialDestination[0] : ZONE_CENTER.lat,
@@ -190,12 +234,37 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
           return ids;
         }, [showHeatmapRed, showHeatmapYellow, isRoutingActive])}
         onClick={handleMapClick}
-        onLoad={() => setMapLoaded(true)}
+        onLoad={handleMapLoad}
         attributionControl={false}
         maxBounds={PHILIPPINES_BOUNDS}
         minZoom={5}
       >
         <NavigationControl position="top-left" />
+
+        {roadSourceId && (
+          <>
+            <Layer
+              id={DESTINATION_ROAD_LAYER_ID}
+              type="line"
+              source={roadSourceId}
+              source-layer="transportation"
+              filter={ROAD_FILTER}
+              layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+              paint={{ 'line-color': '#8b5cf6', 'line-width': 4, 'line-opacity': 0 }}
+            />
+            {/* Query-only twin for road names, same reason as PinMap.jsx: transportation
+                geometry carries no `name`, only transportation_name does. Not used for Point B's
+                hint copy today, but keeps parity with snapToRenderedRoad's return shape. */}
+            <Layer
+              id={DESTINATION_ROAD_NAME_LAYER_ID}
+              type="line"
+              source={roadSourceId}
+              source-layer="transportation_name"
+              filter={ROAD_FILTER}
+              paint={{ 'line-opacity': 0 }}
+            />
+          </>
+        )}
 
         <MockLocation position={locationA} onMove={setLocationA} />
 
@@ -373,10 +442,10 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
         <div className="map-toolbar-group">
           {!locationB && !settingB && (
             <div style={{ position: 'relative' }}>
-              <button 
-                className="map-toolbar-btn primary" 
+              <button
+                className="map-toolbar-btn primary"
                 title="Set destination"
-                onClick={() => setSettingB(true)}
+                onClick={() => { setDestinationHint(null); setSettingB(true); }}
               >
                 <MapPin size={20} />
               </button>
@@ -446,8 +515,10 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
           <RouteNotify tone={routeSummary.tone}>{routeSummary.message}</RouteNotify>
         )}
         {settingB && (
-          <span className="map-ctrl-hint" style={{ width: 'auto', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow-sm)' }}>
-            Click on the map to place Point B
+          <span className={destinationHint ? 'map-ctrl-error' : 'map-ctrl-hint'} style={{ width: 'auto', padding: '8px 16px', borderRadius: '20px', boxShadow: 'var(--shadow-sm)' }}>
+            {destinationHint === 'coverage' && 'Outside the coverage area — tap within 20 km of PUP Sta. Mesa.'}
+            {destinationHint === 'miss' && 'Tap closer to a road.'}
+            {!destinationHint && 'Click on a road to place Point B'}
           </span>
         )}
         {routeError && (

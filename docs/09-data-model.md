@@ -3,11 +3,18 @@
 # Data Model / Schema
 
 > **Purpose:** the data. Entities, relationships, constraints, and privacy classification for the
-> MVP. Models **Cloud Firestore** (NoSQL document store) per system-design §"Segment / report data
-> shape" and §"Authentication & authorization."
+> MVP. Models **Cloud Firestore** (NoSQL document store, `users/{uid}` only as of ADR-0004) and
+> **Supabase/Postgres** (`reports`, `barangay_analytics_cache`, `platform_transparency_stats`,
+> plus the imported `crime_reports_csv`/`safe_areas_csv` reference tables) per system-design
+> §"Segment / report data shape" and §"Authentication & authorization."
 > Traces back to: system design (`docs/06-system-design.md`), PRD (`docs/03-prd.md`), `idea.md`.
-> Traces forward to: API spec, Firestore Security Rules.
+> Traces forward to: API spec, Firestore Security Rules, Supabase Row Level Security
+> (`backend/supabase/schema.sql`).
 > **Build context:** 2-day SparkFest hackathon MVP. Single zone (BR-003). F-004 (Gemini) is P1 stretch.
+> **Resolved (2026-07-08, ADR-0004):** `reports` and the analytics collections below moved from
+> Firestore to Supabase — see [ADR-0004](adr/ADR-0004-supabase-reports-store.md). This doc's
+> "Firestore" framing for those entities is historical; the `report` and analytics sections below
+> are annotated with what changed. `segments` and `users` are unaffected by this move.
 
 ## Entities & relationships (ERD)
 
@@ -100,16 +107,21 @@ F-001 (render flags) and F-003 (route → segment matching).
 > flags/heatmap/routing see them like seeded segments. No `segments/{segmentId}` document exists
 > for these ids.
 
-### report (`reports/{reportId}`)
+### report (Supabase table `reports`, id in path shown as `reportId` below for continuity)
 
-Written by `submitReport` (F-006, `backend/server/index.js` — Express on Render, ADR-0002) — **not** a direct client write;
-see Firestore Security Rules below. Read by F-001/F-003/F-005/F-008 (current flags + routing) and
-F-004 (notes → Gemini).
+**Moved to Supabase (ADR-0004):** this is now the Postgres table `reports`
+(`backend/supabase/schema.sql`), not a Firestore collection. Column names are `snake_case` in
+Postgres (`segment_id`, `condition_type`, `corroboration_count`, `created_at`, `last_activity_at`,
+`photo_path`, `liked_by`); `frontend/src/lib/reports.js` normalizes rows back to the camelCase
+shape below so the rest of the frontend is unaffected. Written by `submitReport` (F-006,
+`backend/server/index.js` — Express on Render, ADR-0002) via the Supabase `service_role` client —
+**not** a direct client write; see Supabase Row Level Security below. Read by F-001/F-003/F-005/F-008
+(current flags + routing) and F-004 (notes → Gemini).
 
 | Field | Type | Null? | Default | Description |
 |-------|------|-------|---------|-------------|
-| `reportId` | string (doc ID) | No | auto-ID | Firestore auto-generated document ID. |
-| `segmentId` | string | No | — | **Required** (BR-004). Logical FK to `segments/{segmentId}`. |
+| `reportId` | uuid (`id` column) | No | `gen_random_uuid()` | Postgres-generated primary key (was a Firestore auto-ID document ID before ADR-0004). |
+| `segmentId` | string (`segment_id` column) | No | — | **Required** (BR-004). Logical FK to `segments/{segmentId}` — no cross-database referential integrity, same as the pre-ADR-0004 Firestore relationship. |
 | `conditionType` | string (**closed enum**) | No | — | **Required.** One of `{poor_lighting, no_crowd, recent_incident}` ONLY (BR-001). Validated in `submitReport`'s code (Rules no longer validate `create` shape — see below). |
 | `severity` | string (**closed enum**) | No | — | **Required (F-006).** One of `{green, yellow, red}`, AI-assigned by `submitReport` — never user-selectable. Per-report triage signal, not a place/neighborhood classification (BR-007). |
 | `corroborationCount` | number | No | `1` | **Required (F-006).** Incremented by `submitReport` each time the AI merges a new submission as a duplicate/corroboration of this report. |
@@ -119,7 +131,7 @@ F-004 (notes → Gemini).
 | `title` | string | No | — | **Required (F-006).** Short free-text headline, max 60 chars. Validated by `submitReport`'s Gemini classify (title + note must coherently describe the `conditionType`; crime-label/people-classification text is rejected — BR-001). Legacy docs written before this field may lack it; readers render it only when present. |
 | `note` | string | **Yes (optional)** | — | Optional free text. Feeds F-004's Gemini summary (BR-006) and `submitReport`'s classify prompt (BR-007). Not a condition/crime label; not rendered as a classification. |
 | `photoPath` | string | **Yes (optional)** | — | **Optional (F-007).** Firebase Storage object path (`reports/{uid}/...`); resolved to a display URL at render time, not stored as a URL. EXIF-stripped client-side before upload (BR-008). |
-| `likedBy` | array\<string\> | **Yes (optional, absent on legacy docs)** | `[]` | **Added (2026-07-08, F-010).** Firebase Auth UIDs of users who liked this report, toggled via `POST /likeReport` (`backend/server/index.js`, Admin SDK `arrayUnion`/`arrayRemove` — clients still never write `reports` directly, BR-005). `likedBy.length` is the real, cross-user "how many people confirmed this" signal that sizes the community-heatmap cloud (`frontend/src/lib/heatmap.js`) — distinct from `corroborationCount` above, which is an AI-driven duplicate-merge signal, not a user reaction. |
+| `likedBy` | text[] (`liked_by` column) | No | `{}` | **Added (2026-07-08, F-010).** Firebase Auth UIDs of users who liked this report, toggled via `POST /likeReport` (`backend/server/index.js`, `service_role` client calling the `toggle_report_like` Postgres function — the ADR-0004 replacement for Firestore's `arrayUnion`/`arrayRemove`; clients still never write `reports` directly, BR-005). `likedBy.length` is the real, cross-user "how many people confirmed this" signal that sizes the community-heatmap cloud (`frontend/src/lib/heatmap.js`) — distinct from `corroborationCount` above, which is an AI-driven duplicate-merge signal, not a user reaction. |
 
 > **No** `crimeType`, `neighborhoodRating`, `dangerLabel`, or any crime/neighborhood-classification field
 > anywhere (BR-001). The enum is the only condition vocabulary. `severity` is a distinct,
@@ -127,17 +139,21 @@ F-004 (notes → Gemini).
 
 > **F-010 note:** there is no stored `validated` field. "Condition validated" for the community
 > heatmap is a derived, client-side-only concept: `severity in {yellow, red}`. This reuses
-> BR-007's existing per-report `severity` semantics and introduces no new schema, field, or
-> Firestore index.
+> BR-007's existing per-report `severity` semantics and introduces no new schema, field, or index.
 
 > **Added (2026-07-08): safe-zone data mirror.** `backend/data/safe/safe-heatmap.json` (~500 static
 > landmark points — `lat`, `lng`, `weight` 0.4–1.0, `safety_type`, `landmark_name` — 24/7 stores,
 > well-lit streets, high foot traffic, police presence) is mirrored verbatim into
 > `frontend/src/data/safe-heatmap.json` and rendered as a green "Safe Zones" MapLibre heatmap layer
 > (`frontend/src/features/map/SafeHeatmap.jsx`), toggled independently of the red/yellow report
-> layers. It has no relationship to the `reports` collection and carries no `corroborationCount` —
+> layers. It has no relationship to the `reports` table and carries no `corroborationCount` —
 > it's static reference data, not a crowd-sourced signal. `backend/data/safe-spaces/safe-heatmap.json`
-> is a byte-identical duplicate, unused by the frontend.
+> is a byte-identical duplicate, unused by the frontend. **Added (2026-07-08, ADR-0004):** the
+> underlying CSVs this JSON was derived from — `backend/data/crime-reports.csv` and
+> `backend/data/safe/safe-areas.csv` — are now also imported verbatim into Supabase tables
+> `crime_reports_csv` and `safe_areas_csv` (`backend/scripts/import-csv-to-supabase.mjs`) as
+> queryable reference data. Same relationship (none) to the live `reports` table applies to these
+> two tables as well.
 
 ### user (`users/{uid}`, F-009)
 
@@ -150,7 +166,7 @@ out-of-band via `backend/scripts/seed-auth-users.mjs`'s Admin SDK write, which b
 |-------|------|-------|---------|-------------|
 | `uid` | string (doc ID) | No | — | Firebase Auth UID; also the document ID. |
 | `email` | string | No | — | The account's email (Google or email/password). |
-| `role` | string (**closed enum**) | No | `'user'` | One of `{user, admin}`. `admin` grants read of all `users` docs and delete on any `reports` doc (moderation) — see `backend/firestore.rules` `isAdmin()`. |
+| `role` | string (**closed enum**) | No | `'user'` | One of `{user, admin}`. `admin` grants read of all `users` docs (`backend/firestore.rules` `isAdmin()`) and, via the same role check re-implemented server-side in `backend/server/index.js`'s `isAdmin` middleware, delete on any `reports` row in Supabase (moderation) — see ADR-0004 for why that delete can no longer be a direct RLS-gated client write. |
 
 ### Storage objects (`reports/{uid}/{timestamp}-{filename}`, F-007)
 
@@ -222,59 +238,65 @@ why this moved out of Rules):**
 
 | Feature | Query | Index needed |
 |---------|-------|--------------|
-| **F-001** render flags | `segments`: read all (single zone, small set, BR-003). `reports`: read current flags per segment. | Single-field auto-index on `reports.segmentId`. No composite needed for the all-segments read. |
-| **F-006** write report (via `submitReport`) | Recent reports for dedup context: `where('segmentId','==',X).orderBy('createdAt','desc').limit(10)`, then `reports.add({...})` or `.update({corroborationCount, lastActivityAt})`. | Reuses `(segmentId, createdAt DESC)` composite. |
-| **F-003/F-008** per-segment freshness / "tonight" | Newest report per segment: `where('segmentId','==',X).orderBy('createdAt','desc').limit(1)`, freshness now compares `lastActivityAt \|\| createdAt`. | **Composite index** `(segmentId ASC, createdAt DESC)` — required by Firestore for equality + orderBy on different fields. |
-| **F-004** notes → Gemini | Reports for a segment with notes: `where('segmentId','==',X)` (filter `note` present client/function-side) or `where('segmentId','==',X).orderBy('createdAt','desc')`. | Reuses `(segmentId, createdAt DESC)` composite; or single-field `segmentId` if unordered. |
+| **F-001** render flags | `segments`: read all (single zone, small set, BR-003). `reports`: read current flags per segment. | Postgres index on `reports.segment_id` (part of the composite below). No composite needed for the all-segments read. |
+| **F-006** write report (via `submitReport`) | Recent reports for dedup context: `.eq('segment_id', X).order('created_at', {ascending:false}).limit(10)`, then `.insert({...})` or the `increment_report_corroboration` Postgres function. | Reuses `(segment_id, created_at DESC)` composite. |
+| **F-003/F-008** per-segment freshness / "tonight" | Newest report per segment: `.eq('segment_id', X).order('created_at', {ascending:false}).limit(1)`, freshness now compares `lastActivityAt \|\| createdAt`. | **Composite index** `(segment_id, created_at DESC)` — same shape as the pre-ADR-0004 Firestore composite, now a Postgres b-tree index. |
+| **F-004** notes → Gemini | Reports for a segment with notes: `.eq('segment_id', X)` (filter `note` present server-side) or with `.order('created_at', {ascending:false})`. | Reuses `(segment_id, created_at DESC)` composite; or the single-field `segment_id` index if unordered. |
 
-> Firestore auto-creates single-field indexes; the `(segmentId ASC, createdAt DESC)` **composite must be
-> declared** in `firestore.indexes.json`. This is the one index F-003 and F-004 depend on.
+> **Moved to Supabase (ADR-0004):** this index lives in `backend/supabase/schema.sql` as
+> `reports_segment_id_created_at_idx` — the direct Postgres equivalent of the Firestore composite
+> index this table used before the move (`backend/firestore.indexes.json` no longer covers
+> `reports`, since it isn't a Firestore collection anymore).
 
-## Firestore Security Rules — data-validation view
+## Supabase Row Level Security — data-validation view (`reports` + analytics tables, ADR-0004)
 
-> What the rules must enforce at the document level. Cross-references system-design §"Authentication &
-> authorization" (item 1: Firestore). Reads open (public safety info, no PII beyond `uid`); writes gated.
+> What RLS must enforce at the row level for `reports`, `barangay_analytics_cache`, and
+> `platform_transparency_stats`. Cross-references system-design §"Authentication & authorization"
+> (item 1: Supabase). Reads open (public safety info, no PII beyond `uid`); writes gated.
 
-**Changed (F-006):** `reports` writes no longer happen from the client at all. Firestore Rules
-cannot verify "this write went through AI review" — they can only inspect the write itself — so
-Rules now simply deny client `create`/`update`/`delete` on `reports` outright, and all the
-validation that used to live in Rules (closed enum, required fields, closed field allowlist, UID
-ownership) has moved into `submitReport`'s code (`backend/server/index.js`, Express on Render —
-ADR-0002), which writes via the Admin SDK — a path that bypasses Rules by design. The `false`
-lines below document intent; they are not what stops a malicious write (that code's own logic,
-and the fact that only its service-account credential can perform an Admin SDK write, are what
-actually enforce this). **Added (2026-07-08):** `POST /likeReport` (same file) is the one other
-Admin-SDK write path onto an existing `reports` doc, scoped to only the `likedBy` field via
-`arrayUnion`/`arrayRemove` — it does not touch any other field.
+**Changed (ADR-0004, carrying forward the F-006 posture):** `reports` writes still never happen
+from the client. RLS cannot verify "this write went through AI review" any more than Firestore
+Rules could — it can only inspect the write itself — so every table simply has **no**
+`INSERT`/`UPDATE`/`DELETE` policy for the `anon`/`authenticated` roles (default-deny), and all the
+validation that used to live in Firestore Rules (closed enum — now also a Postgres `check`
+constraint — required fields, UID ownership) lives in `submitReport`'s code (`backend/server/index.js`,
+Express on Render — ADR-0002), which writes via the Supabase `service_role` key — a client that
+bypasses RLS entirely by design, the same relationship the Admin SDK had to Firestore Rules.
+`POST /likeReport` (same file) is the one other `service_role` write path onto an existing
+`reports` row, scoped to only the `liked_by` column via the `toggle_report_like` Postgres function
+— it does not touch any other column.
 
-```
-match /reports/{id} {
-  allow read: if true;
-  allow create, update, delete: if false;   // server-only, via submitReport's Admin SDK write
-}
-match /segments/{id} {
-  allow read: if true;
-  allow write: if false;            // seeded out-of-band
-}
+```sql
+-- backend/supabase/schema.sql (abbreviated)
+alter table reports enable row level security;
+create policy "reports_public_read" on reports for select using (true);
+-- no insert/update/delete policy — anon/authenticated can never write; service_role bypasses RLS
 ```
 > Auth **method**: anonymous by default, with an optional Google sign-in upgrade via account
-> linking (`/login`) that preserves the `uid`; either state yields a `request.auth.uid` that
-> `submitReport` relies on.
+> linking (`/login`) that preserves the `uid`; either state yields a Firebase ID token that
+> `submitReport` verifies server-side (RLS itself cannot see this token at all — see ADR-0004's
+> "Auth boundary" note).
 
-**Verification gate: passed (2026-07-02).** `submitReport` was exercised live against the
-emulator suite (create / duplicate-merge / spam-reject / closed-enum rejection all confirmed —
-see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach),
-and `backend/firestore.rules` now matches the deny-all sketch above (a rules-evaluated direct
-client create returns `PERMISSION_DENIED` in the emulator while `submitReport` still writes via
-the Admin SDK). **The updated rules file is not yet deployed** — deploying
-`firebase deploy --only firestore:rules` remains a pre-demo checklist item
-(security doc §pre-demo checklist).
+**Verification gate: passed (2026-07-02, carried forward).** `submitReport`'s validation logic is
+unchanged by the Supabase move — only the storage backend changed. The same create /
+duplicate-merge / spam-reject / closed-enum rejection behavior applies; see
+`docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach for the
+original verification, and this doc's §11 QA plan for Supabase-specific re-verification.
 
-**F-009 addition (already in `backend/firestore.rules`, independent of the migration above):**
-`allow delete: if isAdmin()` on `reports` (moderation stays remove-only — `update` is still
-`false`), plus a `users/{uid}` match block: read is self-or-admin, create only as `role: 'user'`
-(privilege escalation blocked — `admin` is Admin-SDK-only via the seed script), update/delete
-always `false`.
+**F-009 addition:** admin moderation delete is `DELETE /api/v1/admin/reports/:id`
+(`backend/server/index.js`, guarded by the `isAdmin` middleware, which still reads
+`users/{uid}.role` from Firestore) calling the `delete_report_and_decrement` Postgres function —
+**not** a direct client delete against Supabase, because RLS has no way to evaluate `isAdmin()`
+the way Firestore Rules could (see ADR-0004). `frontend/src/lib/reports.js`'s `deleteReport()`
+calls this route instead of the Supabase client directly.
+
+### Firestore Security Rules — `users/{uid}` only (ADR-0004)
+
+`backend/firestore.rules` now governs only the `users` collection: read is self-or-admin, create
+only as `role: 'user'` (privilege escalation blocked — `admin` is Admin-SDK-only via the seed
+script), update/delete always `false`. The prior `reports`/`segments` match blocks in that file
+are stale as of ADR-0004 — `segments` was already a static frontend module before this change (see
+this doc's ERD note above), and `reports` moved to Supabase RLS above.
 
 ## Freshness / "tonight" window — `[unverified]`
 

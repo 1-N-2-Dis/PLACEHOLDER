@@ -19,46 +19,58 @@ mitigation, not just hygiene — see Threat T6 and BR-001).
 | Data | Classification | Where it lives | Notes |
 |------|----------------|----------------|-------|
 | `segment.*` (id, name, geo) | **Public** | Firestore `segments` | Seeded demo content, `[unverified]` (idea §7 pins). No PII. |
-| `report.conditionType` (closed enum) | **Public** | Firestore `reports` | Observable, fixable condition only (BR-001). No crime/neighborhood label exists by design. |
-| `report.createdAt`, `report.segmentId` | **Public** | Firestore `reports` | Operational metadata. |
-| `report.uid` | **Internal — pseudonymous identifier** | Firestore `reports` | Firebase Auth UID linking a report to an account for abuse control (BR-005). **Not displayed in UI.** Anonymous-auth UID is not directly identifying, but it *links a person to the places/times they flagged* — that linkage is the sensitive part. |
-| `report.note` (optional free text) | **User-generated — potential incidental PII** | Firestore `reports` | May contain names, plate numbers, descriptions of people, "my" locations. Feeds F-004 (BR-006) and the F-006 classify prompt (BR-007). |
-| `report.severity` / `corroborationCount` / `lastActivityAt` | **Public** | Firestore `reports` | AI-assigned per-report triage signal (BR-007) + operational metadata; not a place/crime classification. |
-| `report.likedBy` | **Internal — pseudonymous identifier array** | Firestore `reports` | **Added (2026-07-08).** Array of Firebase Auth UIDs who liked a report (`POST /likeReport`). Same sensitivity note as `report.uid`: not directly identifying, but links a person to the reports they engaged with. **Not displayed in UI** — only the count (`likedBy.length`) is rendered. |
+| `report.conditionType` (closed enum) | **Public** | Supabase `reports` (moved from Firestore, ADR-0004) | Observable, fixable condition only (BR-001). No crime/neighborhood label exists by design. |
+| `report.createdAt`, `report.segmentId` | **Public** | Supabase `reports` (ADR-0004) | Operational metadata. |
+| `report.uid` | **Internal — pseudonymous identifier** | Supabase `reports` (ADR-0004) | Firebase Auth UID linking a report to an account for abuse control (BR-005). **Not displayed in UI.** Anonymous-auth UID is not directly identifying, but it *links a person to the places/times they flagged* — that linkage is the sensitive part. Cross-references a Firestore `users` doc by uid only — no enforced referential integrity across the two databases, same as the pre-ADR-0004 within-Firestore relationship. |
+| `report.note` (optional free text) | **User-generated — potential incidental PII** | Supabase `reports` (ADR-0004) | May contain names, plate numbers, descriptions of people, "my" locations. Feeds F-004 (BR-006) and the F-006 classify prompt (BR-007). |
+| `report.severity` / `corroborationCount` / `lastActivityAt` | **Public** | Supabase `reports` (ADR-0004) | AI-assigned per-report triage signal (BR-007) + operational metadata; not a place/crime classification. |
+| `report.likedBy` | **Internal — pseudonymous identifier array** | Supabase `reports` (ADR-0004) | **Added (2026-07-08).** Array of Firebase Auth UIDs who liked a report (`POST /likeReport`). Same sensitivity note as `report.uid`: not directly identifying, but links a person to the reports they engaged with. **Not displayed in UI** — only the count (`likedBy.length`) is rendered. |
+| `crime_reports_csv.*`, `safe_areas_csv.*` | **Public** | Supabase (imported reference tables, ADR-0004) | Verbatim import of `backend/data/crime-reports.csv`/`safe/safe-areas.csv` — same public-safety-info posture as `reports`; no new PII beyond what the source CSVs already contained (third-party desk research, not first-party). |
 | `report.photoPath` (optional) | **User-generated image — potential PII** | Firebase Storage `reports/{uid}/...` (unused — **disabled**, ADR-0002) | Bystander faces, incidental scene context; EXIF GPS/camera metadata stripped client-side before upload (BR-008), but photo *content* privacy (who/what is visible) is **not** mitigated by that — see Threat T7. This field/path is currently dormant since `PHOTO_UPLOAD_ENABLED = false`; the risk re-activates unchanged if Storage is ever re-enabled. |
 | ~~ORS API key (routing)~~ — **removed (ADR-0003)** | N/A | N/A | Routing moved to a client-side Rust/WASM engine over a preprocessed graph asset (`frontend/public/graph/pup-20km.bin`) — no routing key exists anymore. This resolves the prior "secret-in-client, unrestricted" gap (Threat T2) by elimination, not mitigation. MapLibre/OpenFreeMap render is **keyless** too — no map-render secret exists in this build. |
 | Gemini API key | **Secret (must stay server-side)** | **Render env var (`backend/server`)** — moved off Firebase Cloud Functions, ADR-0002 | MUST NOT ship in client bundle. Backs `summarizeSegment` (P1), `submitReport` (P0 — its unavailability blocks report submission entirely by design, fail-closed, BR-007), and `assessRoute` (P0 — F-003/F-008 route assessment; fails open with an error message shown, since it's informational, not a moderation gate). |
 | Firebase service account key (`FIREBASE_SERVICE_ACCOUNT_KEY`) | **Secret (must stay server-side)** | Render env var (`backend/server`) | New secret introduced by ADR-0002 — grants the Admin SDK Firestore/Auth access outside a GCP environment. MUST NOT ship in client bundle or be committed; equivalent sensitivity to a database root credential. |
+| Supabase `service_role` key (`SUPABASE_SERVICE_ROLE_KEY`) | **Secret (must stay server-side)** | Render env var (`backend/server`) | New secret introduced by ADR-0004 — bypasses Row Level Security entirely, equivalent sensitivity to `FIREBASE_SERVICE_ACCOUNT_KEY`. MUST NOT ship in client bundle or be committed. |
+| Supabase `anon` key (`VITE_SUPABASE_ANON_KEY`) | **Public — ships in client bundle by design** | Frontend env var | New in ADR-0004, mirrors the existing Firebase client-config posture (not secret; an identifier). RLS is the real access gate, same relationship the Firebase config values have to Firestore Rules. |
+| Supabase DB password (`SUPABASE_DB_PASSWORD`) | **Secret (must stay server-side, migration-only)** | Local `.env` only, never Render | Only used by the one-off `backend/scripts/apply-supabase-schema.mjs` migration script for a direct Postgres connection — the running app never reads it. Not deployed anywhere. |
 
 ## Authn / authz model (per network-exposed surface)
 
 Mirrors system-design §"Authentication & authorization." Each exposed surface is stated explicitly —
 a silent unauthenticated surface is a factory-gate failure.
 
-1. **Cloud Firestore (read/write reports + read segments)** — **Changed (F-006).**
-   - **Reads: open** (`allow read: if true`). Flags are public safety info; the only non-public field
+1. **Supabase (read/write `reports` + analytics — ADR-0004, supersedes Cloud Firestore for this surface).**
+   - **Reads: open** (RLS `SELECT` policy, `using (true)`). Flags are public safety info; the only non-public field
      is `uid`, which is internal but readable in MVP — see Threat T6 / open question on whether to
      strip `uid` from client reads post-July-2 `[unverified]`.
-   - **Writes (`reports` create/update/delete): denied for all clients** —
-     `allow create, update, delete: if false`. The only writer is `submitReport`, on
-     **`backend/server` (Render)** as of ADR-0002 — via the Admin SDK (authenticated with a
-     Firebase service account credential), which **bypasses Rules entirely, always** (not merely
-     "trusted more"). This means Rules no longer enforce `request.auth != null` (BR-005), UID
-     ownership, the closed `conditionType` enum (BR-001), or the closed field allowlist for creates
-     — **that enforcement has moved into `submitReport`'s code**, which is now the sole point of
-     failure for those guarantees. `request.auth != null` is itself no longer `onCall`'s built-in
-     check — `backend/server` verifies the caller's Firebase ID token itself
-     (`admin.auth().verifyIdToken()`) before treating a request as authenticated (ADR-0002).
-     Mitigation: only the service account credential can perform an Admin SDK write, so a client
-     cannot bypass the API to write directly, regardless of Rules content.
+   - **Writes (`reports` insert/update/delete): denied for `anon`/`authenticated`** — no policy
+     exists for these operations on any table (RLS default-deny). The only writer is `submitReport`, on
+     **`backend/server` (Render)** as of ADR-0002 — via the `service_role` key, which **bypasses RLS
+     entirely, always** (not merely "trusted more"), the same relationship the Admin SDK had to
+     Firestore Rules. This means RLS cannot enforce `request.auth != null` (BR-005), UID
+     ownership, the closed `conditionType` enum (BR-001, though this is now also a Postgres `check`
+     constraint as a backstop), or a field allowlist for inserts — **that enforcement lives in
+     `submitReport`'s code**, which is the sole point of failure for those guarantees. Auth itself
+     is verified independently of RLS — `backend/server` verifies the caller's Firebase ID token
+     (`admin.auth().verifyIdToken()`) before treating a request as authenticated (ADR-0002); RLS has
+     no visibility into that token at all (see ADR-0004's "Auth boundary" note) — it is not part of
+     this auth check, only the row-write gate. Mitigation: only the `service_role` key can write, so a
+     client cannot bypass the API to write directly, regardless of RLS policy content.
    - **Added (2026-07-08): `POST /likeReport`** (`backend/server`, same `requireAuth` middleware as
-     `submitReport`) is the one other Admin-SDK write path onto an existing `reports` doc — scoped
-     to only the `likedBy` field via `arrayUnion`/`arrayRemove` (idempotent: liking twice, or
-     unliking when not liked, is a safe no-op). It cannot alter any other field on the doc.
-   - **`segments`: read open, write denied** (seeded out-of-band, unchanged).
-   - Without deployed rules, **reads would be unrestricted too** — rules remain mandatory, a
-     pre-demo gate (see checklist). **Do not deploy the new deny-create rule until `submitReport`
-     is fully verified** (see `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md`).
+     `submitReport`) is the one other `service_role` write path onto an existing `reports` row — scoped
+     to only the `liked_by` column via the `toggle_report_like` Postgres function (idempotent: liking
+     twice, or unliking when not liked, is a safe no-op). It cannot alter any other column on the row.
+   - **Admin delete (F-009):** `DELETE /api/v1/admin/reports/:id`, guarded by `isAdmin` (which still
+     reads `users/{uid}.role` from Firestore), calls the `delete_report_and_decrement` Postgres
+     function. This is **not** a direct client delete — RLS cannot evaluate `isAdmin()` the way
+     Firestore Rules could, so there is no policy that could ever authorize an anon-key client to
+     delete (see ADR-0004).
+   - Without RLS enabled at all, **reads would be unrestricted too** (same posture as before) —
+     RLS remains mandatory, a pre-demo gate (see checklist).
+1a. **Cloud Firestore (`users/{uid}.role` only, ADR-0004)** — reads: self or admin. Writes: self-create
+    as `role: 'user'` only; `admin` is Admin-SDK-only (`backend/scripts/seed-admin-role.mjs`), same
+    posture as before this change. No longer governs `reports` or `segments` (the latter was already
+    a static frontend module, an existing documented drift — see `docs/09-data-model.md`).
 2. **Firebase Auth** — the identity surface. Anonymous sign-in by default (demo speed), with an
    optional upgrade via Google sign-in (`linkWithPopup`) **or email/password** (`linkWithCredential`)
    at `/login` (`frontend/src/lib/auth.js`), either of which preserves the existing `uid`. While
@@ -74,8 +86,11 @@ a silent unauthenticated surface is a factory-gate failure.
    self or admin. Create: self-only, and only as `role: 'user'` — `backend/firestore.rules`
    rejects any client attempt to self-assign `role: 'admin'`. `admin` is set only via
    `backend/scripts/seed-auth-users.mjs`, an Admin-SDK script that bypasses Rules by design (same
-   posture as `submitReport`). An `admin` role grants `reports` **delete** (moderation, remove-only
-   — no update) via the `isAdmin()` rule helper.
+   posture as `submitReport`). An `admin` role grants Supabase `reports` **delete** (moderation,
+   remove-only — no update) via `backend/server`'s `isAdmin` middleware (re-checks this same
+   `users/{uid}.role` doc server-side, since RLS can't — see item 1 above and ADR-0004) — no
+   longer via a Firestore rule helper directly, since `reports` isn't a Firestore collection
+   anymore.
 3. **Google Maps JS API key** — N/A for this build (superseded by OpenFreeMap keyless tiles).
    **Routing key: N/A too, as of ADR-0003** — the client-side Rust/WASM routing engine has no
    external key at all; the graph asset it loads is a same-origin, keyless static file. (Formerly
@@ -101,6 +116,12 @@ a silent unauthenticated surface is a factory-gate failure.
    a Render env var only; never committed, never logged. Compromise of this credential is
    equivalent to compromising the whole Firestore/Auth trust boundary — treat with the same care
    as the Gemini key, but higher blast radius.
+7. **Supabase `service_role` key (`SUPABASE_SERVICE_ROLE_KEY`, new in ADR-0004)** — grants
+   `backend/server` full read/write access to every Supabase table, bypassing RLS entirely. Held
+   as a Render env var only; never committed, never logged, never sent to the frontend (the
+   frontend uses only the public `anon` key). Compromise of this credential is equivalent to
+   compromising the whole `reports`/analytics trust boundary — same care as items 5–6, but scoped
+   to report/analytics data rather than identity.
 
 ## Threat model (STRIDE-lite)
 
@@ -199,10 +220,17 @@ This app's failure modes can *harm the people it claims to protect* — treat th
 - **Firebase config** (apiKey/projectId in client): not a secret in the traditional sense — it's an
   identifier; Firestore Security Rules are the actual access control, not the config. (Storage Security
   Rules exist but are dormant while Storage is disabled — ADR-0002.)
-- **Firestore Rules no longer validate `reports` content shape on create** (F-006) — this is a documented
-  architecture change, not a regression: the validation moved into `submitReport`'s code because Rules
-  cannot express "this write came from the moderation function." Treat a bug in that code's validation
-  as equivalent in severity to a Rules misconfiguration used to be.
+- **Supabase `service_role` key (`SUPABASE_SERVICE_ROLE_KEY`, new in ADR-0004):** Render
+  environment variable only (`backend/server`); never committed, never sent to the frontend.
+  Bypasses RLS entirely — treat rotation of this credential (Supabase Dashboard → Project
+  Settings → API) as equally urgent as a Firebase service account key leak.
+- **Supabase `anon` key (`VITE_SUPABASE_ANON_KEY`, new in ADR-0004):** not a secret — an
+  identifier, same posture as the Firebase client config above. RLS is the actual access control.
+- **RLS no longer validates `reports` content shape on insert** (carried forward from F-006 via
+  ADR-0004) — this is a documented architecture change, not a regression: the validation moved
+  into `submitReport`'s code because RLS cannot express "this write came from the moderation
+  function," the same limitation Firestore Rules had. Treat a bug in that code's validation as
+  equivalent in severity to an RLS misconfiguration.
 - **No secret values appear in this document, in code, or in git history.** Rotation: N/A for a 2-day demo —
   **because** keys are demo-scoped and disposable; for any real deployment, rotation + a secret manager are
   required `[unverified]`.
@@ -214,23 +242,28 @@ This app's failure modes can *harm the people it claims to protect* — treat th
 - **Never log:** the Gemini key value, raw `note` contents (potential PII — T6), or any data that
   re-identifies a reporter.
 - A dedicated security log / SIEM is **N/A for the MVP — because** there is no custom backend to instrument;
-  Firebase/GCP console gives basic usage + auth visibility. Flagged for post-July-2 `[unverified]`.
+  Firebase/GCP console gives basic usage + auth visibility, and the Supabase Dashboard gives basic
+  query/usage visibility for `reports`/analytics data (ADR-0004). Flagged for post-July-2 `[unverified]`.
 
 ## Incident response basics
 
-- **Detection (demo-grade):** watch the Firebase/GCP console for abnormal Firestore write volume (spam — T3)
-  and abnormal Gemini usage/billing (key abuse — T2; the ORS half of this vector no longer exists — ADR-0003).
-- **Containment levers:** tighten/redeploy Security Rules (can hard-stop writes); stop/redeploy the
-  Render service to cut Gemini access, or rotate `GEMINI_API_KEY`/`FIREBASE_SERVICE_ACCOUNT_KEY`
-  there if either is suspected compromised. Anonymous auth can be turned off to stop a spam wave.
-- **Recovery:** reports are immutable, so cleanup = deleting poisoned docs out-of-band (console/admin), not
-  editing. No automated rollback in MVP `[unverified]`.
+- **Detection (demo-grade):** watch the Firebase/GCP console for abnormal Auth activity, the
+  Supabase Dashboard for abnormal `reports` write volume (spam — T3, moved from Firestore per
+  ADR-0004), and abnormal Gemini usage/billing (key abuse — T2; the ORS half of this vector no
+  longer exists — ADR-0003).
+- **Containment levers:** tighten/redeploy Firestore Security Rules or Supabase RLS policies (can
+  hard-stop writes on their respective surfaces); stop/redeploy the Render service to cut
+  Gemini/Supabase access, or rotate `GEMINI_API_KEY`/`FIREBASE_SERVICE_ACCOUNT_KEY`/
+  `SUPABASE_SERVICE_ROLE_KEY` there if any is suspected compromised. Anonymous auth can be turned
+  off to stop a spam wave.
+- **Recovery:** reports are immutable, so cleanup = deleting poisoned rows out-of-band (Supabase
+  Dashboard/admin route), not editing. No automated rollback in MVP `[unverified]`.
 - **Escalation / notification:** N/A formal path for a hackathon — **because** there are no real users yet;
   for real users a breach-notification process under RA 10173 would be required `[unverified]`, for counsel.
 
 ## Pre-demo security checklist (MUST be true before the July 2 demo)
 
-Hard gates — a world-writable Firestore or an unrestricted key is a demo-day liability, not a polish item.
+Hard gates — a world-writable Firestore/Supabase table or an unrestricted key is a demo-day liability, not a polish item.
 
 - [x] **`submitReport` fully verified against the emulator BEFORE deploying the new Firestore rules**
   (create/duplicate/reject outcomes all exercised live against Gemini, 2026-07-02; the deny-client-write
@@ -238,8 +271,14 @@ Hard gates — a world-writable Firestore or an unrestricted key is a demo-day l
   `PERMISSION_DENIED` while `submitReport` still writes) — deploying
   `allow create: if false` on `reports` before this was proven would have left F-002 entirely broken with
   no fallback. See `docs/superpowers/specs/2026-07-01-severity-tiered-ai-routing-design.md` §Testing approach.
-- [ ] **Firestore Security Rules deployed and tested** — `reports` create/update/delete denied for all
-  clients (F-006), `segments` write-locked. (Kills T1.)
+  **Re-verify after ADR-0004:** confirm the same create/duplicate/reject outcomes against Supabase
+  before demoing (the write target changed; the moderation logic did not).
+- [ ] **Firestore Security Rules deployed and tested** — `users/{uid}` read/write-locked per F-009
+  (F-006's `reports` rule is stale as of ADR-0004 — `reports` isn't a Firestore collection anymore).
+- [ ] **Supabase schema + RLS applied to the live project (ADR-0004)** — `backend/supabase/schema.sql`
+  run against the project (`npm run db:schema` in `backend/`); confirm every table shows RLS
+  enabled with a `SELECT`-only policy and no client-facing write policy in the Supabase Dashboard
+  → Authentication → Policies. (Kills T1 for `reports`/analytics.)
 - [x] **Storage disabled rather than deployed unverified** (F-007, ADR-0002) — the free Spark plan
   can no longer provision a bucket, so `PHOTO_UPLOAD_ENABLED = false` and `firebase.json` no longer
   wires `storage.rules` into any deploy. If re-enabled later (Blaze), re-verify: auth-gated write,
