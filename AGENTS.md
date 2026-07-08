@@ -37,12 +37,15 @@ React + Vite single-page web app, served from **Vercel** (moved off Firebase Hos
   provision a bucket. `PHOTO_UPLOAD_ENABLED = false` in `frontend/src/lib/storage.js`; the
   EXIF-stripping code (BR-008) and Storage rules still exist, just unwired, for a future re-enable.
 - **Auth:** **Firebase Auth** (anonymous or Google sign-in) — unchanged, stays on Firebase.
-- **Firestore:** unchanged, stays on Firebase (Spark/free plan).
+- **Firestore:** now holds only the `users/{uid}.role` identity/role record (ADR-0004) — `reports`,
+  `barangay_analytics_cache`, and `platform_transparency_stats` moved to **Supabase (Postgres)**,
+  along with imported `crime-reports.csv`/`safe-areas.csv` reference tables. See ADR-0004.
 
 The mandatory Google-technology requirement is satisfied by **Firestore + Auth + Gemini** — the
-maps/routing stack is intentionally non-Google, and hosting/compute for the frontend and
-Gemini-backed routes moved to Vercel/Render (ADR-0002) without affecting this. The stack is owned
-by [System Design](./docs/06-system-design.md).
+maps/routing stack is intentionally non-Google, hosting/compute for the frontend and
+Gemini-backed routes moved to Vercel/Render (ADR-0002), and report/analytics data moved to
+Supabase (ADR-0004), none of which affects this since Firestore still hosts Auth-adjacent data.
+The stack is owned by [System Design](./docs/06-system-design.md).
 
 ## Build & run
 ```
@@ -154,7 +157,7 @@ When you edit any spec doc, before you finish:
 - [Data Model](./docs/09-data-model.md) — segment + report schema, Storage objects
 - [QA Test Plan](./docs/11-qa-test-plan.md) — traceability matrix
 - [Security & Compliance](./docs/12-security-compliance.md) — threats, auth, secrets, privacy
-- [ADRs](./docs/adr/) — significant decisions (map stack = ADR-0001; hosting/compute split = ADR-0002; client-side WASM routing = ADR-0003)
+- [ADRs](./docs/adr/) — significant decisions (map stack = ADR-0001; hosting/compute split = ADR-0002; client-side WASM routing = ADR-0003; reports/analytics move to Supabase = ADR-0004)
 - [Idea brief](./docs/idea.md), [Deployment Guide](./docs/DEPLOYMENT_GUIDE.md), [Deploy Quick Reference](./docs/deploy.md), [Local Dev](./docs/LOCAL_DEV.md) — the origin brief and the operational how-tos, kept alongside the rest of `docs/`
 
 <!-- Optional: scoped, path-specific rules live under ./.cursor/rules/*.mdc. -->

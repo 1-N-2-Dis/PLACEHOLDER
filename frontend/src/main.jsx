@@ -9,10 +9,10 @@ import { ThemeProvider } from './lib/theme.jsx';
 import { ensureSignedIn } from './lib/auth.js';
 import './styles.css';
 
-// Kick off anonymous Firebase Auth sign-in for report writes (BR-005).
-// The guidHER mock auth layer (AuthProvider/mockAuth.js) is separate — it manages
-// the UX identity (name, prefs). Firebase Auth anonymous uid is still needed for
-// the Cloud Function gate (submitReport).
+// Kick off anonymous Firebase Auth sign-in for report writes (BR-005). AuthProvider
+// (lib/authContext.jsx) is also backed by Firebase Auth, but only counts a real (non-anonymous)
+// session as "logged in" — this anonymous uid just satisfies the submitReport auth gate until/
+// unless the visitor actually logs in.
 ensureSignedIn().catch((err) => console.error('Firebase anonymous sign-in failed:', err.message));
 
 createRoot(document.getElementById('root')).render(

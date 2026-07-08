@@ -2,29 +2,36 @@
 // Source: data/heatmap-baseline.json — risk weights derived from 99 collected community reports
 // across crime-reports-MERGED.csv (Reddit, PH news, first-party interviews, evidence-register).
 //
-// Run AFTER seed-segments.mjs — requires segment docs to exist in Firestore.
-// Deterministic doc IDs make reruns idempotent (re-run before demo to refresh timestamps).
+// Writes to Supabase's `reports` table (see backend/supabase/schema.sql) instead of Firestore.
+// Re-runnable: clears rows with uid='csv-seed' before inserting, so reruns refresh timestamps
+// without duplicating (Postgres generates a fresh uuid per row — there's no stable doc id to
+// upsert against like the old Firestore version had).
 //
-// Run against LOCAL EMULATOR — PowerShell:
-//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"
-//   node backend/scripts/seed-heatmap-baseline.mjs
-//
-// Run against REAL project:
-//   $env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"
+// Run against the Supabase project configured in backend/server/.env:
 //   node backend/scripts/seed-heatmap-baseline.mjs
 //
 // BR-001: All note fields use conditions-only language — no crime labels, no people labels.
 // BR-006: All data derives from real community reports — nothing invented.
-import { initializeApp, applicationDefault } from 'firebase-admin/app';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { createClient } from '@supabase/supabase-js';
+// See backend/server/lib/supabase.js for why: supabase-js needs a WebSocket global (Node 22+)
+// just to construct its client, even for scripts that never open a Realtime channel.
+import WebSocket from 'ws';
 
-const useEmulator = !!process.env.FIRESTORE_EMULATOR_HOST;
-initializeApp(
-  useEmulator
-    ? { projectId: process.env.GCLOUD_PROJECT || 'demo-saferroute' }
-    : { credential: applicationDefault() },
-);
-const db = getFirestore();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.loadEnvFile?.(path.join(__dirname, '..', 'server', '.env'));
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in backend/server/.env');
+  process.exit(1);
+}
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { persistSession: false },
+  realtime: { transport: WebSocket },
+});
 
 const NOW = Date.now();
 const H = 60 * 60 * 1000;
@@ -35,7 +42,6 @@ const H = 60 * 60 * 1000;
 // createdAt staggered so heatmap looks organic, not batch-stamped.
 const BASELINE_REPORTS = [
   {
-    id: 'baseline_pureza_approaches',
     segmentId: 'seg_pureza_approaches',
     conditionType: 'recent_incident',
     severity: 'red',
@@ -46,7 +52,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 0.5 * H,
   },
   {
-    id: 'baseline_magsaysay_jeeps',
     segmentId: 'seg_magsaysay_jeeps',
     conditionType: 'recent_incident',
     severity: 'red',
@@ -57,7 +62,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 1 * H,
   },
   {
-    id: 'baseline_recto_legarda',
     segmentId: 'seg_recto_legarda',
     conditionType: 'recent_incident',
     severity: 'red',
@@ -68,7 +72,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 0.33 * H,
   },
   {
-    id: 'baseline_teresa_st',
     segmentId: 'seg_teresa_wellused_1',
     conditionType: 'recent_incident',
     severity: 'red',
@@ -79,7 +82,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 0.25 * H,
   },
   {
-    id: 'baseline_legarda_estero',
     segmentId: 'seg_legarda_estero',
     conditionType: 'poor_lighting',
     severity: 'yellow',
@@ -90,7 +92,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 2 * H,
   },
   {
-    id: 'baseline_pureza_st',
     segmentId: 'seg_pureza_st_3',
     conditionType: 'poor_lighting',
     severity: 'yellow',
@@ -101,7 +102,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 3 * H,
   },
   {
-    id: 'baseline_anonas_st',
     segmentId: 'seg_anonas_st_3',
     conditionType: 'recent_incident',
     severity: 'yellow',
@@ -112,7 +112,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 4 * H,
   },
   {
-    id: 'baseline_vmapa',
     segmentId: 'seg_vmapa_sm',
     conditionType: 'no_crowd',
     severity: 'yellow',
@@ -123,7 +122,6 @@ const BASELINE_REPORTS = [
     lastActivityAt: NOW - 5 * H,
   },
   {
-    id: 'baseline_hipodromo',
     segmentId: 'seg_hipodromo_st_2',
     conditionType: 'recent_incident',
     severity: 'yellow',
@@ -136,16 +134,23 @@ const BASELINE_REPORTS = [
 ];
 
 async function seed() {
-  const batch = db.batch();
-  for (const { id, createdAt, lastActivityAt, ...fields } of BASELINE_REPORTS) {
-    batch.set(db.collection('reports').doc(id), {
-      ...fields,
-      uid: 'csv-seed',
-      createdAt: Timestamp.fromMillis(createdAt),
-      lastActivityAt: Timestamp.fromMillis(lastActivityAt),
-    });
-  }
-  await batch.commit();
+  const { error: delErr } = await supabase.from('reports').delete().eq('uid', 'csv-seed');
+  if (delErr) throw new Error(`Clearing previous baseline reports failed: ${delErr.message}`);
+
+  const rows = BASELINE_REPORTS.map((r) => ({
+    segment_id: r.segmentId,
+    condition_type: r.conditionType,
+    severity: r.severity,
+    title: r.title,
+    note: r.note,
+    corroboration_count: r.corroborationCount,
+    uid: 'csv-seed',
+    created_at: new Date(r.createdAt).toISOString(),
+    last_activity_at: new Date(r.lastActivityAt).toISOString(),
+  }));
+
+  const { error: insErr } = await supabase.from('reports').insert(rows);
+  if (insErr) throw new Error(`Inserting baseline reports failed: ${insErr.message}`);
 
   const red = BASELINE_REPORTS.filter((r) => r.severity === 'red');
   const yellow = BASELINE_REPORTS.filter((r) => r.severity === 'yellow');
@@ -158,7 +163,7 @@ async function seed() {
     console.log(`  ${color}${r.severity.padEnd(6)}${reset} ${bar.padEnd(5)} ${r.segmentId.padEnd(30)} "${r.title}"`);
   }
 
-  console.log(`\n✓ ${BASELINE_REPORTS.length} baseline reports seeded${useEmulator ? ' (emulator)' : ' (production)'}.`);
+  console.log(`\n✓ ${BASELINE_REPORTS.length} baseline reports seeded (Supabase).`);
   console.log(`  ${red.length} red segments · ${yellow.length} yellow segments`);
   console.log('  Re-run before demo to refresh the 24h freshness window.\n');
 }

@@ -1,26 +1,35 @@
-// Demo seeding of `reports` docs so the zone map / incident heatmap isn't empty at demo
-// (F-001/F-010). Writes real Firestore docs in the exact shape submitReport produces
-// (docs/09-data-model.md) — including the required AI-era fields (severity, corroborationCount,
-// lastActivityAt) and a title — via the Admin SDK (bypasses the deny-client-write rules).
+// Demo seeding of `reports` rows so the zone map / incident heatmap isn't empty at demo
+// (F-001/F-010). Writes rows in the exact shape submitReport produces (docs/09-data-model.md)
+// — including the required AI-era fields (severity, corroboration_count, last_activity_at) and
+// a title — to Supabase (see backend/supabase/schema.sql) instead of Firestore.
 //
 // DEMO-ONLY content: segment ids come from frontend/src/data/seed-segments.js; notes describe
 // observable, fixable conditions only (BR-001 — no crime labels, no people classification).
-// Deterministic doc ids make reruns idempotent (a rerun refreshes timestamps, no duplicates).
+// Re-runnable: clears rows with uid='demo-seed' before inserting, so reruns refresh timestamps
+// without duplicating.
 //
-// Run against the LOCAL EMULATOR (no credentials needed) — PowerShell:
-//   $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; node backend/scripts/seed-reports.mjs
-// Run against a REAL project (service-account creds, NOT committed):
-//   $env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"; node backend/scripts/seed-reports.mjs
-import { initializeApp, applicationDefault } from 'firebase-admin/app';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+// Run against the Supabase project configured in backend/server/.env:
+//   node backend/scripts/seed-reports.mjs
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { createClient } from '@supabase/supabase-js';
+// See backend/server/lib/supabase.js for why: supabase-js needs a WebSocket global (Node 22+)
+// just to construct its client, even for scripts that never open a Realtime channel.
+import WebSocket from 'ws';
 
-const useEmulator = !!process.env.FIRESTORE_EMULATOR_HOST;
-initializeApp(
-  useEmulator
-    ? { projectId: process.env.GCLOUD_PROJECT || 'demo-saferroute' }
-    : { credential: applicationDefault() },
-);
-const db = getFirestore();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.loadEnvFile?.(path.join(__dirname, '..', 'server', '.env'));
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in backend/server/.env');
+  process.exit(1);
+}
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { persistSession: false },
+  realtime: { transport: WebSocket },
+});
 
 const NOW = Date.now();
 const H = 60 * 60 * 1000;
@@ -29,7 +38,6 @@ const H = 60 * 60 * 1000;
 // entry is deliberately stale (>24h) to demo freshness decay (its segment reads "not tonight").
 const DEMO_REPORTS = [
   {
-    id: 'demo_seed_1',
     segmentId: 'seg_legarda_estero',
     conditionType: 'poor_lighting',
     severity: 'yellow',
@@ -40,7 +48,6 @@ const DEMO_REPORTS = [
     lastActivityAt: NOW - 0.5 * H,
   },
   {
-    id: 'demo_seed_2',
     segmentId: 'seg_pureza_approaches',
     conditionType: 'no_crowd',
     severity: 'yellow',
@@ -51,7 +58,6 @@ const DEMO_REPORTS = [
     lastActivityAt: NOW - 0.75 * H,
   },
   {
-    id: 'demo_seed_3',
     segmentId: 'seg_recto_legarda',
     conditionType: 'recent_incident',
     severity: 'red',
@@ -62,7 +68,6 @@ const DEMO_REPORTS = [
     lastActivityAt: NOW - 0.33 * H,
   },
   {
-    id: 'demo_seed_4',
     segmentId: 'seg_anonas_st_3',
     conditionType: 'poor_lighting',
     severity: 'yellow',
@@ -73,7 +78,6 @@ const DEMO_REPORTS = [
     lastActivityAt: NOW - 4 * H,
   },
   {
-    id: 'demo_seed_5',
     segmentId: 'seg_hipodromo_st_2',
     conditionType: 'recent_incident',
     severity: 'red',
@@ -84,7 +88,6 @@ const DEMO_REPORTS = [
     lastActivityAt: NOW - 1.5 * H,
   },
   {
-    id: 'demo_seed_6_stale',
     segmentId: 'seg_vmapa_sm',
     conditionType: 'no_crowd',
     severity: 'yellow',
@@ -97,20 +100,28 @@ const DEMO_REPORTS = [
 ];
 
 async function seed() {
-  const batch = db.batch();
-  for (const { id, createdAt, lastActivityAt, ...fields } of DEMO_REPORTS) {
-    batch.set(db.collection('reports').doc(id), {
-      ...fields,
-      uid: 'demo-seed',
-      createdAt: Timestamp.fromMillis(createdAt),
-      lastActivityAt: Timestamp.fromMillis(lastActivityAt),
-    });
-  }
-  await batch.commit();
+  const { error: delErr } = await supabase.from('reports').delete().eq('uid', 'demo-seed');
+  if (delErr) throw new Error(`Clearing previous demo reports failed: ${delErr.message}`);
+
+  const rows = DEMO_REPORTS.map((r) => ({
+    segment_id: r.segmentId,
+    condition_type: r.conditionType,
+    severity: r.severity,
+    title: r.title,
+    note: r.note,
+    corroboration_count: r.corroborationCount,
+    uid: 'demo-seed',
+    created_at: new Date(r.createdAt).toISOString(),
+    last_activity_at: new Date(r.lastActivityAt).toISOString(),
+  }));
+
+  const { error: insErr } = await supabase.from('reports').insert(rows);
+  if (insErr) throw new Error(`Inserting demo reports failed: ${insErr.message}`);
+
   for (const r of DEMO_REPORTS) {
     console.log(`${r.severity.padEnd(6)} ${r.segmentId.padEnd(24)} "${r.title}"`);
   }
-  console.log(`\nSeeded ${DEMO_REPORTS.length} demo reports${useEmulator ? ' (emulator)' : ''}.`);
+  console.log(`\nSeeded ${DEMO_REPORTS.length} demo reports (Supabase).`);
 }
 
 seed().catch((err) => {

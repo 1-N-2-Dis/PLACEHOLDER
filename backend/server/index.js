@@ -1,13 +1,15 @@
 // Express API replacing the Firebase Cloud Functions in backend/functions (F-004/F-006/F-008).
 // Deploys to Render instead of Firebase Functions — Functions v2 requires the Firebase Blaze
 // plan even at zero usage (Cloud Run/Cloud Build under the hood); a plain Node host does not.
-// Firestore + Auth stay on Firebase (Spark/free plan) — this server talks to them via the Admin
-// SDK, and verifies each request's Firebase ID token itself instead of relying on onCall's
-// built-in request.auth.
+// Firebase Auth (Spark/free plan) stays the identity/role source of truth — this server
+// verifies each request's Firebase ID token itself instead of relying on onCall's built-in
+// request.auth, and still reads the Firestore `users` collection for the isAdmin role check.
+// Reports + analytics data live in Supabase (Postgres) instead of Firestore — see
+// backend/supabase/schema.sql and lib/supabase.js.
 //
 // WHY SERVER-SIDE: the Gemini key must never ship in the client bundle (Threat T2). The
 // authenticated client calls these routes with a Firebase ID token; only this server holds the
-// Gemini key and the Firestore Admin credential.
+// Gemini key, the Firestore Admin credential, and the Supabase service_role key.
 //
 // PS: all Gemini-backed features (submitReport moderation, summarizeSegment, assessRoute) are
 // currently disabled for demo purposes, so the app responds instantly instead of waiting on the
@@ -19,8 +21,9 @@ import PDFDocument from 'pdfkit';
 import { renderBarangayBriefPdf } from './pdfReport.js';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getFirestore } from 'firebase-admin/firestore';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { supabase } from './lib/supabase.js';
 
 // Firestore Admin needs explicit credentials outside a GCP environment. Set
 // FIREBASE_SERVICE_ACCOUNT_KEY to the full JSON contents of a service account key (Firebase
@@ -38,6 +41,8 @@ if (process.env.FIRESTORE_EMULATOR_HOST) {
   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
   initializeApp({ credential: cert(serviceAccount) });
 }
+// Firestore is now used only for the `users` collection (isAdmin's role lookup below) —
+// reports/analytics reads/writes in this file all go through `supabase` instead.
 const db = getFirestore();
 const auth = getAuth();
 
@@ -55,23 +60,29 @@ const SEGMENT_NAME_MAX_LEN = 120;
 
 // Closed validity verdicts for the classify decision. Anything but 'valid' rejects the report
 // with the matching canned copy below (BR-006: the model picks a verdict, it never writes the
-// user-facing reason itself).
-const VERDICTS = ['valid', 'spam', 'mismatch', 'crime_label'];
+// user-facing reason itself). Only a troll/spam check now — the mismatch and crime_label
+// verdicts were dropped in favor of a single dangerous/cautious severity call (see DANGER_LEVELS).
+const VERDICTS = ['valid', 'spam'];
 const REJECT_REASONS = {
-  spam: 'This looks like spam or a joke submission, so it was not filed.',
-  mismatch: 'The title and note don\'t seem to describe the selected condition type. Please pick the matching condition or reword your report.',
-  crime_label: 'Reports describe observable conditions (lighting, crowds, a recent incident) — not labels for people or places. Please reword your report.',
+  spam: 'This looks like a troll, spam, or joke submission, so it was not filed.',
 };
+
+// Simple binary severity the model actually reasons about — mapped to the stored green/red
+// severity values below (DANGER_LEVEL_TO_SEVERITY) so the rest of the app (map colors, routing
+// avoidance, DB schema) keeps working against the existing SEVERITY_VALUES enum unchanged.
+const DANGER_LEVELS = ['dangerous', 'cautious'];
+const DANGER_LEVEL_TO_SEVERITY = { dangerous: 'red', cautious: 'green' };
 
 // PS: demo flag — set to false to skip every Gemini call (submitReport's classify/dedupe/reject,
 // summarizeSegment, assessRoute) and fall straight through to each route's existing cut-safe
 // fallback path instead. Flip back to true to restore all AI features.
 const AI_FEATURES_ENABLED = false;
 // No AI severity classification while disabled, so pick a plausible severity at random instead
-// of hardcoding one value for every report — weighted red-heavy since red is the rarer/urgent case.
+// of hardcoding one value for every report — weighted red-heavy since red (dangerous) is the
+// rarer/urgent case.
 const RED_SEVERITY_RATIO_WHEN_AI_DISABLED = 0.4;
 function randomSeverityWhenAiDisabled() {
-  return Math.random() < RED_SEVERITY_RATIO_WHEN_AI_DISABLED ? 'red' : 'yellow';
+  return Math.random() < RED_SEVERITY_RATIO_WHEN_AI_DISABLED ? 'red' : 'green';
 }
 
 // How close in time a new report must be to an existing one on the same segment to be eligible
@@ -183,15 +194,19 @@ app.post('/summarizeSegment', requireAuth, async (req, res) => {
   }
 
   // Read this segment's report notes (BR-006: summary is derived only from submitted reports).
-  const snap = await db
-    .collection('reports')
-    .where('segmentId', '==', segmentId)
-    .orderBy('createdAt', 'desc')
-    .limit(50)
-    .get();
+  const { data: rows, error } = await supabase
+    .from('reports')
+    .select('note, segment_id')
+    .eq('segment_id', segmentId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) {
+    console.error('Supabase read failed in /summarizeSegment:', error.message);
+    return sendError(res, 'internal', 'Could not load reports for this segment.');
+  }
 
-  const notes = snap.docs
-    .map((d) => d.get('note'))
+  const notes = rows
+    .map((r) => r.note)
     .filter((n) => typeof n === 'string' && n.trim().length > 0)
     .map((n) => n.trim());
 
@@ -206,7 +221,7 @@ app.post('/summarizeSegment', requireAuth, async (req, res) => {
     return res.json({ summary: null, count: notes.length });
   }
 
-  const segmentName = snap.docs[0].get('segmentId'); // name lives on segments; id is enough context here.
+  const segmentName = rows[0].segment_id; // name lives on segments; id is enough context here.
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
@@ -228,7 +243,7 @@ app.post('/summarizeSegment', requireAuth, async (req, res) => {
 const CLASSIFY_SCHEMA = {
   type: SchemaType.OBJECT,
   properties: {
-    severity: { type: SchemaType.STRING, format: 'enum', enum: SEVERITY_VALUES },
+    dangerLevel: { type: SchemaType.STRING, format: 'enum', enum: DANGER_LEVELS },
     duplicateOfIndex: {
       type: SchemaType.INTEGER,
       description: 'Index (1-based) into the "Existing reports" list this duplicates, or 0 if not a duplicate of any listed report.',
@@ -237,15 +252,15 @@ const CLASSIFY_SCHEMA = {
       type: SchemaType.STRING,
       format: 'enum',
       enum: VERDICTS,
-      description: 'valid = coherent condition report; spam = gibberish, joke, or implausible; mismatch = title+note do not describe the selected condition type; crime_label = title or note labels people or the place as criminal/dangerous-by-reputation instead of describing an observable, fixable condition.',
+      description: 'valid = coherent condition report; spam = a troll, joke, gibberish, or otherwise implausible submission.',
     },
   },
-  required: ['severity', 'duplicateOfIndex', 'verdict'],
+  required: ['dangerLevel', 'duplicateOfIndex', 'verdict'],
 };
 
-// Constrained prompt: classify severity from observable/fixable-condition language ONLY, decide
-// if this looks like a duplicate of one of the listed recent reports on the same segment, and
-// pick a validity verdict (valid/spam/mismatch/crime_label — see VERDICTS). Never invents an
+// Constrained prompt: classify the report as dangerous/cautious from observable/fixable-condition
+// language ONLY, decide if this looks like a duplicate of one of the listed recent reports on the
+// same segment, and flag troll/spam submissions (valid/spam — see VERDICTS). Never invents an
 // incident beyond what's in the new submission (BR-006 spirit).
 function buildClassifyPrompt(conditionType, title, note, existingReports, segmentName) {
   const existingList = existingReports.length
@@ -256,27 +271,23 @@ function buildClassifyPrompt(conditionType, title, note, existingReports, segmen
 
   return [
     'You are triaging a one-tap community safety report for a pedestrian route-safety app.',
-    'Classify the NEW report below into a severity:',
-    '- green: not too dangerous, but worth noting (e.g. minor/older condition).',
-    '- yellow: a bit dangerous — routing should prefer to avoid this if a reasonable alternative exists.',
-    '- red: dangerous — routing should actively avoid this and find a different path.',
-    'Base the severity ONLY on the observable, fixable condition described (lighting, crowd level,',
-    'recent incident) in the new report. Do NOT output or infer any crime-category, neighborhood,',
-    'or place classification — you are rating this one report, not the location or its people.',
+    'Classify the NEW report below into a danger level:',
+    '- cautious: not too dangerous, but worth noting (e.g. minor/older condition).',
+    '- dangerous: routing should actively avoid this and find a different path.',
+    'Base the danger level ONLY on the observable, fixable condition described (lighting, crowd',
+    'level, recent incident) in the new report. Do NOT output or infer any crime-category,',
+    'neighborhood, or place classification — you are rating this one report, not the location or',
+    'its people.',
     '',
     'Also decide:',
     '- Is the new report a duplicate/corroboration of one of the "Existing reports" below (same',
     '  underlying condition, reported again)? If so, give its 1-based index; otherwise 0.',
-    '- A verdict for the new report — pick exactly one:',
+    '- A troll/spam verdict for the new report — pick exactly one:',
     '  - valid: the title and note coherently describe the selected condition type in brackets.',
-    '  - mismatch: the title and note do NOT describe the selected condition type (e.g. text about',
-    '    broken streetlights while the selected condition is no_crowd, or unrelated filler text).',
-    '  - crime_label: the title or note labels people or the place itself as criminal or',
-    '    dangerous-by-reputation (e.g. "holdup area", "addicts hang out here") instead of',
-    '    describing an observable, fixable condition.',
-    '  - spam: gibberish, a joke, or an obviously false submission. Weigh both the text AND',
-    '    whether the condition is a plausible claim for the named street segment below, if given.',
-    '    Only flag genuinely implausible or garbage input, not just terse reports.',
+    '  - spam: a troll, joke, gibberish, or otherwise implausible submission — text unrelated to',
+    '    any real condition, or an obviously false claim. Weigh both the text AND whether the',
+    '    condition is a plausible claim for the named street segment below, if given. Only flag',
+    '    genuinely implausible or garbage input, not just terse or mismatched-but-sincere reports.',
     '',
     segmentName ? `Location: ${segmentName}` : null,
     `New report: [${conditionType}] "${title}" — ${note || '(no note)'}`,
@@ -330,30 +341,33 @@ app.post('/submitReport', requireAuth, async (req, res) => {
   const trimmedNote = (note || '').trim();
 
   // Step 2 — recent reports on this segment, for duplicate-detection context. Reuses the
-  // existing (segmentId ASC, createdAt DESC) composite index (backend/firestore.indexes.json).
-  const recentSnap = await db
-    .collection('reports')
-    .where('segmentId', '==', segmentId)
-    .orderBy('createdAt', 'desc')
-    .limit(10)
-    .get();
+  // (segment_id, created_at desc) index (backend/supabase/schema.sql).
+  const { data: recentRows, error: recentErr } = await supabase
+    .from('reports')
+    .select('id, condition_type, title, note, created_at')
+    .eq('segment_id', segmentId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (recentErr) {
+    console.error('Supabase read failed in /submitReport:', recentErr.message);
+    return sendError(res, 'internal', 'Could not review this report right now. Please try again.');
+  }
 
   const now = Date.now();
-  const recentDocs = recentSnap.docs.filter((d) => {
-    const createdAt = d.get('createdAt');
-    const ms = createdAt && typeof createdAt.toMillis === 'function' ? createdAt.toMillis() : null;
+  const recentDocs = recentRows.filter((r) => {
+    const ms = r.created_at ? new Date(r.created_at).getTime() : null;
     return ms !== null && now - ms <= DUPLICATE_WINDOW_MS;
   });
-  const existingReports = recentDocs.map((d) => ({
-    conditionType: d.get('conditionType'),
-    title: d.get('title'),
-    note: d.get('note'),
-    createdAt: d.get('createdAt')?.toDate?.().toISOString() ?? 'unknown time',
+  const existingReports = recentDocs.map((r) => ({
+    conditionType: r.condition_type,
+    title: r.title,
+    note: r.note,
+    createdAt: r.created_at ? new Date(r.created_at).toISOString() : 'unknown time',
   }));
 
   // Step 3 — Gemini classify/dedupe/reject call, structured JSON output.
   // PS: skipped for demo purposes while AI_FEATURES_ENABLED is false — every report is
-  // accepted as-is with a randomly assigned severity, no spam/mismatch/crime_label/duplicate checks.
+  // accepted as-is with a randomly assigned severity, no troll/spam/duplicate checks.
   let decision;
   if (!AI_FEATURES_ENABLED) {
     decision = { severity: randomSeverityWhenAiDisabled(), verdict: 'valid', duplicateOfIndex: 0 };
@@ -364,10 +378,11 @@ app.post('/submitReport', requireAuth, async (req, res) => {
       generationConfig: { responseMimeType: 'application/json', responseSchema: CLASSIFY_SCHEMA },
     });
 
+    let rawDecision;
     try {
       const prompt = buildClassifyPrompt(conditionType, trimmedTitle, trimmedNote, existingReports, segmentName);
       const result = await model.generateContent(prompt);
-      decision = JSON.parse(result.response.text());
+      rawDecision = JSON.parse(result.response.text());
     } catch (err) {
       // Never log raw note contents (potential PII, Threat T6). Log only a safe message.
       console.error('Gemini classify failed:', err.message);
@@ -375,16 +390,24 @@ app.post('/submitReport', requireAuth, async (req, res) => {
     }
 
     if (
-      !decision
-      || !SEVERITY_VALUES.includes(decision.severity)
-      || !VERDICTS.includes(decision.verdict)
-      || !Number.isInteger(decision.duplicateOfIndex)
-      || decision.duplicateOfIndex < 0
-      || decision.duplicateOfIndex > recentDocs.length
+      !rawDecision
+      || !DANGER_LEVELS.includes(rawDecision.dangerLevel)
+      || !VERDICTS.includes(rawDecision.verdict)
+      || !Number.isInteger(rawDecision.duplicateOfIndex)
+      || rawDecision.duplicateOfIndex < 0
+      || rawDecision.duplicateOfIndex > recentDocs.length
     ) {
       console.error('Gemini classify returned an invalid shape.');
       return sendError(res, 'internal', 'Could not review this report right now. Please try again.');
     }
+
+    // Map the model's dangerous/cautious call onto the stored green/red severity values so
+    // downstream storage, map colors, and routing avoidance logic stay unchanged.
+    decision = {
+      severity: DANGER_LEVEL_TO_SEVERITY[rawDecision.dangerLevel],
+      verdict: rawDecision.verdict,
+      duplicateOfIndex: rawDecision.duplicateOfIndex,
+    };
   }
 
   // Step 4 — act on the decision. Any non-valid verdict rejects with canned copy (BR-006);
@@ -394,34 +417,42 @@ app.post('/submitReport', requireAuth, async (req, res) => {
   }
 
   if (decision.duplicateOfIndex > 0) {
-    const dupDoc = recentDocs[decision.duplicateOfIndex - 1];
-    await dupDoc.ref.update({
-      corroborationCount: FieldValue.increment(1),
-      lastActivityAt: FieldValue.serverTimestamp(),
-    });
-    const updated = await dupDoc.ref.get();
+    const dupRow = recentDocs[decision.duplicateOfIndex - 1];
+    const { data: incremented, error: incErr } = await supabase
+      .rpc('increment_report_corroboration', { p_report_id: dupRow.id })
+      .single();
+    if (incErr) {
+      console.error('Supabase increment failed in /submitReport:', incErr.message);
+      return sendError(res, 'internal', 'Could not review this report right now. Please try again.');
+    }
     return res.json({
       status: 'duplicate',
-      reportId: dupDoc.id,
-      corroborationCount: updated.get('corroborationCount') ?? null,
+      reportId: dupRow.id,
+      corroborationCount: incremented?.corroboration_count ?? null,
     });
   }
 
-  const newDoc = {
-    segmentId,
-    conditionType,
+  const newRow = {
+    segment_id: segmentId,
+    condition_type: conditionType,
     title: trimmedTitle,
-    createdAt: FieldValue.serverTimestamp(),
-    lastActivityAt: FieldValue.serverTimestamp(),
     uid,
     severity: decision.severity,
-    corroborationCount: 1,
+    corroboration_count: 1,
   };
-  if (trimmedNote) newDoc.note = trimmedNote;
-  if (photoPath) newDoc.photoPath = photoPath;
+  if (trimmedNote) newRow.note = trimmedNote;
+  if (photoPath) newRow.photo_path = photoPath;
 
-  const ref = await db.collection('reports').add(newDoc);
-  res.json({ status: 'created', reportId: ref.id, severity: decision.severity });
+  const { data: inserted, error: insertErr } = await supabase
+    .from('reports')
+    .insert(newRow)
+    .select('id')
+    .single();
+  if (insertErr) {
+    console.error('Supabase insert failed in /submitReport:', insertErr.message);
+    return sendError(res, 'internal', 'Could not save this report right now. Please try again.');
+  }
+  res.json({ status: 'created', reportId: inserted.id, severity: decision.severity });
 });
 
 // Toggle the caller's like on a report (F-010: cloud size scales with real, cross-user likes,
@@ -440,17 +471,27 @@ app.post('/likeReport', requireAuth, async (req, res) => {
     return sendError(res, 'invalid-argument', 'liked must be a boolean.');
   }
 
-  const ref = db.collection('reports').doc(reportId);
-  const snap = await ref.get();
-  if (!snap.exists) {
+  const { data: existing, error: getErr } = await supabase
+    .from('reports')
+    .select('id')
+    .eq('id', reportId)
+    .maybeSingle();
+  if (getErr) {
+    console.error('Supabase read failed in /likeReport:', getErr.message);
+    return sendError(res, 'internal', 'Could not update this report right now.');
+  }
+  if (!existing) {
     return sendError(res, 'invalid-argument', 'Report not found.');
   }
 
-  await ref.update({
-    likedBy: liked ? FieldValue.arrayUnion(uid) : FieldValue.arrayRemove(uid),
-  });
-  const updated = await ref.get();
-  const likedBy = updated.get('likedBy') || [];
+  const { data: toggled, error: toggleErr } = await supabase
+    .rpc('toggle_report_like', { p_report_id: reportId, p_uid: uid, p_liked: liked })
+    .single();
+  if (toggleErr) {
+    console.error('Supabase toggle failed in /likeReport:', toggleErr.message);
+    return sendError(res, 'internal', 'Could not update this report right now.');
+  }
+  const likedBy = toggled?.liked_by || [];
   res.json({ status: 'ok', reportId, likeCount: likedBy.length, liked: likedBy.includes(uid) });
 });
 
@@ -506,23 +547,27 @@ app.post('/assessRoute', requireAuth, async (req, res) => {
   for (const { segmentId, segmentName } of routeSegments) {
     // eslint-disable-next-line no-await-in-loop -- bounded by MAX_ROUTE_SEGMENTS, same
     // per-segment query shape as submitReport's dedup lookup above (reuses the existing index).
-    const snap = await db
-      .collection('reports')
-      .where('segmentId', '==', segmentId)
-      .orderBy('createdAt', 'desc')
-      .limit(1)
-      .get();
-    if (snap.empty) continue;
-    const doc = snap.docs[0];
-    const activityAt = doc.get('lastActivityAt') || doc.get('createdAt');
-    const ms = activityAt && typeof activityAt.toMillis === 'function' ? activityAt.toMillis() : null;
+    const { data: rows, error } = await supabase
+      .from('reports')
+      .select('condition_type, severity, note, created_at, last_activity_at')
+      .eq('segment_id', segmentId)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (error) {
+      console.error('Supabase read failed in /assessRoute:', error.message);
+      continue;
+    }
+    if (!rows || rows.length === 0) continue;
+    const row = rows[0];
+    const activityAt = row.last_activity_at || row.created_at;
+    const ms = activityAt ? new Date(activityAt).getTime() : null;
     if (ms === null || now - ms > FRESHNESS_WINDOW_MS) continue; // stale — not "tonight"
     activeReports.push({
       segmentName,
-      conditionType: doc.get('conditionType'),
-      severity: doc.get('severity') || 'red',
-      note: doc.get('note'),
-      createdAt: doc.get('createdAt')?.toDate?.().toISOString() ?? 'unknown time',
+      conditionType: row.condition_type,
+      severity: row.severity || 'red',
+      note: row.note,
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : 'unknown time',
     });
   }
 
@@ -569,14 +614,18 @@ function locationToDocId(location) {
 // in a single compound read. No auth required — public, cache-controlled.
 app.get('/api/v1/analytics/dashboard', async (req, res) => {
   try {
-    // Read both collections in parallel.
-    const [cacheSnap, statsDoc] = await Promise.all([
-      db.collection('barangay_analytics_cache').get(),
-      db.collection('platform_transparency_stats').doc('global').get(),
+    // Read both tables in parallel.
+    const [cacheResult, statsResult] = await Promise.all([
+      supabase.from('barangay_analytics_cache').select('*'),
+      supabase.from('platform_transparency_stats').select('*').eq('id', 'global').maybeSingle(),
     ]);
+    if (cacheResult.error) throw cacheResult.error;
+    if (statsResult.error) throw statsResult.error;
+    const cacheRows = cacheResult.data;
+    const statsRow = statsResult.data;
 
     // Guard: cache not yet seeded.
-    if (cacheSnap.empty) {
+    if (!cacheRows || cacheRows.length === 0) {
       return res.status(503).json({
         error: 'cache_empty',
         message: 'Analytics cache has not been compiled yet. Run backend/scripts/compile-analytics.mjs first.',
@@ -595,9 +644,8 @@ app.get('/api/v1/analytics/dashboard', async (req, res) => {
       total_weighted_reports: 0,
     };
 
-    const zones = cacheSnap.docs.map((doc) => {
-      const d = doc.data();
-      const m = d.metrics || {};
+    const zones = cacheRows.map((row) => {
+      const m = row.metrics || {};
       totals.poor_lighting_count += m.poor_lighting_count || 0;
       totals.unsafe_infrastructure_count += m.unsafe_infrastructure_count || 0;
       totals.low_foot_traffic_count += m.low_foot_traffic_count || 0;
@@ -612,10 +660,10 @@ app.get('/api/v1/analytics/dashboard', async (req, res) => {
       // React dashboard can show a tooltip or expandable card per zone without a
       // second round-trip.
       return {
-        location: d.location,
-        last_updated: d.last_updated,
+        location: row.location,
+        last_updated: row.last_updated,
         metrics: m,
-        executive_summary: d.ai_analysis?.executive_summary ?? null,
+        executive_summary: row.ai_analysis?.executive_summary ?? null,
       };
     });
 
@@ -627,7 +675,7 @@ app.get('/api/v1/analytics/dashboard', async (req, res) => {
       return sumB - sumA;
     });
 
-    const platform = statsDoc.exists ? statsDoc.data() : null;
+    const platform = statsRow ? (({ id, ...rest }) => rest)(statsRow) : null;
 
     res.set('Cache-Control', 'public, max-age=300'); // 5-min browser cache — safe for static data
     res.json({ zones, totals, platform });
@@ -642,9 +690,14 @@ app.get('/api/v1/analytics/dashboard', async (req, res) => {
 // and users can verify the dataset is real and moderated. O(1) single-document read.
 app.get('/api/v1/transparency/stats', async (req, res) => {
   try {
-    const doc = await db.collection('platform_transparency_stats').doc('global').get();
+    const { data: row, error } = await supabase
+      .from('platform_transparency_stats')
+      .select('*')
+      .eq('id', 'global')
+      .maybeSingle();
+    if (error) throw error;
 
-    if (!doc.exists) {
+    if (!row) {
       return res.status(503).json({
         error: 'cache_empty',
         message: 'Transparency stats have not been compiled yet. Run backend/scripts/compile-analytics.mjs first.',
@@ -652,8 +705,9 @@ app.get('/api/v1/transparency/stats', async (req, res) => {
       });
     }
 
+    const { id, ...stats } = row;
     res.set('Cache-Control', 'public, max-age=300');
-    res.json({ stats: doc.data() });
+    res.json({ stats });
   } catch (err) {
     console.error('GET /api/v1/transparency/stats failed:', err.message);
     sendError(res, 'internal', 'Could not load transparency stats.');
@@ -672,22 +726,27 @@ app.get('/api/v1/analytics/download-pdf', isAdmin, async (req, res) => {
 
   const docId = locationToDocId(location);
 
-  let cacheDoc;
+  let data;
   try {
-    cacheDoc = await db.collection('barangay_analytics_cache').doc(docId).get();
+    const { data: row, error } = await supabase
+      .from('barangay_analytics_cache')
+      .select('*')
+      .eq('location_id', docId)
+      .maybeSingle();
+    if (error) throw error;
+    data = row;
   } catch (err) {
-    console.error('GET /api/v1/analytics/download-pdf Firestore read failed:', err.message);
+    console.error('GET /api/v1/analytics/download-pdf Supabase read failed:', err.message);
     return sendError(res, 'internal', 'Could not retrieve zone data.');
   }
 
-  if (!cacheDoc.exists) {
+  if (!data) {
     return res.status(404).json({
       error: 'not_found',
       message: `No analytics cache found for location "${location}". Run compile-analytics.mjs first, or check the location name.`,
     });
   }
 
-  const data = cacheDoc.data();
   const metrics = data.metrics || {};
   const analysis = data.ai_analysis || {};
   const mitigations = Array.isArray(analysis.actionable_mitigations) ? analysis.actionable_mitigations : [];
@@ -725,34 +784,38 @@ app.get('/api/v1/admin/reports/summary', isAdmin, async (req, res) => {
       200, // hard ceiling — no unbounded reads
     );
 
-    let query = db.collection('reports').orderBy('createdAt', 'desc').limit(pageSize);
+    let query = supabase.from('reports').select('*').order('created_at', { ascending: false }).limit(pageSize);
 
-    // Cursor: if `after` doc id is supplied, start after that document.
+    // Cursor: if `after` id is supplied, page strictly before that report's created_at
+    // (keyset pagination — the Postgres equivalent of Firestore's startAfter(doc)).
     if (req.query.after && typeof req.query.after === 'string') {
-      const cursorDoc = await db.collection('reports').doc(req.query.after).get();
-      if (cursorDoc.exists) {
-        query = query.startAfter(cursorDoc);
+      const { data: cursorRow } = await supabase
+        .from('reports')
+        .select('created_at')
+        .eq('id', req.query.after)
+        .maybeSingle();
+      if (cursorRow) {
+        query = query.lt('created_at', cursorRow.created_at);
       }
     }
 
-    const snap = await query.get();
-    const reports = snap.docs.map((d) => {
-      const data = d.data();
-      return {
-        id: d.id,
-        segmentId: data.segmentId,
-        conditionType: data.conditionType,
-        severity: data.severity || null,
-        title: data.title,
-        note: data.note || null,
-        corroborationCount: data.corroborationCount || 1,
-        uid: data.uid,
-        createdAt: data.createdAt?.toDate?.().toISOString() ?? null,
-        lastActivityAt: data.lastActivityAt?.toDate?.().toISOString() ?? null,
-      };
-    });
+    const { data: rows, error } = await query;
+    if (error) throw error;
 
-    const lastId = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1].id : null;
+    const reports = rows.map((row) => ({
+      id: row.id,
+      segmentId: row.segment_id,
+      conditionType: row.condition_type,
+      severity: row.severity || null,
+      title: row.title,
+      note: row.note || null,
+      corroborationCount: row.corroboration_count || 1,
+      uid: row.uid,
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+      lastActivityAt: row.last_activity_at ? new Date(row.last_activity_at).toISOString() : null,
+    }));
+
+    const lastId = rows.length > 0 ? rows[rows.length - 1].id : null;
     res.json({ reports, count: reports.length, nextCursor: lastId });
   } catch (err) {
     console.error('GET /api/v1/admin/reports/summary failed:', err.message);
@@ -771,35 +834,18 @@ app.delete('/api/v1/admin/reports/:id', isAdmin, async (req, res) => {
   }
 
   try {
-    await db.runTransaction(async (tx) => {
-      const reportRef = db.collection('reports').doc(reportId);
-      const reportSnap = await tx.get(reportRef);
-
-      if (!reportSnap.exists) {
-        const e = new Error('not_found');
-        e.code = 'not_found';
-        throw e;
-      }
-
-      // Hard-delete the report. Admin SDK bypasses Firestore rules; delete is also
-      // explicitly allowed for admins in firestore.rules (allow delete: if isAdmin()).
-      tx.delete(reportRef);
-
-      // Decrement total_community_reports_processed atomically.
-      // merge:true ensures the stats doc is created if it doesn't exist yet.
-      const statsRef = db.collection('platform_transparency_stats').doc('global');
-      tx.set(
-        statsRef,
-        { total_community_reports_processed: FieldValue.increment(-1) },
-        { merge: true },
-      );
-    });
+    // delete_report_and_decrement (backend/supabase/schema.sql) does the delete + the
+    // total_community_reports_processed decrement atomically in one Postgres function call —
+    // the equivalent of the Firestore transaction this replaced. Admins may delete (F-009
+    // moderation) but never edit report content — moderation is remove-only.
+    const { data: deleted, error } = await supabase.rpc('delete_report_and_decrement', { p_report_id: reportId });
+    if (error) throw error;
+    if (!deleted) {
+      return res.status(404).json({ error: 'not_found', message: `Report "${reportId}" not found.` });
+    }
 
     res.json({ status: 'deleted', reportId });
   } catch (err) {
-    if (err.code === 'not_found') {
-      return res.status(404).json({ error: 'not_found', message: `Report "${reportId}" not found.` });
-    }
     console.error('DELETE /api/v1/admin/reports/:id failed:', err.message);
     sendError(res, 'internal', 'Could not delete report.');
   }
@@ -869,7 +915,8 @@ app.post('/api/v1/admin/compile-analytics', isAdmin, async (req, res) => {
 
   try {
     // Step 1 — read all reports and bucket by zone.
-    const reportsSnap = await db.collection('reports').get();
+    const { data: reportRows, error: reportsErr } = await supabase.from('reports').select('*');
+    if (reportsErr) throw reportsErr;
 
     const buckets = {};
     for (const zone of ANALYTICS_ZONES) {
@@ -892,26 +939,26 @@ app.post('/api/v1/admin/compile-analytics', isAdmin, async (req, res) => {
     let spamCount = 0;
     let dupCount = 0;
 
-    for (const d of reportsSnap.docs) {
-      if (d.get('verdict') === 'spam') { spamCount++; continue; }
-      const corr = d.get('corroborationCount') || 1;
+    for (const row of reportRows) {
+      if (row.verdict === 'spam') { spamCount++; continue; }
+      const corr = row.corroboration_count || 1;
       if (corr > 1) dupCount += corr - 1;
-      const segId = d.get('segmentId') || '';
-      const locField = d.get('location');
+      const segId = row.segment_id || '';
+      const locField = row.location;
       const zone = (locField && ANALYTICS_ZONES.includes(locField))
         ? locField
         : (SEGMENT_ZONE_MAP[segId] || (segId.startsWith('seg_osm_') ? 'Sta. Mesa' : null));
       if (!zone) continue;
-      const key = COND_TO_METRIC[d.get('conditionType')] || 'other_scams_count';
+      const key = COND_TO_METRIC[row.condition_type] || 'other_scams_count';
       buckets[zone][key] += corr;
       totalReports += corr;
-      const note = d.get('note');
+      const note = row.note;
       if (note && typeof note === 'string' && note.trim()) buckets[zone].notes.push(note.trim());
     }
 
-    // Step 2 — Gemini analysis per active zone, batch write cache.
+    // Step 2 — Gemini analysis per active zone, batch upsert cache.
     const genAI = aiEnabled ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
-    const writeBatch = db.batch();
+    const cacheUpserts = [];
     let aiCallsMade = 0;
     const activeZoneNames = ANALYTICS_ZONES.filter((z) => {
       const b = buckets[z];
@@ -970,7 +1017,8 @@ app.post('/api/v1/admin/compile-analytics', isAdmin, async (req, res) => {
       }
 
       const docId = locationToDocId(zone);
-      writeBatch.set(db.collection('barangay_analytics_cache').doc(docId), {
+      cacheUpserts.push({
+        location_id: docId,
         location: zone,
         last_updated: new Date().toISOString(),
         metrics: {
@@ -986,16 +1034,23 @@ app.post('/api/v1/admin/compile-analytics', isAdmin, async (req, res) => {
       });
     }
 
-    await writeBatch.commit();
+    const { error: upsertErr } = await supabase
+      .from('barangay_analytics_cache')
+      .upsert(cacheUpserts, { onConflict: 'location_id' });
+    if (upsertErr) throw upsertErr;
 
     // Step 3 — write transparency stats.
-    await db.collection('platform_transparency_stats').doc('global').set({
-      total_community_reports_processed: totalReports,
-      ai_moderation_rejections_spam: spamCount,
-      duplicate_corroborations_merged: dupCount,
-      generated_barangay_briefs_count: ANALYTICS_ZONES.length,
-      last_processed_timestamp: new Date().toISOString(),
-    });
+    const { error: statsErr } = await supabase
+      .from('platform_transparency_stats')
+      .upsert({
+        id: 'global',
+        total_community_reports_processed: totalReports,
+        ai_moderation_rejections_spam: spamCount,
+        duplicate_corroborations_merged: dupCount,
+        generated_barangay_briefs_count: ANALYTICS_ZONES.length,
+        last_processed_timestamp: new Date().toISOString(),
+      }, { onConflict: 'id' });
+    if (statsErr) throw statsErr;
 
     res.json({
       status: 'compiled',

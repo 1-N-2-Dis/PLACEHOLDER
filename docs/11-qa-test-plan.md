@@ -32,9 +32,11 @@
   2026-07-02 (ADR-0002)** — `PHOTO_UPLOAD_ENABLED = false`; TC-023/024/025/027 are currently N/A
   (nothing to exercise) and become live again only if Storage is re-enabled under Blaze.
 - F-008 AI-assessed "is my route safe tonight?" for the recommended route (`assessRoute`).
-- Security: Firestore rules (client `create` on `reports` denied — F-006; closed enum / no
-  crime-label BR-001 now enforced in `submitReport`'s code), Storage rules (F-007), routing graph
-  asset load (no client-side key exists — ADR-0003), Gemini key server-side only.
+- Security: Supabase RLS (client `insert` on `reports` denied — F-006, moved from Firestore Rules
+  per ADR-0004; closed enum / no crime-label BR-001 now enforced in `submitReport`'s code),
+  Firestore rules (`users/{uid}` only, ADR-0004), Storage rules (F-007), routing graph asset load
+  (no client-side key exists — ADR-0003), Gemini key server-side only, Supabase `service_role` key
+  server-side only (ADR-0004).
 - Negative/edge: empty zone, stale flags, offline, red-segment-unavoidable, AI rejection.
 
 ### Out of scope
@@ -134,16 +136,21 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Steps:** Request the structured summary for that segment.
 - **Expected:** One structured summary; overlapping reports merged; every claim traces to an input note — no incident/fact absent from inputs. If F-004 cut, UJ-003 degrades to raw flag list (mark N/A and verify the fallback).
 
-### TC-007 — Firestore rules reject ANY direct client write to `reports` ⭐DEMO-CRITICAL
+### TC-007 — RLS rejects ANY direct client write to `reports` ⭐DEMO-CRITICAL
 - **Covers:** BR-005 (superseded semantics — see note)
-- **Preconditions:** New `firestore.rules` deployed (only after `submitReport` is verified — see
-  the design doc's Testing approach); emulator or live project.
+- **Preconditions (updated 2026-07-08, ADR-0004):** `backend/supabase/schema.sql` applied to the
+  live Supabase project (`reports` has RLS enabled, `SELECT`-only policy, no insert/update/delete
+  policy for `anon`/`authenticated`).
 - **Steps:** From the browser console (signed in or signed out), attempt a direct
-  `addDoc(collection(db,'reports'), {...})` write, bypassing `submitReport` entirely.
-- **Expected:** Write rejected (permission denied) regardless of auth state or payload shape — the
-  only path that can write a report is `backend/server`'s `submitReport` route. This replaces the original
-  TC-007/TC-008 (which tested auth-gating and enum-validation on a *direct* client write; that
-  validation now lives in `submitReport`'s code — see TC-017/TC-021 for its coverage).
+  `supabase.from('reports').insert({...})` write using the anon-key client, bypassing
+  `submitReport` entirely.
+- **Expected:** Write rejected (RLS policy violation) regardless of auth state or payload shape —
+  the only path that can write a report is `backend/server`'s `submitReport` route (via the
+  `service_role` key, which bypasses RLS). This replaces the original TC-007/TC-008 (which tested
+  auth-gating and enum-validation on a *direct* client write; that validation now lives in
+  `submitReport`'s code — see TC-017/TC-021 for its coverage). Prior to ADR-0004 this test targeted
+  a direct Firestore `addDoc` write and `backend/firestore.rules`; the assertion (server-only
+  write) is unchanged, only the mechanism (RLS vs. Firestore Rules) and target database moved.
 
 ### TC-008 — `submitReport` rejects non-enum conditionType / oversized note / bad title
 - **Covers:** BR-001, F-006
@@ -151,7 +158,8 @@ TC-016 (offline), TC-019 (red-segment-unavoidable), TC-022 (AI rejects spam/fals
 - **Steps:** Call `submitReport` with (a) `conditionType` outside the closed enum, (b) a `note`
   over 280 chars, (c) a `photoPath` not under the caller's own `reports/{uid}/` prefix, (d) a
   missing/empty `title`, (e) a `title` over 60 chars.
-- **Expected:** All five rejected with `invalid-argument`, nothing written to Firestore.
+- **Expected:** All five rejected with `invalid-argument`, nothing written to Supabase (moved from
+  Firestore, ADR-0004).
 
 ### TC-009 — Stale flag treated as not "tonight"
 - **Covers:** F-003, BR-004 (edge)

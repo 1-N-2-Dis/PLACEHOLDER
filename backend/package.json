@@ -6,10 +6,18 @@
   "scripts": {
     "seed": "node scripts/seed-segments.mjs",
     "seed:users": "node scripts/seed-auth-users.mjs",
-    "seed:reports": "node scripts/seed-reports.mjs"
+    "seed:reports": "node scripts/seed-reports.mjs",
+    "seed:heatmap": "node scripts/seed-heatmap-baseline.mjs",
+    "db:schema": "node scripts/apply-supabase-schema.mjs",
+    "db:import-csv": "node scripts/import-csv-to-supabase.mjs",
+    "compile:analytics": "node scripts/compile-analytics.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
-    "firebase-admin": "^13.0.1"
+    "@supabase/supabase-js": "^2.110.1",
+    "csv-parse": "^7.0.1",
+    "firebase-admin": "^13.0.1",
+    "pg": "^8.22.0",
+    "ws": "^8.21.0"
   }
 }

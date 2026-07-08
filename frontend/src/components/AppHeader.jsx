@@ -22,9 +22,10 @@ const NAV_LINKS = [
 export default function AppHeader({ onBrandClick }) {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
-  // Separate from the mock-auth `user` above: this reflects the real Firebase Auth session
-  // (see lib/useAuthUser.js) that backend/firestore.rules' isAdmin() check relies on. Sign in at
-  // /login with the seeded admin account (backend/scripts/seed-auth-users.mjs) to see the admin button.
+  // Both `user` above and `role` here read the same real Firebase Auth session now — `role`
+  // just adds the users/{uid} Firestore role lookup (lib/useAuthUser.js) that
+  // backend/firestore.rules' isAdmin() check relies on. Log in with the seeded admin account
+  // (backend/scripts/seed-auth-users.mjs) to see the admin button.
   const { role } = useAuthUser();
   const navigate = useNavigate();
 

@@ -29,13 +29,13 @@ until the loser is reconciled.
 | Change history · pivots · naming · what is TRUE vs UNVALIDATED | [POSTMORTEM](POSTMORTEM.md) | append-only change/decision log; the anti-hallucination anchor. If history disagrees, this wins |
 | Competition rules · timeline · judging rubric · pitch format | [Hackathon Context](00-hackathon-context.md) | SparkFest 2026 brief; owns the rubric weights, the 5-min pitch + 15-min Q&A format, the Google-tech + community-sector requirements |
 | Vision · problem · who it's for | [idea.md](./idea.md) | the brief; origin of the `F-###` spine (F-001..F-008 MVP, F-101..F-103 final) |
-| What we build (features `F-###`, journeys `UJ-###`, business rules `BR-###`) | [PRD](03-prd.md) | stable IDs; F-001..F-011 (F-011 added 2026-07-08 post-interview — quick-dial 911), UJ-001..004, BR-001..008 (BR-002 amended 2026-07-08) |
-| How it's built (architecture, components, **map/routing stack**, server-side writes) | [System Design](06-system-design.md) | owns MapLibre/OpenFreeMap + the client-side Rust/WASM routing engine (ADR-0003, replaces ORS) + the `submitReport`/`assessRoute` design |
-| Data schema · entities · Storage objects · Firestore rules shape | [Data Model](09-data-model.md) | segment/report fields, `severity`/`photoPath`, indexes |
+| What we build (features `F-###`, journeys `UJ-###`, business rules `BR-###`) | [PRD](03-prd.md) | stable IDs; F-001..F-008, UJ-001..004, BR-001..008 |
+| How it's built (architecture, components, **map/routing stack**, server-side writes) | [System Design](06-system-design.md) | owns MapLibre/OpenFreeMap + the client-side Rust/WASM routing engine (ADR-0003, replaces ORS) + the `submitReport`/`assessRoute` design + the Firestore/Supabase data-store split (ADR-0004) |
+| Data schema · entities · Storage objects · Firestore rules shape · **Supabase tables/RLS shape** | [Data Model](09-data-model.md) | segment/report fields, `severity`/`photoPath`, indexes; reports/analytics tables now live in Supabase (ADR-0004) — `users`/Auth stay Firestore |
 | Tests · traceability (every `F-###` → ≥1 test) | [QA Test Plan](11-qa-test-plan.md) | TC-001..TC-030; the traceability home |
-| Security · auth/authz · secrets · compliance · privacy | [Security & Compliance](12-security-compliance.md) | 5 network surfaces incl. Firebase Storage (F-007); threats T1–T7 |
+| Security · auth/authz · secrets · compliance · privacy | [Security & Compliance](12-security-compliance.md) | 5 network surfaces incl. Firebase Storage (F-007); threats T1–T7; Supabase service_role/anon key posture (ADR-0004) |
 | Evidence · research leads (`said/did/paid`, tiered) | [Evidence Register](evidence-register.md) | desk research + seed-pin hypotheses; not validation |
-| Significant decisions (the *why*) | [ADRs](adr/) | append-only; supersede, never edit. Map stack = ADR-0001; hosting/compute split (Vercel + Render, Storage disabled) = ADR-0002; client-side WASM routing (replaces ORS) = ADR-0003 |
+| Significant decisions (the *why*) | [ADRs](adr/) | append-only; supersede, never edit. Map stack = ADR-0001; hosting/compute split (Vercel + Render, Storage disabled) = ADR-0002; client-side WASM routing (replaces ORS) = ADR-0003; reports/analytics move to Supabase, Firestore keeps Auth/`users` = ADR-0004 |
 | Pitch · narrative · **BMC** · Q&A ownership map · interview probe sheet | [Pitch Kit](analysis/alex-pitch-kit.md) | the filled-in pitch; Alex owns. The BMC lives in §2 |
 | Pitch **method** / VC-deck-building playbook (re-weighted to the rubric) | [Pitch Deck Playbook](analysis/pitch-deck-playbook.md) | method only — the filled-in instance is the Pitch Kit |
 | Mentor guidance (Jerico + Troy), reconciled | [Mentor Synthesis](analysis/mentor-synthesis.md) | tie-broken decisions incl. the F-005 "2 routes" call |
@@ -57,12 +57,12 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
 | Hackathon Context | [00-hackathon-context.md](00-hackathon-context.md) | current — SparkFest 2026 brief, rubric, format | 2026-07-06 |
 | Idea brief | [idea.md](./idea.md) | draft (schema 1.1.0) | 2026-07-01 |
 | PRD | [03-prd.md](03-prd.md) | draft | 2026-07-01 |
-| System Design | [06-system-design.md](06-system-design.md) | draft (MapLibre + client-side WASM routing + server-side writes) | 2026-07-06 |
-| Data Model | [09-data-model.md](09-data-model.md) | draft | 2026-07-01 |
+| System Design | [06-system-design.md](06-system-design.md) | draft (MapLibre + client-side WASM routing + server-side writes; reports/analytics on Supabase, ADR-0004) | 2026-07-08 |
+| Data Model | [09-data-model.md](09-data-model.md) | draft (reports/analytics tables on Supabase, ADR-0004) | 2026-07-08 |
 | QA Test Plan | [11-qa-test-plan.md](11-qa-test-plan.md) | draft | 2026-07-01 |
-| Security & Compliance | [12-security-compliance.md](12-security-compliance.md) | draft | 2026-07-01 |
+| Security & Compliance | [12-security-compliance.md](12-security-compliance.md) | draft (Supabase service_role/anon key posture, ADR-0004) | 2026-07-08 |
 | Evidence Register | [evidence-register.md](evidence-register.md) | draft | 2026-06-30 |
-| ADRs | [adr/](adr/) | ADR-0001, ADR-0002, ADR-0003 accepted | 2026-07-06 |
+| ADRs | [adr/](adr/) | ADR-0001, ADR-0002, ADR-0003, ADR-0004 accepted | 2026-07-08 |
 | Pitch Kit (narrative, **BMC**, 5-min script, Q&A map, probe sheet) | [analysis/alex-pitch-kit.md](analysis/alex-pitch-kit.md) | current — Alex owns | 2026-07-06 |
 | Pitch Deck Playbook (VC method → rubric) | [analysis/pitch-deck-playbook.md](analysis/pitch-deck-playbook.md) | current — method | 2026-07-06 |
 | Mentor Synthesis (Jerico + Troy) | [analysis/mentor-synthesis.md](analysis/mentor-synthesis.md) | current | 2026-07-06 |
@@ -80,17 +80,28 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
 
 - [ ] Every `F-###` (F-001..F-011) in the PRD has ≥ 1 test in the QA plan (consistency-checker T1). **Gap: F-011 has no QA test yet — frontend-only, to be added.**
 - [ ] No doc restates a fact owned by another (§0 respected) — esp. the map/routing stack.
-- [ ] Every network-exposed surface declares auth/authz: Firestore (client writes denied, F-006),
-      Firebase Auth, routing graph asset (keyless static file, ADR-0003 — no ORS key exists
-      anymore), Gemini key (server-side, on `backend/server`/Render as of ADR-0002),
-      `FIREBASE_SERVICE_ACCOUNT_KEY` (server-side, new in ADR-0002),
-      Firebase Storage (F-007 — disabled, ADR-0002; rules kept but unwired).
+- [ ] Every network-exposed surface declares auth/authz: Firestore (`users`/Auth only as of
+      ADR-0004; client writes denied), Firebase Auth, routing graph asset (keyless static file,
+      ADR-0003 — no ORS key exists anymore), Gemini key (server-side, on `backend/server`/Render
+      as of ADR-0002), `FIREBASE_SERVICE_ACCOUNT_KEY` (server-side, new in ADR-0002),
+      Firebase Storage (F-007 — disabled, ADR-0002; rules kept but unwired), Supabase
+      `service_role` key (server-side only, ADR-0004; bypasses RLS — never ships to the client),
+      Supabase `anon` key (public, RLS-gated to read-only on every table).
 - [ ] Google-technology requirement satisfied (Firebase + Gemini) — do not remove both.
 - [ ] Open items tracked: freshness window (24h constant, revisit); photo bystander-privacy (T7).
       (ORS key restriction is no longer an open item — resolved by elimination, ADR-0003.)
 
 ## 3. Known consistency gaps (flagged, not silently carried)
 
+- **Resolved (2026-07-08) — reports/analytics move to Supabase; Firestore keeps Auth/`users`
+  (ADR-0004):** `reports`, `barangay_analytics_cache`, and `platform_transparency_stats` moved
+  from Firestore to Supabase (Postgres) — see `backend/supabase/schema.sql`. Firebase Auth and the
+  Firestore `users/{uid}.role` lookup (`isAdmin`) are unchanged, so the Google-technology
+  requirement (Firebase + Gemini) is unaffected. `docs/06-system-design.md`, `docs/09-data-model.md`,
+  and `docs/12-security-compliance.md` were reconciled to this decision on 2026-07-08.
+  Client-side admin report delete moved from a direct Firestore call (gated by Firestore Rules) to
+  the existing `isAdmin`-guarded backend route, because Supabase RLS cannot evaluate a Firebase ID
+  token — see ADR-0004's "Auth boundary" note.
 - **Resolved (2026-07-06) — client-side WASM routing replaces OpenRouteService (ADR-0003):**
   point-to-point routing (F-005) moved from OpenRouteService to a client-side Rust/WASM engine
   (A* over a preprocessed 20km pedestrian graph, `frontend/public/graph/pup-20km.bin`, running in
