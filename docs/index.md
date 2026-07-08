@@ -78,7 +78,7 @@ Data Model, QA, and Security docs mention it in one line and link there. Change 
 
 ## 2. Health check (run before calling the suite "done")
 
-- [ ] Every `F-###` (F-001..F-008) in the PRD has ≥1 test in the QA plan (consistency-checker T1).
+- [ ] Every `F-###` (F-001..F-011) in the PRD has ≥ 1 test in the QA plan (consistency-checker T1). **Gap: F-011 has no QA test yet — frontend-only, to be added.**
 - [ ] No doc restates a fact owned by another (§0 respected) — esp. the map/routing stack.
 - [ ] Every network-exposed surface declares auth/authz: Firestore (`users`/Auth only as of
       ADR-0004; client writes denied), Firebase Auth, routing graph asset (keyless static file,

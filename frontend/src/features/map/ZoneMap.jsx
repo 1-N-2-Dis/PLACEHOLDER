@@ -25,8 +25,8 @@ import DestinationMarker from './DestinationMarker.jsx';
 import RouteLayer from './RouteLayer.jsx';
 import ReportHeatmap from './ReportHeatmap.jsx';
 import SafeHeatmap from './SafeHeatmap.jsx';
-import RouteCheck from '../route-check/RouteCheck.jsx';
-import RiskSummary from '../risk-summary/RiskSummary.jsx';
+import BubblePopup from './BubblePopup.jsx';
+import SosButton from './SosButton.jsx';
 import { OwlyMapLoader, OwlyRouteNotifyLoading } from './MapLoading.jsx';
 
 const INITIAL_A = [ZONE_CENTER.lat, ZONE_CENTER.lng];
@@ -528,10 +528,13 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
         )}
       </div>
 
-      <div className="bottom-center-overlay">
-        <RouteCheck hasRoute={!!selectedRouteCoords} onRouteSegments={onRouteSegments} />
-        <RiskSummary segments={segments} selectedId={selectedId} reports={reports} />
-      </div>
+      <BubblePopup
+        segments={segments}
+        selectedId={selectedId}
+        reports={reports}
+      />
+
+      <SosButton />
     </div>
   );
 }

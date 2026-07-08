@@ -17,6 +17,7 @@ const CATEGORIES = [
   {
     id: 'before',
     label: 'Before you travel',
+    description: 'Prepare before leaving home. Learn how to plan safer routes, check reports, and avoid risky areas.',
     Icon: Clock,
     iconClass: 'tip-cat-icon-before',
     iconColor: 'var(--primary)',
@@ -30,6 +31,7 @@ const CATEGORIES = [
   {
     id: 'during',
     label: 'During travel',
+    description: 'Stay alert while commuting. Discover habits that help you stay aware and react quickly.',
     Icon: Eye,
     iconClass: 'tip-cat-icon-during',
     iconColor: 'var(--sev-green-fg)',
@@ -43,6 +45,7 @@ const CATEGORIES = [
   {
     id: 'situations',
     label: 'Handling situations',
+    description: 'Know what to do during emergencies. Step-by-step guidance for harassment, theft, and unsafe encounters.',
     Icon: Lightbulb,
     iconClass: 'tip-cat-icon-situations',
     iconColor: 'var(--sev-yellow-fg)',
@@ -56,6 +59,7 @@ const CATEGORIES = [
   {
     id: 'transport',
     label: 'Transport-specific',
+    description: 'Safety advice for every commute. Learn best practices for LRT, MRT, jeepneys, buses, tricycles, and ride-hailing.',
     Icon: Train,
     iconClass: 'tip-cat-icon-transport',
     iconColor: 'var(--pink)',
@@ -71,10 +75,19 @@ const CATEGORIES = [
 export default function SafetyTipsPage() {
   const [tipIdx, setTipIdx] = useState(0);
   const [activeCategory, setActiveCategory] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   function nextTip() {
-    setTipIdx(i => (i + 1) % OWLY_TIPS.length);
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setTimeout(() => {
+      setTipIdx(i => (i + 1) % OWLY_TIPS.length);
+      setIsAnimating(false);
+    }, 500); // Wait for CSS animation to finish
   }
+
+  const currentTip = OWLY_TIPS[tipIdx];
+  const nextTipText = OWLY_TIPS[(tipIdx + 1) % OWLY_TIPS.length];
 
   return (
     <div className="page-scroll">
@@ -83,70 +96,85 @@ export default function SafetyTipsPage() {
 
       <div className="page-scroll-inner">
 
-        {/* Tip categories */}
-        <div className="tip-categories-accordion mb-24">
-          {CATEGORIES.map(({ id, label, Icon, iconClass, iconColor, tips }) => {
+        {/* Featured Owly Tip Card Deck */}
+        <div className={`featured-tip-deck-container mb-32 ${isAnimating ? 'is-animating' : ''}`}>
+          
+          {/* Bottom Card (Next Tip Preview) */}
+          <div className="featured-tip-card card-bottom" aria-hidden="true">
+            <GradientBlobs opacity={0.6} variant="tips" />
+            <TriangleMesh />
+            <div className="featured-tip-content">
+              <div className="featured-tip-header">
+                <span className="featured-tip-badge">Tip {((tipIdx + 1) % OWLY_TIPS.length) + 1} of {OWLY_TIPS.length}</span>
+              </div>
+              <h2 className="featured-tip-title">GuidHer Safety Tip</h2>
+              <p className="featured-tip-text">{nextTipText}</p>
+              <button className="btn featured-tip-btn mt-16" disabled tabIndex="-1">
+                Next Tip <ChevronRight size={16} />
+              </button>
+            </div>
+            <div className="featured-tip-owly">
+              <Owly size={160} pose="protect" className="owly-shadow" />
+            </div>
+          </div>
+
+          {/* Top Card (Current Tip) */}
+          <div className="featured-tip-card card-top">
+            <GradientBlobs opacity={0.6} variant="tips" />
+            <TriangleMesh />
+            <div className="featured-tip-content">
+              <div className="featured-tip-header">
+                <span className="featured-tip-badge">Tip {tipIdx + 1} of {OWLY_TIPS.length}</span>
+              </div>
+              <h2 className="featured-tip-title">GuidHer Safety Tip</h2>
+              <p className="featured-tip-text">{currentTip}</p>
+              <button className="btn featured-tip-btn mt-16" onClick={nextTip} disabled={isAnimating}>
+                Next Tip <ChevronRight size={16} />
+              </button>
+            </div>
+            <div className="featured-tip-owly">
+              <Owly size={160} pose="protect" className="owly-shadow" />
+            </div>
+          </div>
+
+        </div>
+
+        {/* Tip Categories Cards */}
+        <div className="tip-categories-grid mb-32">
+          {CATEGORIES.map(({ id, label, description, Icon, iconClass, iconColor, tips }) => {
             const isOpen = activeCategory === id;
             return (
-              <div key={id} className="card" style={{ 
-                padding: 0, 
-                marginBottom: 12, 
-                overflow: 'hidden',
-                borderColor: isOpen ? iconColor : 'var(--line)',
-                transition: 'all 0.3s ease'
-              }}>
-                <button
-                  type="button"
-                  aria-expanded={isOpen}
-                  onClick={() => setActiveCategory(isOpen ? null : id)}
-                  style={{
-                    width: '100%', border: 'none', font: 'inherit', textAlign: 'left',
-                    padding: '16px',
-                    margin: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    cursor: 'pointer',
-                    background: isOpen ? `color-mix(in srgb, ${iconColor} 8%, transparent)` : 'transparent',
-                    transition: 'background 0.3s ease'
-                  }}
-                >
-                  <span className={`tip-cat-icon ${iconClass}`} style={{ margin: 0 }}>
-                    <Icon size={18} color={iconColor} />
-                  </span>
-                  <span style={{ flex: 1, fontWeight: 700, color: isOpen ? iconColor : 'var(--ink)', transition: 'color 0.2s' }}>{label}</span>
-                  <ChevronRight size={20} color={isOpen ? iconColor : 'var(--muted)'} style={{ transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'all 0.3s ease' }} />
-                </button>
+              <div key={id} className={`tip-category-card ${isOpen ? 'open' : ''}`} style={{ '--cat-color': iconColor }}>
                 <div 
-                  style={{ 
-                    display: 'grid', 
-                    gridTemplateRows: isOpen ? '1fr' : '0fr', 
-                    transition: 'grid-template-rows 0.3s ease-out' 
-                  }}
+                  className="tip-category-header" 
+                  onClick={() => setActiveCategory(isOpen ? null : id)}
+                  role="button"
+                  aria-expanded={isOpen}
                 >
-                  <div style={{ overflow: 'hidden' }}>
-                    <div className="tips-list" style={{ padding: '12px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12, opacity: isOpen ? 1 : 0, transition: 'opacity 0.3s ease-out', transitionDelay: isOpen ? '0.1s' : '0s' }}>
+                  <div className="tip-category-header-top">
+                    <span className={`tip-cat-icon ${iconClass}`}>
+                      <Icon size={24} color={iconColor} />
+                    </span>
+                    <span className="tip-cat-badge">{tips.length} Tips</span>
+                  </div>
+                  <h3 className="tip-cat-title">{label}</h3>
+                  <p className="tip-cat-desc">{description}</p>
+                  <div className="tip-cat-cta">
+                    {isOpen ? 'Close Guide' : 'Read Guide'} <ChevronRight size={16} className="tip-cat-chevron" />
+                  </div>
+                </div>
+
+                <div className="tip-category-content-wrapper" style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}>
+                  <div className="tip-category-content-inner">
+                    <div className="tips-list">
                       {tips.map(tip => (
-                        <div
-                          key={tip.title}
-                          className="tip-item-modern"
-                          style={{
-                            '--tip-accent': iconColor,
-                            display: 'flex',
-                            gap: '14px',
-                            alignItems: 'flex-start',
-                            background: 'var(--bg)',
-                            padding: '16px',
-                            borderRadius: '16px',
-                            border: '1px solid var(--line)',
-                          }}
-                        >
-                          <div style={{ padding: '6px', background: 'var(--surface)', borderRadius: '10px', display: 'flex', flexShrink: 0 }}>
+                        <div key={tip.title} className="tip-item-modern">
+                          <div className="tip-item-icon">
                             <CheckCircle2 size={18} color={iconColor} />
                           </div>
                           <div>
-                            <div className="tip-title" style={{ fontSize: '0.98rem', fontWeight: 600, color: 'var(--ink)', marginBottom: '4px', letterSpacing: '-0.01em' }}>{tip.title}</div>
-                            <div className="tip-body" style={{ fontSize: '0.88rem', color: 'var(--muted)', lineHeight: 1.55 }}>{tip.body}</div>
+                            <div className="tip-title">{tip.title}</div>
+                            <div className="tip-body">{tip.body}</div>
                           </div>
                         </div>
                       ))}
@@ -156,20 +184,6 @@ export default function SafetyTipsPage() {
               </div>
             );
           })}
-        </div>
-
-        {/* Owly tip of the day */}
-        <div className="owly-tip-card" style={{ marginBottom: 28 }}>
-          <div className="owly-tip-text">
-            <div className="label">Owly's tip of the day</div>
-            <div className="tip">{OWLY_TIPS[tipIdx]}</div>
-            <button className="btn btn-sm btn-glass mt-12" onClick={nextTip}>
-              <RefreshCw size={13} /> Next tip
-            </button>
-          </div>
-          <div style={{ marginTop: -30, marginBottom: -30, marginRight: -10 }}>
-            <Owly size={140} pose="protect" className="owly-shadow" />
-          </div>
         </div>
 
         {/* Footer note */}

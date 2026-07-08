@@ -20,6 +20,35 @@ import { PHOTO_UPLOAD_ENABLED } from '../../lib/storage.js';
 import LocationStep from './steps/LocationStep.jsx';
 import DetailsStep from './steps/DetailsStep.jsx';
 import PhotoStep from './steps/PhotoStep.jsx';
+import { CheckCircle2, ShieldCheck } from 'lucide-react';
+
+function ReportProgress({ currentStep }) {
+  const steps = [
+    { num: 1, label: 'Location' },
+    { num: 2, label: 'Condition' },
+    { num: 3, label: 'Details' },
+    { num: 4, label: 'Submit' }
+  ];
+
+  return (
+    <div className="report-progress">
+      {steps.map(step => {
+        let status = '';
+        if (currentStep > step.num) status = 'completed';
+        else if (currentStep === step.num) status = 'current';
+
+        return (
+          <div key={step.num} className={`report-progress-step ${status}`}>
+            <div className="report-progress-dot">
+              {status === 'completed' ? <CheckCircle2 size={18} /> : step.num}
+            </div>
+            <span className="report-progress-label">{step.label}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function ReportForm({ segments, selectedId, onSelect }) {
   const [conditionType, setConditionType] = useState(null);
@@ -27,16 +56,20 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
   const [note, setNote] = useState('');
   const [photoFile, setPhotoFile] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState(null); // { status: 'created'|'duplicate'|'rejected', ... } | { status: 'error', msg }
+  const [result, setResult] = useState(null);
 
   const canSubmit = !!selectedId && !!conditionType && title.trim().length > 0 && note.trim().length > 0;
+
+  let currentStep = 1;
+  if (selectedId) currentStep = 2;
+  if (selectedId && conditionType) currentStep = 3;
+  if (canSubmit) currentStep = 4;
 
   async function submit() {
     if (!canSubmit) return;
     setBusy(true);
     setResult(null);
     try {
-      // Dynamic road pins (seg_osm_*) aren't in the seeded list — their name is encoded in the id.
       const segmentName = segments.find((s) => s.segmentId === selectedId)?.name
         ?? parseRoadSegmentId(selectedId)?.name;
       const outcome = await submitReportForReview({
@@ -58,10 +91,35 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
   }
 
   return (
-    <section className="report-form">
-      <h2 style={{ textAlign: 'center', marginBottom: 8 }}>Report a condition</h2>
+    <section className="report-form-container">
+      <ReportProgress currentStep={currentStep} />
+
+      {result && result.status === 'created' && (
+        <div className="report-section-card" style={{ border: '1px solid var(--primary)' }}>
+          <p className="status-ok mb-0">Report filed ({result.severity}). Thanks — others can see it now.</p>
+        </div>
+      )}
+      {result && result.status === 'duplicate' && (
+        <div className="report-section-card">
+          <p className="status-ok mb-0">
+            Merged with an existing report — thanks for confirming
+            {typeof result.corroborationCount === 'number' ? ` (${result.corroborationCount} reports now)` : ''}.
+          </p>
+        </div>
+      )}
+      {result && result.status === 'rejected' && (
+        <div className="report-section-card">
+          <p className="status-err mb-0">Not filed: {result.reason}</p>
+        </div>
+      )}
+      {result && result.status === 'error' && (
+        <div className="report-section-card">
+          <p className="status-err mb-0">{result.msg}</p>
+        </div>
+      )}
 
       <LocationStep segments={segments} segmentId={selectedId} onSelect={onSelect} />
+      
       <DetailsStep
         conditionType={conditionType}
         onConditionChange={setConditionType}
@@ -70,27 +128,23 @@ export default function ReportForm({ segments, selectedId, onSelect }) {
         note={note}
         onNoteChange={setNote}
       />
+      
       {PHOTO_UPLOAD_ENABLED && <PhotoStep photoFile={photoFile} onChange={setPhotoFile} />}
 
-      <button type="button" className="btn btn-primary btn-full" disabled={busy || !canSubmit} onClick={submit}>
-        {busy ? <span className="spinner" /> : 'Submit report'}
-      </button>
-
-      {result && result.status === 'created' && (
-        <p className="status-ok">Report filed ({result.severity}). Thanks — others can see it now.</p>
-      )}
-      {result && result.status === 'duplicate' && (
-        <p className="status-ok">
-          Merged with an existing report — thanks for confirming
-          {typeof result.corroborationCount === 'number' ? ` (${result.corroborationCount} reports now)` : ''}.
-        </p>
-      )}
-      {result && result.status === 'rejected' && (
-        <p className="status-err">Not filed: {result.reason}</p>
-      )}
-      {result && result.status === 'error' && (
-        <p className="status-err">{result.msg}</p>
-      )}
+      <div className="report-section-card report-submit-card">
+        <div className="report-section-header" style={{ justifyContent: 'center' }}>
+          <div className="report-section-icon">
+            <ShieldCheck size={24} />
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <h3 className="report-section-title">Review & Submit</h3>
+            <p className="report-section-desc">Your report helps protect other commuters.</p>
+          </div>
+        </div>
+        <button type="button" className="btn-full btn-submit-gradient" disabled={busy || !canSubmit} onClick={submit}>
+          {busy ? <span className="spinner" /> : 'Submit Community Report'}
+        </button>
+      </div>
     </section>
   );
 }

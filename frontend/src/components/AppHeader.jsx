@@ -70,8 +70,8 @@ export default function AppHeader({ onBrandClick }) {
           onClick={() => navigate('/profile')}
           aria-label="My profile"
         >
-          <User size={16} />
-          <span>{user?.name?.split(' ')[0] || 'Profile'}</span>
+          <User className="nav-profile-icon" />
+          <span className="nav-profile-name">{user?.name?.split(' ')[0] || 'Profile'}</span>
         </button>
       </div>
     </header>

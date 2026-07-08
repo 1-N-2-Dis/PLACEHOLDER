@@ -14,9 +14,10 @@ group chats. It serves women students (18–24) at PUP Main Campus, and trans wo
 same zone, who today have no reliable way to know which stretches of their commute are dangerous
 before they set out.
 
-> Status: draft / provisional MVP for SparkFest elimination (July 2). Demand is unvalidated —
-> all evidence is third-party desk research, no first-party interviews or paid commitment yet.
-> Scope, segment, and payer story to be re-validated after July 2.
+> Status: draft / provisional MVP for SparkFest elimination (July 2). **F-011 (quick-dial 911)
+> was added post-interview** — first-party user interviews surfaced this need after the initial
+> draft; BR-002 amended accordingly (2026-07-08). All other demand remains unvalidated
+> third-party desk research. Scope, segment, and payer story to be re-validated after July 2.
 
 ## Architecture
 React + Vite single-page web app, served from **Vercel** (moved off Firebase Hosting — ADR-0002).
@@ -71,14 +72,19 @@ report submission with no fallback.
   AI-assigned only, never user-selectable. Enforce report shape in `submitReport`'s code (Rules no
   longer validate it — F-006).
 - Patterns to avoid: any free-text "crime label" / neighborhood classification field; any copy or
-  UI implying rescue, SOS, or dispatch; shipping the Gemini key to the client; **emoji anywhere in
-  the UI (icons or copy)** — use `lucide-react` components for every icon need instead (condition
-  types, severity, status badges, etc.).
+  UI implying GuidHer itself provides rescue, SOS dispatch, or in-the-moment intervention (a
+  passive `tel:911` quick-dial shortcut is permitted per BR-002 amendment — see F-011 in
+  `docs/03-prd.md`); shipping the Gemini key to the client; **emoji anywhere in the UI (icons or
+  copy)** — use `lucide-react` components for every icon need instead (condition types, severity,
+  status badges, etc.).
 
 ## Non-negotiable product/build rules (from PRD business rules)
 - **BR-001 — Conditions only.** Reports describe fixable/observable conditions (lighting, crowd,
   recent incident). NO neighborhood crime-zone profiling, ever — not rendered, not stored.
-- **BR-002 — No rescue.** No real-time rescue / SOS / dispatch promise anywhere in UI or copy.
+- **BR-002 — Quick-dial only, no in-app rescue.** No in-app real-time rescue / SOS dispatch
+  system / emergency-tracking promise anywhere in UI or copy. **Amended (2026-07-08):** a
+  passive `tel:911` quick-dial shortcut (F-011) is permitted — it hands off to the device dialer
+  and makes no in-app rescue promise. Must include a misclick-protection dialog.
 - **BR-003 — Single zone.** Coverage is the one PUP Sta. Mesa commute zone. No metro-wide expansion.
 - **BR-004 — Typed + timestamped flags.** Every report carries a condition type and a timestamp so
   "tonight"/freshness can be computed for the pre-trip check (F-003).
@@ -115,7 +121,7 @@ report submission with no fallback.
 - No secrets committed; report writes are server-side + auth-gated; routing has no client-side key
   at all (ADR-0003); the Gemini key and `FIREBASE_SERVICE_ACCOUNT_KEY` are server-side only
   (Render); Firestore rules deployed (Storage rules N/A while disabled — ADR-0002).
-- Business rules verified end-to-end (no SOS copy, single zone, condition-only data, EXIF stripped).
+- Business rules verified end-to-end (no in-app SOS system, single zone, condition-only data, EXIF stripped).
 - Docs updated when behavior changes — and the Docs consistency check below is run.
 
 ## Docs consistency check (all agents: Kiro, Claude, Cursor, Gemini)
@@ -134,7 +140,7 @@ When you edit any spec doc, before you finish:
    tests / traceability → `docs/11-qa-test-plan.md`; decisions → `docs/adr/`.
 3. If your edit restated a fact owned by another doc and now disagrees, fix it: update the
    canonical owner (if it's a real decision change) or replace the restatement with a link.
-4. Spot-check invariants: every `F-###` (F-001..F-008) still has ≥1 QA test; every network surface
+4. Spot-check invariants: every `F-###` (F-001..F-011) still has ≥ 1 QA test; every network surface
    (Firestore, Auth, Gemini key, Storage) declares auth/authz; the Google-tech requirement
    is still satisfied (Firebase + Gemini not both removed); no doc reintroduces "Google Maps" or
    "OpenRouteService" as the map/routing stack (both superseded — see ADR-0001/ADR-0003).
