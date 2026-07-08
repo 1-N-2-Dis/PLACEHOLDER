@@ -1,4 +1,4 @@
-// One-time seeding of 3 demo accounts (F-009: 1 admin, 2 end users) for trying out the
+// One-time seeding of 4 demo accounts (F-009: 2 admin, 2 end users) for trying out the
 // login/signup + admin moderation flow.
 // Role: create the Auth users AND their users/{uid} Firestore role doc (Admin SDK bypasses
 // backend/firestore.rules, which is the only way to set role: 'admin' — see firestore.rules).
@@ -18,6 +18,8 @@ const DEMO_PASSWORD = 'Passw0rd!';
 
 const ACCOUNTS = [
   { email: 'admin@gmail.com', role: 'admin' },
+  // Easy-to-remember login for demo day — same password as the email's local part.
+  { email: 'adminadmin@gmail.com', role: 'admin', password: 'adminadmin' },
   { email: 'user1@gmail.com', role: 'user' },
   { email: 'user2@gmail.com', role: 'user' },
 ];
@@ -31,22 +33,25 @@ initializeApp(
 const auth = getAuth();
 const db = getFirestore();
 
-async function upsertAccount({ email, role }) {
+// Idempotent: re-running always pins the account to its intended password + role, even if the
+// account already exists (e.g. was previously created via self-signup with a different password,
+// which is exactly how admin@gmail.com got stuck with role:'user' on prod before).
+async function upsertAccount({ email, role, password = DEMO_PASSWORD }) {
   let user;
   try {
     user = await auth.getUserByEmail(email);
   } catch {
-    user = await auth.createUser({ email, password: DEMO_PASSWORD, emailVerified: true });
+    user = await auth.createUser({ email, password, emailVerified: true });
   }
+  await auth.updateUser(user.uid, { password, emailVerified: true });
   await db.collection('users').doc(user.uid).set({ email, role });
-  console.log(`${role.padEnd(5)} ${email} (uid: ${user.uid})`);
+  console.log(`${role.padEnd(5)} ${email} / ${password} (uid: ${user.uid})`);
 }
 
 async function seed() {
   for (const account of ACCOUNTS) {
     await upsertAccount(account);
   }
-  console.log(`\nDemo password for all 3 accounts: ${DEMO_PASSWORD}`);
 }
 
 seed().catch((err) => {

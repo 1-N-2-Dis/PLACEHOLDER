@@ -1,19 +1,16 @@
 // Analytics batch-compilation pipeline for GuidHer.
-// Role: pull active `reports` docs → aggregate condition counts per zone → issue a single
-// structured Gemini prompt per zone → write results to `barangay_analytics_cache` and
-// `platform_transparency_stats`. This is the ONLY place Gemini is called for analytics;
-// all public API routes read the cached output at O(1) without touching the AI model.
+// Role: pull active `reports` rows from Supabase → aggregate condition counts per zone → issue a
+// single structured Gemini prompt per zone → write results to `barangay_analytics_cache` and
+// `platform_transparency_stats` (Supabase tables — see backend/supabase/schema.sql). This is the
+// ONLY place Gemini is called for analytics; all public API routes read the cached output at
+// O(1) without touching the AI model.
 //
 // Designed to run:
-//   (a) Manually before a demo — PowerShell emulator:
-//         $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; $env:GEMINI_API_KEY="<key>"
-//         node backend/scripts/compile-analytics.mjs
-//   (b) Manually against real Firestore (Render / production):
-//         $env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"
+//   (a) Manually before a demo:
 //         $env:GEMINI_API_KEY="<key>"
 //         node backend/scripts/compile-analytics.mjs
-//   (c) As the last step in the Docker seed chain — docker-compose.yml passes
-//       GEMINI_API_KEY from the host env, so this is opt-in (blank key → AI_ENABLED=false).
+//   (b) As the last step in a seed chain — GEMINI_API_KEY from the host env is opt-in (blank
+//       key → AI_ENABLED=false, placeholder Taglish copy is written instead).
 //
 // Free-tier guard: Gemini is called at most once per zone (25 max), in series with a 2-second
 // delay between requests, so we never exceed the free-tier RPM cap during a seeding run.
@@ -21,21 +18,31 @@
 // BR-001: no crime labels in any generated copy. The system instruction enforces conditions-only
 // language (lighting, visibility, crowds) — same constraint as submitReport's classify prompt.
 // BR-006: Gemini never invents data; it structures only the aggregated counts passed to it.
-import { initializeApp, applicationDefault } from 'firebase-admin/app';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { createClient } from '@supabase/supabase-js';
+// See backend/server/lib/supabase.js for why: supabase-js needs a WebSocket global (Node 22+)
+// just to construct its client, even for scripts that never open a Realtime channel.
+import WebSocket from 'ws';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Initialisation
 // ─────────────────────────────────────────────────────────────────────────────
 
-const useEmulator = !!process.env.FIRESTORE_EMULATOR_HOST;
-initializeApp(
-  useEmulator
-    ? { projectId: process.env.GCLOUD_PROJECT || 'demo-saferroute' }
-    : { credential: applicationDefault() },
-);
-const db = getFirestore();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.loadEnvFile?.(path.join(__dirname, '..', 'server', '.env'));
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in backend/server/.env');
+  process.exit(1);
+}
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { persistSession: false },
+  realtime: { transport: WebSocket },
+});
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const AI_ENABLED = !!GEMINI_API_KEY;
@@ -141,13 +148,13 @@ const SEGMENT_TO_ZONE = {
   seg_hipodromo_st_7: 'Hipodromo',
 };
 
-function resolveZone(doc) {
+function resolveZone(row) {
   // If the report was submitted with a location field (future field), prefer it.
-  const loc = doc.get('location');
+  const loc = row.location;
   if (loc && ZONES.includes(loc)) return loc;
 
   // Fall back to segmentId prefix mapping.
-  const segId = doc.get('segmentId') || '';
+  const segId = row.segment_id || '';
   if (SEGMENT_TO_ZONE[segId]) return SEGMENT_TO_ZONE[segId];
 
   // Dynamic segment ids: seg_osm_<lat>_<lng>_<slug> — assign to Sta. Mesa as generic zone.
@@ -157,9 +164,10 @@ function resolveZone(doc) {
 }
 
 async function fetchAndBucketReports() {
-  console.log('  Fetching all reports from Firestore...');
-  const snap = await db.collection('reports').get();
-  const total = snap.size;
+  console.log('  Fetching all reports from Supabase...');
+  const { data: rows, error } = await supabase.from('reports').select('*');
+  if (error) throw new Error(`Fetching reports failed: ${error.message}`);
+  const total = rows.length;
   console.log(`  ${total} reports found.`);
 
   // zone name → { poor_lighting_count, unsafe_infrastructure_count, low_foot_traffic_count,
@@ -179,17 +187,17 @@ async function fetchAndBucketReports() {
   let spam_count = 0;
   let duplicate_count = 0;
 
-  for (const doc of snap.docs) {
-    const conditionType = doc.get('conditionType');
-    const corroboration = doc.get('corroborationCount') || 1;
-    const note = doc.get('note');
-    const verdict = doc.get('verdict'); // present on AI-moderated reports
+  for (const row of rows) {
+    const conditionType = row.condition_type;
+    const corroboration = row.corroboration_count || 1;
+    const note = row.note;
+    const verdict = row.verdict; // present on AI-moderated reports
 
     // Count platform transparency stats.
     if (verdict === 'spam') { spam_count++; continue; } // excluded from zone counts
     if (corroboration > 1) duplicate_count += corroboration - 1;
 
-    const zone = resolveZone(doc);
+    const zone = resolveZone(row);
     if (!zone) continue;
 
     const metricKey = CONDITION_TO_METRIC[conditionType] || 'other_scams_count';
@@ -306,10 +314,9 @@ async function analyzeZoneWithGemini(genAI, location, metrics) {
 // Cache writers
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function writeAnalyticsCache(location, metrics, aiAnalysis, batchRef) {
-  const docId = locationToDocId(location);
-  const ref = db.collection('barangay_analytics_cache').doc(docId);
-  batchRef.set(ref, {
+function buildAnalyticsCacheRow(location, metrics, aiAnalysis) {
+  return {
+    location_id: locationToDocId(location),
     location,
     last_updated: new Date().toISOString(),
     metrics: {
@@ -322,19 +329,19 @@ async function writeAnalyticsCache(location, metrics, aiAnalysis, batchRef) {
       executive_summary: aiAnalysis.executive_summary,
       actionable_mitigations: aiAnalysis.actionable_mitigations,
     },
-  });
-  return docId;
+  };
 }
 
 async function writeTransparencyStats(stats) {
-  const ref = db.collection('platform_transparency_stats').doc('global');
-  await ref.set({
+  const { error } = await supabase.from('platform_transparency_stats').upsert({
+    id: 'global',
     total_community_reports_processed: stats.total,
     ai_moderation_rejections_spam: stats.spam_count,
     duplicate_corroborations_merged: stats.duplicate_count,
     generated_barangay_briefs_count: stats.briefs_generated,
     last_processed_timestamp: new Date().toISOString(),
-  });
+  }, { onConflict: 'id' });
+  if (error) throw new Error(`Writing platform_transparency_stats failed: ${error.message}`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -354,9 +361,9 @@ async function compile() {
   console.log(`\n  Active zones (have reports): ${activeZones.length}`);
   console.log(`  Empty zones (no reports yet): ${emptyZones.length}`);
 
-  // Step 2 — call Gemini for each active zone, write all results in a batch.
+  // Step 2 — call Gemini for each active zone, upsert all results in one batch.
   const genAI = AI_ENABLED ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
-  const batch = db.batch();
+  const cacheRows = [];
   let aiCallCount = 0;
   let briefsGenerated = 0;
 
@@ -387,14 +394,17 @@ async function compile() {
       aiAnalysis = buildPlaceholderAnalysis(zone, hasData);
     }
 
-    await writeAnalyticsCache(zone, metrics, aiAnalysis, batch);
+    cacheRows.push(buildAnalyticsCacheRow(zone, metrics, aiAnalysis));
     briefsGenerated++;
   }
 
-  // Commit all 25 zone cache documents in a single batch write.
-  console.log('\n  Committing analytics cache to Firestore...');
-  await batch.commit();
-  console.log(`  ✓ ${briefsGenerated} barangay_analytics_cache documents written.`);
+  // Upsert all 25 zone cache rows in one call.
+  console.log('\n  Committing analytics cache to Supabase...');
+  const { error: upsertErr } = await supabase
+    .from('barangay_analytics_cache')
+    .upsert(cacheRows, { onConflict: 'location_id' });
+  if (upsertErr) throw new Error(`Upserting barangay_analytics_cache failed: ${upsertErr.message}`);
+  console.log(`  ✓ ${briefsGenerated} barangay_analytics_cache rows written.`);
 
   // Step 3 — write platform transparency stats.
   console.log('  Writing platform_transparency_stats...');
@@ -411,7 +421,6 @@ async function compile() {
   console.log(`  Active zones analysed:      ${activeZones.length}`);
   console.log(`  Gemini calls made:          ${aiCallCount}`);
   console.log(`  Briefs written to cache:    ${briefsGenerated}`);
-  console.log(`  Mode:                       ${useEmulator ? 'emulator' : 'production'}`);
   console.log(`  AI:                         ${AI_ENABLED ? 'enabled' : 'disabled (no GEMINI_API_KEY)'}`);
   console.log('');
 }

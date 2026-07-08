@@ -32,3 +32,24 @@ export async function callApi(path, payload) {
   }
   return body;
 }
+
+// DELETE variant — used by admin moderation (reports.js deleteReport). Reports/analytics data
+// now lives in Supabase, whose Row Level Security has no visibility into Firebase Auth sessions
+// (Auth intentionally stayed on Firebase), so the anon key can never be authorized to delete
+// directly. Every write, including this one, goes through backend/server (service_role key),
+// same as submitReport/likeReport above.
+export async function callApiDelete(path) {
+  const user = await ensureSignedIn();
+  const token = await user.getIdToken();
+
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const body = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error((body && body.message) || `Request to ${path} failed (${res.status}).`);
+  }
+  return body;
+}

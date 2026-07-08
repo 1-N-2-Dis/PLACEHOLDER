@@ -9,12 +9,17 @@
 
 export const FRESHNESS_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-// Normalize a Firestore Timestamp | Date | millis to epoch millis. Returns null if absent.
+// Normalize a Firestore Timestamp | Date | millis | ISO string (Supabase timestamptz) to epoch
+// millis. Returns null if absent.
 export function toMillis(createdAt) {
   if (!createdAt) return null;
   if (typeof createdAt.toMillis === 'function') return createdAt.toMillis();
   if (createdAt instanceof Date) return createdAt.getTime();
   if (typeof createdAt === 'number') return createdAt;
+  if (typeof createdAt === 'string') {
+    const ms = new Date(createdAt).getTime();
+    return Number.isNaN(ms) ? null : ms;
+  }
   return null;
 }
 

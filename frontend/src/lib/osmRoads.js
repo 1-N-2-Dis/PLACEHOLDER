@@ -17,6 +17,13 @@ import { haversineMeters, MAX_SNAP_METERS } from './segmentSnap.js';
 
 export const ROAD_COVERAGE_RADIUS_M = 20000;
 
+// The OpenMapTiles `transportation` layer also carries non-road ways — rail/transit lines, ferry
+// routes, aerialways. Any consumer adding a road-query layer over this source-layer should apply
+// this filter so those ways neither render nor accept a snap (e.g. a road under an elevated rail
+// line, like Magsaysay Blvd under LRT-2, shouldn't pick up the rail line's name).
+export const NON_ROAD_CLASSES = ['rail', 'transit', 'ferry', 'aerialway'];
+export const ROAD_FILTER = ['!', ['in', ['get', 'class'], ['literal', NON_ROAD_CLASSES]]];
+
 // Pixel half-size of the queryRenderedFeatures box around a tap. Generous on purpose: the box
 // only gathers candidate roads — the MAX_SNAP_METERS check below is what actually rejects taps.
 const QUERY_BOX_PX = 30;

@@ -306,7 +306,7 @@ function SignupView({ onBack, onDone, onLogin, backLabel = 'home' }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setBusy(true); setErr('');
-    try { await register({ name: form.name, email: form.email, campus: form.campus, commutePrefs: form.commutePrefs }); onDone(); }
+    try { await register({ name: form.name, email: form.email, password: form.password, campus: form.campus, commutePrefs: form.commutePrefs }); onDone(); }
     catch (ex) { setErr(ex.message); }
     finally { setBusy(false); }
   }

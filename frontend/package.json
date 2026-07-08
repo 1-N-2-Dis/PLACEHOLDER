@@ -11,6 +11,7 @@
     "build:wasm": "wasm-pack build rust/router --target web --out-dir ../../src/wasm/router && node -e \"require('fs').rmSync('src/wasm/router/.gitignore',{force:true})\""
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.1",
     "firebase": "^11.1.0",
     "lucide-react": "^0.469.0",
     "maplibre-gl": "^5.24.0",

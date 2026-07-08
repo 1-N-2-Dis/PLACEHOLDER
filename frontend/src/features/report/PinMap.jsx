@@ -17,18 +17,11 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { useRef, useState, useCallback } from 'react';
 import Map, { Marker, NavigationControl, Layer } from 'react-map-gl/maplibre';
 import { ZONE_CENTER, ZONE_ZOOM, getMapStyle, PHILIPPINES_BOUNDS } from '../../lib/maps.js';
-import { isWithinCoverage, snapToRenderedRoad, makeRoadSegmentId } from '../../lib/osmRoads.js';
+import { isWithinCoverage, snapToRenderedRoad, makeRoadSegmentId, ROAD_FILTER } from '../../lib/osmRoads.js';
 import { useTheme } from '../../lib/theme.jsx';
 
 const ROAD_LAYER_ID = 'pin-roads';
 const NAME_LAYER_ID = 'pin-road-names';
-
-// The OpenMapTiles `transportation` layer also carries non-road ways — rail/transit lines,
-// ferry routes, aerialways. Exclude them from both layers so they neither render purple nor
-// accept a snap, and so a road under an elevated rail line (e.g. Magsaysay Blvd under LRT-2)
-// can't pick up the rail line's name.
-const NON_ROAD_CLASSES = ['rail', 'transit', 'ferry', 'aerialway'];
-const ROAD_FILTER = ['!', ['in', ['get', 'class'], ['literal', NON_ROAD_CLASSES]]];
 
 const HINTS = {
   coverage: 'Outside the coverage area (20 km around PUP Sta. Mesa).',
