@@ -1241,6 +1241,15 @@ textarea.form-input { min-height: 80px; resize: vertical; }
 .route-condition-chip { font-size: 0.72rem; padding: 3px 10px; border-radius: 99px; background: var(--surface); color: var(--muted); }
 .route-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
+.owly-tip-card {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 18px; padding: 24px; display: flex; gap: 18px; align-items: center;
+  margin-bottom: 28px; color: #fff;
+}
+.owly-tip-text { flex: 1; }
+.owly-tip-text .label { font-size: 0.75rem; font-weight: 700; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.owly-tip-text .tip { font-size: 0.95rem; line-height: 1.55; }
+
 /* ── Tips Page Redesign ── */
 
 /* Featured Tip Card Deck Wrapper */
