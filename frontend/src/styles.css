@@ -40,7 +40,7 @@
   --radius-full: 999px;
   /* typography */
   --font-display: 'Baloo 2', 'Outfit', sans-serif;
-  --grid-line: rgba(75, 46, 131, 0.09);
+  --grid-line: rgba(75, 46, 131, 0.17);
   /* layout */
   --bottom-nav-h: 58px;
 }
@@ -68,7 +68,7 @@
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.28);
   --shadow-md: 0 4px 20px rgba(0,0,0,0.32);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
-  --grid-line: rgba(255, 255, 255, 0.09);
+  --grid-line: rgba(255, 255, 255, 0.14);
 }
 
 * { box-sizing: border-box; }
@@ -93,7 +93,7 @@ body {
 }
 
 /* ── Layout shell ── */
-.app { display: flex; flex-direction: column; height: 100vh; }
+.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 .app-main { display: flex; flex: 1; min-height: 0; overflow: hidden; }
 .map-pane { flex: 1 1 100%; min-height: 420px; }
 /* When the map page is active, app-main should not clip or add bottom padding */
@@ -167,14 +167,14 @@ textarea.form-input { min-height: 80px; resize: vertical; }
 /* ── Navigation ── */
 .app-nav {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 20px; background: var(--card); border-bottom: 1px solid var(--line);
+  padding: 12px 32px; background: var(--card); border-bottom: 1px solid var(--line);
   position: sticky; top: 0; z-index: 100;
   box-shadow: var(--shadow-sm);
 }
 .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
-.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
 .app-nav-brand-btn { display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; padding: 0; }
-.app-nav-brand-btn .brand-wordmark { font-size: 1.2rem; }
+.app-nav-brand-btn .brand-wordmark { font-size: 1.25rem; }
 .nav-icon-btn { padding: 6px 8px; }
 .nav-profile-btn { padding: 6px 10px; display: flex; align-items: center; gap: 6px; }
 .nav-profile-btn span { font-size: 0.82rem; font-weight: 600; }

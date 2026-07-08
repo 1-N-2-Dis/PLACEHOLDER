@@ -408,7 +408,7 @@ function SignupView({ onBack, onDone, onLogin }) {
 }
 
 // ── Full landing page ─────────────────────────────────────────────────────────
-function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest, guestBusy }) {
+function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest }) {
   const heroRef = useRevealOnScroll();
   const featuresRef = useRevealOnScroll();
   const howItWorksRef = useRevealOnScroll();
@@ -445,8 +445,8 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest, guestBus
             <button className="btn btn-primary btn-lg" onClick={onSignup}>
               <Users size={18} /> Join GuidHer
             </button>
-            <button className="btn btn-secondary btn-lg" onClick={onGuest} disabled={guestBusy}>
-              {guestBusy ? <span className="spinner" /> : <><Map size={18} /> View Safety Map</>}
+            <button className="btn btn-secondary btn-lg" onClick={onGuest}>
+              <Map size={18} /> View Safety Map
             </button>
           </div>
           <div className="hero-stats">
@@ -607,10 +607,9 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest, guestBus
 }
 
 // ── Root export ───────────────────────────────────────────────────────────────
-export default function WelcomePage({ onEnter, onEnterProfile }) {
-  const [view, setView] = useState('landing');
-  const [guestBusy, setGuestBusy] = useState(false);
-  const { login, user } = useAuth();
+export default function WelcomePage({ onEnter, onEnterProfile, onGuest, initialView }) {
+  const [view, setView] = useState(initialView === 'login' ? 'login' : 'landing');
+  const { user } = useAuth();
 
   useEffect(() => {
     function handleMouseMove(e) {
@@ -623,16 +622,6 @@ export default function WelcomePage({ onEnter, onEnterProfile }) {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  async function handleGuest() {
-    setGuestBusy(true);
-    try {
-      await login({ email: 'guest@guidher.app' });
-      onEnter('/map');
-    } finally {
-      setGuestBusy(false);
-    }
-  }
-
   if (view === 'login')  return <LoginView  onBack={() => setView('landing')} onDone={onEnter} onSignup={() => setView('signup')} />;
   if (view === 'signup') return <SignupView onBack={() => setView('landing')} onDone={onEnter} onLogin={() => setView('login')} />;
   return (
@@ -641,8 +630,7 @@ export default function WelcomePage({ onEnter, onEnterProfile }) {
       onSignup={() => setView('signup')}
       onProfile={onEnterProfile}
       loggedIn={!!user}
-      onGuest={handleGuest}
-      guestBusy={guestBusy}
+      onGuest={onGuest}
     />
   );
 }

@@ -18,10 +18,11 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import RequireAdmin from './components/RequireAdmin.jsx';
+import RequireUser from './components/RequireUser.jsx';
 
 const segments = [...SEED_SEGMENTS, ...WELL_USED_SEGMENTS];
 
-function AuthenticatedApp({ onExitToLanding, entryPath }) {
+function AuthenticatedApp({ onExitToLanding, entryPath, onRequireLogin }) {
   const [reports, setReports] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const { pathname } = useLocation();
@@ -57,9 +58,17 @@ function AuthenticatedApp({ onExitToLanding, entryPath }) {
             <MapPage segments={allSegments} latest={latest} reports={reports} selectedId={selectedId} onSelect={setSelectedId} />
           } />
           <Route path="/routes"    element={<RoutesPage />} />
-          <Route path="/report"    element={<ReportPage segments={segments} selectedId={selectedId} onSelect={setSelectedId} />} />
+          <Route path="/report"    element={
+            <RequireUser onBlocked={onRequireLogin}>
+              <ReportPage segments={segments} selectedId={selectedId} onSelect={setSelectedId} />
+            </RequireUser>
+          } />
           <Route path="/tips"      element={<SafetyTipsPage />} />
-          <Route path="/profile"   element={<ProfilePage />} />
+          <Route path="/profile"   element={
+            <RequireUser onBlocked={onRequireLogin}>
+              <ProfilePage />
+            </RequireUser>
+          } />
           <Route path="/login"     element={<AccountPage />} />
           <Route path="/admin"     element={
             <RequireAdmin>
@@ -85,6 +94,11 @@ export default function App() {
   const navigate = useNavigate();
   const [entered, setEntered] = useState(!!user);
   const [entryPath, setEntryPath] = useState('/dashboard');
+  // Guest is a real, unprivileged, in-memory-only state — never written to localStorage, unlike
+  // a real login. It lets AuthenticatedApp mount with user === null so RequireUser can gate
+  // account-only routes (/report, /profile) instead of guests silently getting a fake account.
+  const [isGuest, setIsGuest] = useState(false);
+  const [forceLoginView, setForceLoginView] = useState(false);
 
   useEffect(() => { if (user) setEntered(true); }, [user]);
   useEffect(() => { if (!user) setEntered(false); }, [user]);
@@ -93,14 +107,26 @@ export default function App() {
   // page's guest map button) pass it explicitly, avoiding a race with AuthenticatedApp's own
   // "/" redirect that a separate post-mount navigate() call would lose to.
   function enterApp(path) { if (path) setEntryPath(path); setEntered(true); }
+  function enterGuest() { setIsGuest(true); enterApp('/map'); }
   function enterProfile() { setEntered(true); navigate('/profile'); }
   // Reset the URL back to "/" too — otherwise AuthenticatedApp's <Routes> remounts against
   // whatever sub-route (e.g. /profile) was still showing underneath, matching that route
   // directly on next entry instead of respecting entryPath (e.g. the guest map button).
   function exitToLanding() { navigate('/'); setEntered(false); }
+  // A guest hit an account-only route (RequireUser's onBlocked) — drop guest mode and land
+  // straight on the login form instead of the landing hero, since they were already trying
+  // to do something that needs an account.
+  function requireLogin() { setIsGuest(false); setForceLoginView(true); navigate('/', { replace: true }); }
 
-  if (!user || !entered) {
-    return <WelcomePage onEnter={enterApp} onEnterProfile={enterProfile} />;
+  if ((!user && !isGuest) || !entered) {
+    return (
+      <WelcomePage
+        onEnter={enterApp}
+        onEnterProfile={enterProfile}
+        onGuest={enterGuest}
+        initialView={forceLoginView ? 'login' : 'landing'}
+      />
+    );
   }
-  return <AuthenticatedApp onExitToLanding={exitToLanding} entryPath={entryPath} />;
+  return <AuthenticatedApp onExitToLanding={exitToLanding} entryPath={entryPath} onRequireLogin={requireLogin} />;
 }

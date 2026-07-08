@@ -42,13 +42,13 @@ export function GradientBlobs({ opacity = 0.4, variant = 'default', style, class
   }
 
   return (
-    <>
-      <div className="landing-bg-grid" style={{ position: 'fixed', inset: 0, zIndex: -2, opacity: 0.5 }} />
-      <div className={`landing-bg-abstracts ${className}`} style={{ opacity, ...style }}>
+    <div className={`landing-bg-abstracts ${className}`} style={style}>
+      <div className="landing-bg-grid" />
+      <div className="landing-bg-blobs" style={{ opacity }}>
         <div className="landing-blob blob-1" style={{ transform: transforms.b1 }} />
         <div className="landing-blob blob-2" style={{ transform: transforms.b2 }} />
         <div className="landing-blob blob-3" style={{ transform: transforms.b3 }} />
       </div>
-    </>
+    </div>
   );
 }
