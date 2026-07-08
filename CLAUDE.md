@@ -8,4 +8,6 @@ check"** defined in AGENTS.md before finishing — it keeps one fact in one cano
 <!-- Optional: Claude Code users can also wire an automatic trigger in .claude/settings.json via a
      PostToolUse hook matching Edit|Write to run this check after doc edits. -->
 
-NEVER COMMIT CHANGES. it always should be done by me manually.
+NEVER push CHANGES. it always should be done by me manually.
+
+please note to always use the impeccable frontend design skills

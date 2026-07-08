@@ -14,6 +14,8 @@ import { ZONE_CENTER, ZONE_ZOOM, getMapStyle, PHILIPPINES_BOUNDS } from '../../l
 import { segmentStatus } from '../../lib/freshness.js';
 import { nearestDistanceToRoute, hazardsNearRoute, nearestNamedHazard, YELLOW_AVOID_RADIUS_M } from '../../lib/routing.js';
 import { HEATMAP_BASELINE } from '../../data/heatmap-baseline.js';
+import { computeHazards } from '../../lib/hazards.js';
+import { STATUS_META } from '../../lib/routeStatus.js';
 import { useAuthUser } from '../../lib/useAuthUser.js';
 import { toggleReportLike } from '../../lib/likes.js';
 import SegmentFlag from './SegmentFlag.jsx';
@@ -24,19 +26,9 @@ import ReportHeatmap from './ReportHeatmap.jsx';
 import SafeHeatmap from './SafeHeatmap.jsx';
 import RouteCheck from '../route-check/RouteCheck.jsx';
 import RiskSummary from '../risk-summary/RiskSummary.jsx';
-import { Skeleton, MapSkeleton } from '../../components/Skeleton.jsx';
+import { OwlyMapLoader, OwlyRouteNotifyLoading } from './MapLoading.jsx';
 
 const INITIAL_A = [ZONE_CENTER.lat, ZONE_CENTER.lng];
-
-// Route status -> short badge copy + icon. Kept small and flat rather than enumerating every
-// severity/highway combination (routing.js's describeStatus already collapses to these).
-const STATUS_META = {
-  safe: { copy: 'Avoids flagged areas', Icon: CheckCircle2 },
-  'caution-highway': { copy: 'Uses a major road', Icon: AlertTriangle },
-  'caution-yellow': { copy: 'Passes a caution area', Icon: AlertTriangle },
-  'caution-red': { copy: 'Passes a dangerous area', Icon: AlertOctagon },
-  'caution-red-unavoidable': { copy: 'Dangerous area could not be avoided', Icon: AlertOctagon },
-};
 
 // Route note copy — names the specific report/hotspot a route passes near instead of a generic
 // phrase, when one is known (grounded in real data; falls back to STATUS_META's generic copy
@@ -70,20 +62,6 @@ function RouteNotify({ tone, children }) {
   );
 }
 
-// Shown in the same slot while the WASM engine is still computing a route, so a slow device or
-// a large graph fetch reads as "working on it" instead of leaving the top of the map blank.
-function RouteNotifySkeleton() {
-  return (
-    <div className="route-notify route-notify--loading" aria-hidden="true">
-      <Skeleton className="route-notify-icon-skeleton" width={17} height={17} radius="50%" />
-      <span className="route-notify-text-skeleton">
-        <Skeleton width="78%" height={10} />
-        <Skeleton width="52%" height={10} />
-      </span>
-    </div>
-  );
-}
-
 export default function ZoneMap({ segments, latest, reports, selectedId, onSelect, initialDestination = null, destinationLabel = null }) {
   const { theme } = useTheme();
   const { user } = useAuthUser();
@@ -109,19 +87,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
   // baseline counterpart (fresher, real signal). Missing severity on a live report (written
   // before AI classification shipped) defaults to 'red', preserving today's hard-avoid behavior.
   // Memoized so RouteLayer's useEffect only re-fires when reports actually change.
-  const hazards = useMemo(() => {
-    const live = segments
-      .filter((seg) => segmentStatus(latest.get(seg.segmentId)) === 'flagged_tonight')
-      .map((seg) => {
-        const report = latest.get(seg.segmentId);
-        return { segmentId: seg.segmentId, geo: seg.geo, severity: report?.severity || 'red', title: report?.title || null };
-      });
-    const liveIds = new Set(live.map((h) => h.segmentId));
-    const baseline = HEATMAP_BASELINE
-      .filter((h) => (h.severity === 'red' || h.severity === 'yellow') && !liveIds.has(h.segmentId))
-      .map((h) => ({ segmentId: h.segmentId, geo: h.geo, severity: h.severity, title: h.title }));
-    return [...live, ...baseline];
-  }, [segments, latest]);
+  const hazards = useMemo(() => computeHazards(segments, latest), [segments, latest]);
 
   const selectedRouteCoords = routes[selectedRouteIndex]?.coords || null;
 
@@ -399,7 +365,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
         })}
       </Map>
 
-      <MapSkeleton hidden={mapLoaded} />
+      <OwlyMapLoader hidden={mapLoaded} />
 
       {/* Neat Map Controls Toolbar */}
       <div className="map-toolbar">
@@ -475,7 +441,7 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
             Destination: {destinationLabel}
           </span>
         )}
-        {isComputingRoute && <RouteNotifySkeleton />}
+        {isComputingRoute && <OwlyRouteNotifyLoading />}
         {!isComputingRoute && routes.length > 0 && (
           <RouteNotify tone={routeSummary.tone}>{routeSummary.message}</RouteNotify>
         )}

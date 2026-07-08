@@ -148,7 +148,7 @@ function GoogleSignIn({ onDone, onError, onBusy, dividerPosition = 'before' }) {
 }
 
 // ── Login form ────────────────────────────────────────────────────────────────
-function LoginView({ onBack, onDone, onSignup }) {
+function LoginView({ onBack, onDone, onSignup, backLabel = 'home' }) {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -245,7 +245,7 @@ function LoginView({ onBack, onDone, onSignup }) {
         </form>
         <p className="auth-footer">No account? <span className="auth-link" onClick={onSignup}>Sign up</span></p>
         <p style={{ textAlign: 'center', marginTop: 8 }}>
-          <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to home</span>
+          <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to {backLabel}</span>
         </p>
       </div>
     </div>
@@ -253,7 +253,7 @@ function LoginView({ onBack, onDone, onSignup }) {
 }
 
 // ── Signup form ───────────────────────────────────────────────────────────────
-function SignupView({ onBack, onDone, onLogin }) {
+function SignupView({ onBack, onDone, onLogin, backLabel = 'home' }) {
   const { register } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '', campus: 'PUP Main Campus', commutePrefs: [] });
@@ -400,7 +400,7 @@ function SignupView({ onBack, onDone, onLogin }) {
           Already have an account? <span className="auth-link" onClick={onLogin}>Log in</span>
         </p>
         <p style={{ textAlign: 'center', marginTop: 6 }}>
-          <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to home</span>
+          <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onBack}>← Back to {backLabel}</span>
         </p>
       </div>
     </div>
@@ -606,10 +606,18 @@ function LandingPage({ onLogin, onSignup, onProfile, loggedIn, onGuest }) {
   );
 }
 
+// Maps a guest's remembered route to a readable label for the "← Back to …" link.
+const GUEST_ROUTE_LABELS = { '/map': 'map', '/tips': 'safety tips', '/dashboard': 'home', '/routes': 'routes' };
+
 // ── Root export ───────────────────────────────────────────────────────────────
-export default function WelcomePage({ onEnter, onEnterProfile, onGuest, initialView }) {
+export default function WelcomePage({ onEnter, onEnterProfile, onGuest, initialView, onGuestBack, guestReturnPath }) {
   const [view, setView] = useState(initialView === 'login' ? 'login' : 'landing');
   const { user } = useAuth();
+  // When a guest got bounced here by a gated route (RequireUser), send "back" to their last
+  // route instead of the marketing landing page. Otherwise (a normal visitor clicking "Log In"
+  // from the landing page) keep the original in-page landing behaviour.
+  const backLabel = onGuestBack ? (GUEST_ROUTE_LABELS[guestReturnPath] || 'map') : 'home';
+  const handleBack = onGuestBack || (() => setView('landing'));
 
   useEffect(() => {
     function handleMouseMove(e) {
@@ -622,8 +630,8 @@ export default function WelcomePage({ onEnter, onEnterProfile, onGuest, initialV
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  if (view === 'login')  return <LoginView  onBack={() => setView('landing')} onDone={onEnter} onSignup={() => setView('signup')} />;
-  if (view === 'signup') return <SignupView onBack={() => setView('landing')} onDone={onEnter} onLogin={() => setView('login')} />;
+  if (view === 'login')  return <LoginView  onBack={handleBack} backLabel={backLabel} onDone={onEnter} onSignup={() => setView('signup')} />;
+  if (view === 'signup') return <SignupView onBack={handleBack} backLabel={backLabel} onDone={onEnter} onLogin={() => setView('login')} />;
   return (
     <LandingPage
       onLogin={() => setView('login')}

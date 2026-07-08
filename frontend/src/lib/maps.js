@@ -8,6 +8,10 @@
 export const ZONE_CENTER = { lat: 14.5985, lng: 121.0102 };
 export const ZONE_ZOOM = 15;
 
+// OSM-sourced coords for LRT-2 Pureza Station — the zone's canonical "recommended route"
+// destination (Dashboard hero card, RoutesPage's default recommended route).
+export const PUREZA_STATION = { lat: 14.60167, lng: 121.00519 };
+
 // Keeps the map from panning/zooming out past the Philippines (SW/NE corners, [lng, lat]).
 export const PHILIPPINES_BOUNDS = [
   [116.9, 4.6],

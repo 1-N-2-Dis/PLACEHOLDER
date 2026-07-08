@@ -1,6 +1,6 @@
 // guidHER root — auth gate + shared state + routing shell.
 // Traces to: docs/06-system-design.md (React + Vite SPA architecture).
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { SEED_SEGMENTS, WELL_USED_SEGMENTS } from './data/seed-segments.js';
 import { subscribeReports, latestBySegment } from './lib/reports.js';
@@ -22,12 +22,16 @@ import RequireUser from './components/RequireUser.jsx';
 
 const segments = [...SEED_SEGMENTS, ...WELL_USED_SEGMENTS];
 
-function AuthenticatedApp({ onExitToLanding, entryPath, onRequireLogin }) {
+// Routes gated by RequireUser — never worth remembering as a guest's "return to" route.
+const GUEST_GATED_PATHS = ['/report', '/profile'];
+
+function AuthenticatedApp({ onExitToLanding, entryPath, onRequireLogin, onRouteChange }) {
   const [reports, setReports] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const { pathname } = useLocation();
   const isMapPage = pathname === '/map';
 
+  useEffect(() => { onRouteChange(pathname); }, [pathname, onRouteChange]);
   useEffect(() => subscribeReports(setReports), []);
   const latest = useMemo(() => latestBySegment(reports), [reports]);
 
@@ -53,7 +57,7 @@ function AuthenticatedApp({ onExitToLanding, entryPath, onRequireLogin }) {
       <AppHeader onBrandClick={onExitToLanding} />
       <main className={`app-main${isMapPage ? ' app-main--map' : ''}`}>
         <Routes>
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage segments={allSegments} latest={latest} reports={reports} />} />
           <Route path="/map" element={
             <MapPage segments={allSegments} latest={latest} reports={reports} selectedId={selectedId} onSelect={setSelectedId} />
           } />
@@ -92,16 +96,27 @@ function AuthenticatedApp({ onExitToLanding, entryPath, onRequireLogin }) {
 export default function App() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [entered, setEntered] = useState(!!user);
+  // Always false on mount, even for a returning user with a stored session — the landing
+  // page is the entry point for everyone; a logged-in visitor sees it with a "My Profile"
+  // nav button (LandingNav's loggedIn state) instead of being skipped straight to /dashboard.
+  const [entered, setEntered] = useState(false);
   const [entryPath, setEntryPath] = useState('/dashboard');
   // Guest is a real, unprivileged, in-memory-only state — never written to localStorage, unlike
   // a real login. It lets AuthenticatedApp mount with user === null so RequireUser can gate
   // account-only routes (/report, /profile) instead of guests silently getting a fake account.
   const [isGuest, setIsGuest] = useState(false);
   const [forceLoginView, setForceLoginView] = useState(false);
+  // Last non-gated route a guest was on — lets the forced login screen's "back" return them
+  // to where they actually were (map/tips/dashboard) instead of the marketing landing page.
+  const [guestReturnPath, setGuestReturnPath] = useState(null);
 
-  useEffect(() => { if (user) setEntered(true); }, [user]);
+  // Logging out drops entered back to the landing page; logging in does NOT auto-enter —
+  // that's left to the explicit enterApp()/enterProfile() calls in the login/signup/guest flows.
   useEffect(() => { if (!user) setEntered(false); }, [user]);
+
+  const trackGuestRoute = useCallback((path) => {
+    if (isGuest && !GUEST_GATED_PATHS.includes(path)) setGuestReturnPath(path);
+  }, [isGuest]);
 
   // path defaults to the dashboard; callers that want to land somewhere else (e.g. the landing
   // page's guest map button) pass it explicitly, avoiding a race with AuthenticatedApp's own
@@ -117,6 +132,9 @@ export default function App() {
   // straight on the login form instead of the landing hero, since they were already trying
   // to do something that needs an account.
   function requireLogin() { setIsGuest(false); setForceLoginView(true); navigate('/', { replace: true }); }
+  // Undo requireLogin(): restore guest mode and land back on the route the guest was
+  // actually on before they hit a gated route, instead of the marketing landing page.
+  function resumeGuest() { setForceLoginView(false); setIsGuest(true); enterApp(guestReturnPath || '/map'); }
 
   if ((!user && !isGuest) || !entered) {
     return (
@@ -125,8 +143,17 @@ export default function App() {
         onEnterProfile={enterProfile}
         onGuest={enterGuest}
         initialView={forceLoginView ? 'login' : 'landing'}
+        onGuestBack={guestReturnPath ? resumeGuest : undefined}
+        guestReturnPath={guestReturnPath}
       />
     );
   }
-  return <AuthenticatedApp onExitToLanding={exitToLanding} entryPath={entryPath} onRequireLogin={requireLogin} />;
+  return (
+    <AuthenticatedApp
+      onExitToLanding={exitToLanding}
+      entryPath={entryPath}
+      onRequireLogin={requireLogin}
+      onRouteChange={trackGuestRoute}
+    />
+  );
 }
