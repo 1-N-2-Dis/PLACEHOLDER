@@ -219,6 +219,8 @@ node scripts/compile-analytics.mjs  # For analytics cache
 
 * **Admin Functions** (admin accounts only): Access the Admin Control Panel at `/admin` to moderate reports, export barangay PDF briefs for 25 target zones, and force-recompile the analytics cache.
 
+---
+
 ## Deployed Project
 
 Live Demo: https://guidher.vercel.app/
