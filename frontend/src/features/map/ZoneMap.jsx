@@ -85,10 +85,10 @@ export default function ZoneMap({ segments, latest, reports, selectedId, onSelec
   const [routes, setRoutes] = useState([]); // Array<{ coords, status, tier }>, safest first
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [showControls, setShowControls] = useState(false);
-  const [showHeatmapRed, setShowHeatmapRed] = useState(false);
-  const [showHeatmapYellow, setShowHeatmapYellow] = useState(false);
-  const [showHeatmapGreen, setShowHeatmapGreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [showHeatmapRed, setShowHeatmapRed] = useState(true);
+  const [showHeatmapYellow, setShowHeatmapYellow] = useState(true);
+  const [showHeatmapGreen, setShowHeatmapGreen] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   // The basemap's vector source id, detected on load (liberty's is 'openmaptiles') — the
   // destination road-query layers reference it directly, same pattern as report/PinMap.jsx.
