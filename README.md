@@ -219,23 +219,6 @@ node scripts/compile-analytics.mjs  # For analytics cache
 
 * **Admin Functions** (admin accounts only): Access the Admin Control Panel at `/admin` to moderate reports, export barangay PDF briefs for 25 target zones, and force-recompile the analytics cache.
 
-## Admin Access
-
-**Production Admin Account:**
-- Email: `admin@gmail.com`
-- UID: `AFgvOssPLXePCPIIv2HqP5xTHzhn`
-- Role doc: `users/AFgvOssPLXePCPIIv2HqP5xTHzhn` → `{ email: "admin@gmail.com", role: "admin" }`
-
-To activate admin access in production:
-```bash
-$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\serviceAccount.json"
-node backend/scripts/seed-admin-role.mjs
-```
-
-See [`data/ADMIN_INTERFACE_NOTES.md`](../data/ADMIN_INTERFACE_NOTES.md) for full admin dashboard documentation.
-
----
-
 ## Deployed Project
 
 Live Demo: https://guidher.vercel.app/
