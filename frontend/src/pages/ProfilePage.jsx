@@ -17,10 +17,6 @@ function initials(name) {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
-const CONTACT_DEFAULTS = [
-  { id: 'c1', name: 'Mom', relationship: 'Parent', phone: '+63 912 345 6789' },
-];
-
 export default function ProfilePage() {
   const { user, logout, update } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -30,7 +26,7 @@ export default function ProfilePage() {
   const [prefs, setPrefs] = useState(user?.commutePrefs || []);
   const [saving, setSaving] = useState(false);
 
-  const [contacts, setContacts] = useState(CONTACT_DEFAULTS);
+  const [contacts, setContacts] = useState([]);
   const [addingContact, setAddingContact] = useState(false);
   const [newContact, setNewContact] = useState({ name: '', relationship: '', phone: '' });
 

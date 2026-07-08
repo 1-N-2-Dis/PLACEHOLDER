@@ -35,7 +35,7 @@ export default function AppHeader({ onBrandClick }) {
         onClick={onBrandClick}
         aria-label="Back to GuidHer landing page"
       >
-        <BrandMark size={30} />
+        <BrandMark size={34} />
         <BrandWordmark />
       </button>
 
@@ -64,16 +64,14 @@ export default function AppHeader({ onBrandClick }) {
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        {user && (
-          <button
-            className="btn btn-secondary btn-sm nav-profile-btn"
-            onClick={() => navigate('/profile')}
-            aria-label="My profile"
-          >
-            <User size={16} />
-            <span>{user.name?.split(' ')[0] || 'Profile'}</span>
-          </button>
-        )}
+        <button
+          className="btn btn-secondary btn-sm nav-profile-btn"
+          onClick={() => navigate('/profile')}
+          aria-label="My profile"
+        >
+          <User size={16} />
+          <span>{user?.name?.split(' ')[0] || 'Profile'}</span>
+        </button>
       </div>
     </header>
   );
