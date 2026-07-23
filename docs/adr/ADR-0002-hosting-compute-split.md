@@ -48,11 +48,11 @@
     sync (env vars in two places, CORS between Vercel and Render) than a single-vendor setup.
   - Auth is now hand-verified in `backend/server/index.js` instead of framework-provided by
     `onCall` — a new surface that must stay correct (see
-    `docs/12-security-compliance.md` for the updated threat notes).
+    `docs/security-compliance.md` for the updated threat notes).
   - `backend/functions/` (the old Cloud Functions code) was deleted; recoverable via git history
     if ever needed.
   - Superseded in this doc: the "Firebase Hosting", "Cloud Function (`backend/functions`)", and
-    "Firebase Storage" entries throughout `docs/06-system-design.md`'s components table and
+    "Firebase Storage" entries throughout `docs/system-design.md`'s components table and
     deployment topology are updated in place with pointers back to this ADR rather than rewritten
     as if this were the original decision — see the "Resolved (2026-07-02)" note in that doc's
     Context diagram section.

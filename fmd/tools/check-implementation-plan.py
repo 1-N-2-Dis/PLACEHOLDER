@@ -2,8 +2,8 @@
 """Validate an emitted FMD implementation-plan task ledger (stdlib only).
 
 Deterministic checks:
-- exactly one canonical task table with one separator immediately after its header
-- every row before the next heading is parsed; malformed/hidden rows cannot be skipped
+- one or more categorized canonical task tables, each with one separator immediately after its header
+- every row in each table is parsed; malformed/hidden rows cannot be skipped
 - every data row has a valid, unique TASK-### ID
 - allowed statuses and required cells
 - dependency cells contain only unique comma-separated TASK-### IDs (or an em dash), resolve,
@@ -116,66 +116,68 @@ def parse_tasks(text: str) -> tuple[list[Task], list[str]]:
         if line.lstrip().startswith("|")
         and tuple(cell.lower() for cell in _cells(line)) == EXPECTED_HEADER
     ]
-    if len(header_lines) != 1:
-        errors.append(f"expected exactly one canonical task-table header, found {len(header_lines)}")
-        return [], errors
-
-    header_index = header_lines[0]
-    separator_index = header_index + 1
-    if separator_index >= len(lines) or not lines[separator_index].lstrip().startswith("|"):
-        errors.append(f"line {header_index + 2}: canonical separator must immediately follow task header")
-        return [], errors
-    separator_cells = _cells(lines[separator_index])
-    if not _is_separator(separator_cells):
-        errors.append(
-            f"line {separator_index + 1}: malformed task-table separator; "
-            f"expected {EXPECTED_COLUMNS} Markdown separator cells"
-        )
+    if not header_lines:
+        errors.append("expected at least one canonical task-table header")
         return [], errors
 
     tasks: list[Task] = []
-    gap_started = False
-    for index in range(separator_index + 1, len(lines)):
-        line = lines[index]
-        line_no = index + 1
-        if HEADING_RE.match(line):
-            break
-        if not line.strip():
-            gap_started = True
+    for header_position, header_index in enumerate(header_lines):
+        separator_index = header_index + 1
+        if separator_index >= len(lines) or not lines[separator_index].lstrip().startswith("|"):
+            errors.append(f"line {header_index + 2}: canonical separator must immediately follow task header")
             continue
-        if not line.lstrip().startswith("|"):
+        separator_cells = _cells(lines[separator_index])
+        if not _is_separator(separator_cells):
             errors.append(
-                f"line {line_no}: malformed non-table content inside task ledger; "
-                "every task row must be a Markdown pipe row before the next heading"
+                f"line {separator_index + 1}: malformed task-table separator; "
+                f"expected {EXPECTED_COLUMNS} Markdown separator cells"
             )
             continue
-        if gap_started:
-            errors.append(
-                f"line {line_no}: task row appears after a blank line; "
-                "task rows must be contiguous so none can be hidden"
-            )
-        cells = _cells(line)
-        if _is_separator(cells):
-            errors.append(
-                f"line {line_no}: unexpected separator after task data; "
-                "the only separator must immediately follow the header"
-            )
-            continue
-        if len(cells) != EXPECTED_COLUMNS:
-            label = cells[0] if cells else "<blank>"
-            errors.append(
-                f"line {line_no}: task row '{label}' has {len(cells)} columns; "
-                f"expected {EXPECTED_COLUMNS}"
-            )
-            continue
-        task_id, outcome, depends, owner, scope, work_ref, status, gate = cells
-        if not TASK_ID_RE.fullmatch(task_id):
-            errors.append(
-                f"line {line_no}: task row has blank/malformed ID '{task_id}'; expected TASK-###"
-            )
-            continue
-        dependencies = _parse_dependencies(depends, task_id, line_no, errors)
-        tasks.append(Task(task_id, outcome, dependencies, owner, scope, work_ref, status, gate, line_no))
+
+        table_end = next(
+            (index for index in range(separator_index + 1, len(lines)) if HEADING_RE.match(lines[index])),
+            len(lines),
+        )
+        gap_started = False
+        for index in range(separator_index + 1, table_end):
+            line = lines[index]
+            line_no = index + 1
+            if not line.strip():
+                gap_started = True
+                continue
+            if not line.lstrip().startswith("|"):
+                errors.append(
+                    f"line {line_no}: malformed non-table content inside task ledger; "
+                    "every task row must be a Markdown pipe row before the next heading"
+                )
+                continue
+            if gap_started:
+                errors.append(
+                    f"line {line_no}: task row appears after a blank line; "
+                    "task rows must be contiguous so none can be hidden"
+                )
+            cells = _cells(line)
+            if _is_separator(cells):
+                errors.append(
+                    f"line {line_no}: unexpected separator after task data; "
+                    "the only separator must immediately follow the header"
+                )
+                continue
+            if len(cells) != EXPECTED_COLUMNS:
+                label = cells[0] if cells else "<blank>"
+                errors.append(
+                    f"line {line_no}: task row '{label}' has {len(cells)} columns; "
+                    f"expected {EXPECTED_COLUMNS}"
+                )
+                continue
+            task_id, outcome, depends, owner, scope, work_ref, status, gate = cells
+            if not TASK_ID_RE.fullmatch(task_id):
+                errors.append(
+                    f"line {line_no}: task row has blank/malformed ID '{task_id}'; expected TASK-###"
+                )
+                continue
+            dependencies = _parse_dependencies(depends, task_id, line_no, errors)
+            tasks.append(Task(task_id, outcome, dependencies, owner, scope, work_ref, status, gate, line_no))
 
     if not tasks:
         errors.append("no valid task rows found below the canonical task-table header")
@@ -421,6 +423,22 @@ def self_test() -> int:
     valid_errors = validate_text(valid)
     if valid_errors:
         failures.append("valid fixture was rejected: " + "; ".join(valid_errors))
+    categorized = valid.replace(
+        "| TASK-003 | docs reconciliation | TASK-002 | Alex | docs/ | — | blocked | `python check-docs.py` |\n",
+        "",
+        1,
+    ).replace(
+        "\n## Execution view",
+        "\n\n### Blocked\n"
+        "| ID | Outcome / trace | Depends on | Owner | Write scope | Work ref | Status | Gate / evidence |\n"
+        "|----|----|----|----|----|----|----|----|\n"
+        "| TASK-003 | docs reconciliation | TASK-002 | Alex | docs/ | — | blocked | `python check-docs.py` |\n"
+        "\n## Execution view",
+        1,
+    )
+    categorized_errors = validate_text(categorized)
+    if categorized_errors:
+        failures.append("categorized fixture was rejected: " + "; ".join(categorized_errors))
     for name, fixture in invalid_cases.items():
         if not validate_text(fixture):
             failures.append(f"invalid fixture '{name}' was accepted")

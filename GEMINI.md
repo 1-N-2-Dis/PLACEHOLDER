@@ -2,6 +2,6 @@
 
 See [AGENTS.md](./AGENTS.md) for all project instructions.
 
-When you edit any spec doc (`docs/**/*.md`, including `docs/idea.md`, or `AGENTS.md`), run the **"Docs consistency
-check"** defined in AGENTS.md before finishing — it prevents cross-doc contradictions by keeping
-one fact in one canonical doc (see `docs/index.md` §0). Do not restate the steps; follow AGENTS.md.
+When you edit a spec document (`docs/**/*.md`, root `idea.md`, `context.md`, or `AGENTS.md`), follow
+the reconciliation and verification model in AGENTS.md. It prevents cross-document contradictions
+by keeping one fact in one canonical document (see `docs/index.md` §0).

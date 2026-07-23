@@ -16,7 +16,7 @@
   1-3-route cascade added latency (up to 4 ORS calls per request). Separately, mentor feedback
   (Troy, via [Mentor Synthesis](../analysis/mentor-synthesis.md)) called for simplifying route
   choice down to a fixed "recommended + one alternative" shape rather than a variable 1-3 list —
-  already tracked as an open decision in `docs/BUILD-GUIDE.md`/`docs/POSTMORTEM.md`.
+  already tracked as an open decision in `docs/BUILD-GUIDE.md`/`docs/DECISION-LEDGER.md`.
 - **Options considered:**
   1. **Keep ORS, finally restrict the key.** Fixes the open security item but not the
      external-dependency/cold-start risk, and does nothing about the route-count simplification.
@@ -61,7 +61,7 @@
     has no Rust toolchain, so these cannot be produced during `vercel build`.
 - **Consequences:**
   - The ORS-key-unrestricted open item (Threat T2) is resolved by elimination — there is no
-    client-side routing key at all anymore. See `docs/12-security-compliance.md`.
+    client-side routing key at all anymore. See `docs/security-compliance.md`.
   - Routing has zero external runtime dependency — no quota, no cold start, no outage risk at
     demo time (offline-capable once the graph asset and wasm are cached).
   - New build-time responsibilities: the graph asset must be refreshed (re-run `graph:fetch` +
@@ -72,5 +72,5 @@
     UI (F-005), superseding the prior variable 1-3-route language in the PRD/QA plan.
   - Supersedes the ORS half of ADR-0001 — MapLibre GL + OpenFreeMap (map **rendering**) is
     unaffected and remains keyless; only the routing half of that decision is replaced here.
-    `docs/06-system-design.md` (the stack's canonical owner) is updated in place with a pointer
+    `docs/system-design.md` (the stack's canonical owner) is updated in place with a pointer
     back to this ADR, per the same convention ADR-0002 used.

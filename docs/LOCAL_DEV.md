@@ -1,3 +1,7 @@
+> **Historical SparkFest artifact.** Verify current local setup against [ops.md](ops.md),
+> [system-design.md](system-design.md), and the active environment configuration before following
+> this guide.
+
 # Running SaferRoute locally
 
 Test everything on your machine before you deploy anything to the cloud. You will run the React app
@@ -226,4 +230,4 @@ $env:FIRESTORE_EMULATOR_HOST="127.0.0.1:8081"; npm run seed
 Local dev uses emulators + a locally-run `backend/server/`; a real deploy splits across Vercel
 (frontend), Render (`backend/server/`), and Firebase (Firestore + Auth only). See
 [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) for the full step-by-step, including required env
-vars for each platform and the pre-demo security checklist in `docs/12-security-compliance.md`.
+vars for each platform and the pre-demo security checklist in `docs/security-compliance.md`.

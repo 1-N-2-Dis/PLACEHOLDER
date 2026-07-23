@@ -8,7 +8,7 @@ Status: approved, implementing now.
 > once, with one Submit button and no step navigation or `ReviewStep.jsx` (removed). The
 > pin-to-segment snapping (`segmentSnap.js`/`PinMap.jsx`) and the AI location-context change are
 > unaffected — only the step structure and the photo requirement changed. See
-> `docs/03-prd.md` F-002 and BR-008 for the current, canonical statement of this behavior.
+> `docs/prd.md` F-002 and BR-008 for the current, canonical statement of this behavior.
 
 ## Problem
 
@@ -120,7 +120,7 @@ boolean's reasoning, per the "same field, richer context" decision, not a new au
 
 ## Docs updated
 
-- `docs/03-prd.md` — F-002 note amended to describe the 4-step wizard; BR-008 amended to say
+- `docs/prd.md` — F-002 note amended to describe the 4-step wizard; BR-008 amended to say
   photo is now required *in this flow* (F-007's own acceptance criterion is unaffected — it still
   only requires EXIF-stripping when a photo exists).
 - `agents/context/claude_context.md` — session conclusion entry appended after implementation.

@@ -1,3 +1,7 @@
+> **Historical SparkFest artifact.** This procedure predates the current Supabase report-store
+> architecture. Do not use it as a deployment runbook without reconciling it against
+> [ops.md](ops.md), [system-design.md](system-design.md), and ADR-0004.
+
 # Deploying SaferRoute — v2
 
 > **Guide version: v2 (2026-07-06).** What changed since v1 (2026-07-02):
@@ -31,7 +35,7 @@ Map rendering (MapLibre GL + OpenFreeMap) is an external, non-Google, keyless se
 a static asset (`frontend/public/graph/pup-20km.bin`). No routing service, no key, no quota, and
 no cold start — the Render free-tier spin-down below never affects routing. For the full
 architecture and the reasoning behind each choice, see
-[`06-system-design.md`](./06-system-design.md) — that document is the canonical owner of the
+[`06-system-design.md`](./system-design.md) — that document is the canonical owner of the
 stack; this guide only covers *how to ship it*.
 
 > **Why Render instead of Firebase Functions:** the three Gemini-backed routes used to be
@@ -290,13 +294,13 @@ Pulled from `docs/index.md` §2 (health check) and `AGENTS.md` ("Definition of d
 
 - [`deploy.md`](./deploy.md) — condensed copy-paste checklist for deploy day, no explanations
 - [`LOCAL_DEV.md`](./LOCAL_DEV.md) — local dev setup and testing, the prerequisite to this guide
-- [`06-system-design.md`](./06-system-design.md) — architecture, deployment topology, and
+- [`06-system-design.md`](./system-design.md) — architecture, deployment topology, and
   the rationale behind each technology choice (canonical owner of the stack)
 - [`adr/ADR-0003-client-side-wasm-routing.md`](./adr/ADR-0003-client-side-wasm-routing.md) — the
   decision record behind the committed routing assets
 - [`HEATMAP_INTEGRATION_GUIDE.md`](./HEATMAP_INTEGRATION_GUIDE.md) — where the heatmap baseline
   data comes from and how it maps to segments
-- [`12-security-compliance.md`](./12-security-compliance.md) — full pre-demo security
+- [`12-security-compliance.md`](./security-compliance.md) — full pre-demo security
   checklist and threat model
 - [`index.md`](./index.md) — source-of-truth map and health check used above
 - [`../AGENTS.md`](../AGENTS.md) — build/test conventions and the security must-dos this guide expands on

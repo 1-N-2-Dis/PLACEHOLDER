@@ -1,5 +1,4 @@
 See AGENTS.md in the project root for all project instructions.
 
-Scoped rule: .cursor/rules/docs-consistency.mdc runs the "Docs consistency check" (defined in
-AGENTS.md) whenever you edit spec docs (including docs/idea.md) or AGENTS.md — it keeps docs from
-contradicting.
+Scoped rule: .cursor/rules/docs-consistency.mdc applies the reconciliation protocol defined in
+AGENTS.md whenever you edit spec docs (including root idea.md) or AGENTS.md.

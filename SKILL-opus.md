@@ -1,12 +1,16 @@
 ---
 name: executing-hard-tasks
-description: Use when starting a multi-step or ambiguous task, when a result surprises you, when repeated fix attempts stop converging, or before claiming any work is complete.
+description: Use only when explicitly requested as Fable Mode or when a Fable model is directly requested.
 metadata:
-  trigger: Hard/multi-step tasks, surprising results, non-converging fixes, pre-completion claims
+  trigger: Explicit Fable Mode or direct Fable-model request only
   author: Distilled from Claude Fable 5's working method, for Opus 4.8
 ---
 
 # Executing Hard Tasks
+
+> Activation boundary: task size, ambiguity, failures, or a request to "think deeply" do not
+> activate this mode. Activate it only when the user explicitly names Fable Mode or directly
+> requests a Fable model.
 
 ## Overview
 

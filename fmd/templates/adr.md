@@ -25,7 +25,7 @@ decision was made and *why*, not filling out every field. (Gate adapted from Mat
 
 - **Date:** YYYY-MM-DD
 - **Status:** Proposed | Accepted | Superseded by ADR-NNN
-- **Context:** <the forces at play; what made this a decision> 
+- **Context:** <the forces at play; what made this a decision>
 - **Options considered:**
   1. <option> — pros / cons
   2. <option> — pros / cons

@@ -43,7 +43,7 @@ solution-space/build state, so no contract change is warranted.
 prints a mutation manifest by default. Only `--apply` may create or update remote state. It creates
 one Issue per `TASK-###`, marked `<!-- fmd-task:TASK-### -->`, and updates only its generated body
 block; comments, labels, assignees, and PR discussion are preserved. It manages explicit custom
-Project fields (`FMD Task`, `FMD Status`, `FMD Wave`) rather than assuming a user's built-in Status
+Project fields (`Task ID`, `Plan Status`, `Wave`) rather than assuming a user's built-in Status
 options. The tool needs `python3`, `gh`, normal issue access, and GitHub's `project` token scope.
 
 FMD does **not** emit a GitHub Action, webhook, PAT, App, branch rule, or automatic reconciliation

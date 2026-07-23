@@ -1,9 +1,9 @@
 # BRD — Business Requirements Document
 
-> ⚠️ PROVENANCE: Generated from `docs/idea.md` (status: draft, schema 1.1.0). Grounded only in
+> ⚠️ PROVENANCE: Generated from `idea.md` (status: draft, schema 1.1.0). Grounded only in
 > the brief + `docs/evidence-register.md`. No first-party demand or payer commitment exists yet —
 > all business claims below are hypotheses to validate after July 2. No facts fabricated.
-> Owner of features `F-###` / journeys / business rules: [PRD](./03-prd.md). This doc owns the
+> Owner of features `F-###` / journeys / business rules: [PRD](./prd.md). This doc owns the
 > WHY-for-the-business only. Traces to `idea.md` §1, §6, §8, §9.
 
 ## Executive summary

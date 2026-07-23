@@ -1,14 +1,14 @@
 # Release / Go-to-Market & Roadmap
 
-> ⚠️ PROVENANCE: Generated from `docs/idea.md`, [BRD](./01-brd.md), [MRD](./02-mrd.md),
-> [PRD](./03-prd.md). Business context: SparkFest MVP (elimination July 2). Demand unvalidated;
+> ⚠️ PROVENANCE: Generated from `idea.md`, [BRD](./01-brd.md), [MRD](./02-mrd.md),
+> [PRD](./prd.md). Business context: SparkFest MVP (elimination July 2). Demand unvalidated;
 > growth plan is a hypothesis to test, not a forecast. No facts fabricated.
 
 ## Release plan & phases
 
 | Phase | Goal | Entry criteria | Exit criteria |
 |-------|------|----------------|---------------|
-| **P0 — SparkFest MVP** | Demoable single-zone guide | Build complete; Firestore deny-client-write rule verified against emulator | Live map + report + pre-trip check working for the Sta. Mesa zone |
+| **P0 — SparkFest MVP** | Demoable single-zone guide | Build complete; Supabase client-write denial and server report path verified | Live map + report + pre-trip check working for the Sta. Mesa zone |
 | **P1 — Validation (post-July 2)** | Answer the riskiest assumption | MVP live; PUP students reachable via subreddits | The **substitute test** answered: does she open the map, or just ask the group chat? |
 | **P2 — Density** | Cross the cold-start usefulness threshold in one zone | Validated that women *will* consult + contribute | Contribution density (reports/zone/week) sustains without unscalable seeding |
 | **P3 — Payer proof** | Turn the dataset into a business | Behavioral proof (route changes) + density | ≥1 institutional letter of intent (LGU / operator / grant) |
@@ -19,18 +19,18 @@
 
 ## Rollout / rollback strategy
 
-- **Ship:** static SPA on Vercel; server routes on Render; Firestore/Auth on Firebase (ADR-0002).
-- **The one hard gate:** do **not** deploy the deny-client-write Firestore rule until `submitReport`
-  is verified against the emulator — deploying early breaks report submission with no fallback
-  (AGENTS.md). That is the rollback-sensitive step.
+- **Ship:** static SPA on Vercel; server routes on Render; Firebase Auth/role records and
+  Supabase report data (ADRs 0002 and 0004).
+- **The one hard gate:** keep Supabase client writes denied and verify `submitReport` against the
+  intended environment before changing RLS or server credentials. That is the rollback-sensitive step.
 - **Feature disable:** photo upload is already flag-gated off (`PHOTO_UPLOAD_ENABLED = false`), so
   `F-007` can stay dark without a redeploy.
 
 ## Launch checklist
 
 - [ ] Build passes, tests pass; every code change ties to an `F-###` with a QA test.
-- [ ] Firestore rules deployed (client `reports` writes denied — `F-006`); Storage rules N/A while
-      Storage disabled.
+- [ ] Supabase RLS denies client `reports` writes; Firestore rules protect role records; Storage
+      rules are N/A while Storage is disabled.
 - [ ] Report writes are server-side + auth-gated (`submitReport`); Gemini key + service-account key
       server-side only (Render).
 - [x] ~~ORS client key origin-restricted + usage-capped~~ — **N/A (ADR-0003):** routing has no client-side key anymore.

@@ -3,7 +3,7 @@
 > ⚠️ **Superseded (2026-07-06) by [ADR-0003](../../adr/ADR-0003-client-side-wasm-routing.md):**
 > the routing half of this doc (the OpenRouteService 1-3-route cascade, avoid-polygon mechanism,
 > highway-waytype refinement) has been replaced by a client-side Rust/WASM A* engine over a
-> preprocessed pedestrian graph — see [System Design](../../06-system-design.md). This doc is kept
+> preprocessed pedestrian graph — see [System Design](../../system-design.md). This doc is kept
 > as-is for historical reference (it is not rewritten); the AI report moderation / photo evidence
 > half (F-006/F-007) is unaffected and still current.
 
@@ -138,10 +138,10 @@ enum / field shape on create.
 
 ## Docs updated
 
-`docs/03-prd.md` (F-005..F-008, BR-007/BR-008, amended BR-005/F-002 language),
-`docs/09-data-model.md` (new fields, Storage objects section, Rules sketch), `docs/06-system-design.md`
+`docs/prd.md` (F-005..F-008, BR-007/BR-008, amended BR-005/F-002 language),
+`docs/data-model.md` (new fields, Storage objects section, Rules sketch), `docs/system-design.md`
 (Gemini/CF critical-path, Storage surface, extended routing section, new ADRs),
-`docs/12-security-compliance.md` (Threat T7, data classification, checklist), `docs/11-qa-test-plan.md`
+`docs/security-compliance.md` (Threat T7, data classification, checklist), `docs/qa-test-plan.md`
 (new TCs, traceability rows).
 
 ## Testing approach
@@ -158,7 +158,7 @@ convention) — manual e2e against the local emulators + live ORS/Gemini/Storage
   reject), and the blocking-spinner latency. **Do not deploy the new `firestore.rules`
   (denying client create) until this is done** — until then, a stale build pointing at the new
   rules with a broken `submitReport` would leave F-002 entirely non-functional with no fallback.
-  See `docs/11-qa-test-plan.md` for the exact manual test cases.
+  See `docs/qa-test-plan.md` for the exact manual test cases.
 - Live ORS multi-route behavior (2-3 genuinely distinct alternatives, the red-unavoidable edge
   case) and live Storage upload/EXIF-strip verification are likewise deferred to the developer's
   own environment per the QA plan.

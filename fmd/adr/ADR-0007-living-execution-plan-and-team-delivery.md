@@ -83,6 +83,11 @@ Contributors normally own their task row. One plan steward owns cross-task reord
 and shared write scopes. `in_review` is set before merge; `done` only after integration and a passing
 gate on the current base. IDs are never reused; abandoned work is `cut`, not deleted.
 
+PR eligibility is separate from release readiness: a task being `blocked` only controls when that
+task may start. It does not block a small, already-scoped PR whose targeted checks pass and whose
+diff is intentional and mergeable. Deployment, pilot, and downstream-task gates are evaluated
+separately.
+
 ### 3. Deterministic structural gate + judgment guidance
 
 **GATE (stdlib checker):** `tools/check-implementation-plan.py` rejects malformed/hidden/duplicate

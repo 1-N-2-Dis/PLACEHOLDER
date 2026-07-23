@@ -12,8 +12,8 @@
 >
 > **How to iterate:** capture Ate Ayen / Kuya Troy feedback in §11, run the `design-taste-frontend`
 > skill (`.agents/skills/`) for redesign passes, and log every real change in §12 + a line in
-> [POSTMORTEM §3](./POSTMORTEM.md). Product rules that constrain design (BR-001/002) are owned by the
-> [PRD](./03-prd.md) — this doc applies them, it does not redefine them.
+> [POSTMORTEM §3](./DECISION-LEDGER.md). Product rules that constrain design (BR-001/002) are owned by the
+> [PRD](./prd.md) — this doc applies them, it does not redefine them.
 
 ## 0. Design principles (why the UI looks the way it does)
 
@@ -47,7 +47,7 @@ Everything else in the skill (contrast checks, state completeness, layout discip
 
 - **Product name:** **GuidHer** (public). Wordmark renders as `Guid` in primary purple + `Her` in
   accent pink (`.brand-wordmark .accent`), display font. Internal codename "SaferRoute" must not
-  appear on any judge-facing surface (see [POSTMORTEM §1](./POSTMORTEM.md)).
+  appear on any judge-facing surface (see [POSTMORTEM §1](./DECISION-LEDGER.md)).
 - **Logo mark:** `BrandMark` = the circular owl-face app icon (`GuidHer_Assets/appicon.png`),
   distinct from the full mascot. Used in the nav and auth screens.
 - **Mascot: Owly** — "Wise. Watchful. With you." An illustrated owl with context-specific poses in
@@ -186,7 +186,7 @@ The pitch deck must look like the product. Pull from this doc: primary purple `#
 for the "Her", Baloo 2 display / Inter body, Owly for warmth, cream/purple backgrounds. Slides use
 the **same** severity colors and the same conditions-only language. See
 [pitch-deck-playbook.md](./analysis/pitch-deck-playbook.md) (method) and
-[alex-pitch-kit.md](./analysis/alex-pitch-kit.md) (content). Presentation is only 10 rubric points —
+[alex-pitch-kit.md](./pitch-kit.md) (content). Presentation is only 10 rubric points —
 keep the deck clean and on-brand, don't over-invest.
 
 ## 11. Feedback capture — Ate Ayen & Kuya Troy (fill in after the calls)
@@ -247,7 +247,7 @@ keep the deck clean and on-brand, don't over-invest.
 - **2026-07-07** — Landing page (`WelcomePage.jsx`) made theme-aware with its own toggle in
   `LandingNav`, superseding the earlier "fixed brand surface" call (see §3.C, §6). Report severity
   colors (`severity-types.js`) switched from raw hex to CSS var refs to fix a dark-mode contrast
-  failure on severity-red. See [POSTMORTEM §3](./POSTMORTEM.md).
+  failure on severity-red. See [POSTMORTEM §3](./DECISION-LEDGER.md).
 - **2026-07-06** — Doc created, transcribed from the current build (`styles.css` tokens,
   `index.html` fonts, condition/severity modules). Baseline captured so iteration has a reference.
 
@@ -255,8 +255,8 @@ keep the deck clean and on-brand, don't over-invest.
 - Code: `frontend/src/styles.css` (tokens), `frontend/index.html` (fonts/meta),
   `frontend/src/data/condition-types.js`, `frontend/src/data/severity-types.js`,
   `frontend/src/components/{AppHeader,BottomNav,BrandMark,Owly}.jsx`.
-- Rules that constrain design: [PRD](./03-prd.md) (BR-001 conditions-only, BR-002 no rescue),
+- Rules that constrain design: [PRD](./prd.md) (BR-001 conditions-only, BR-002 no rescue),
   [AGENTS.md](../AGENTS.md) (lucide-only, no emoji).
 - Iteration tool: `.agents/skills/design-taste-frontend/SKILL.md`.
 - Pitch alignment: [pitch-deck-playbook.md](./analysis/pitch-deck-playbook.md),
-  [alex-pitch-kit.md](./analysis/alex-pitch-kit.md).
+  [alex-pitch-kit.md](./pitch-kit.md).

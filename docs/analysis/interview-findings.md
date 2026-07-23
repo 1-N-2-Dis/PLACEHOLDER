@@ -4,7 +4,7 @@
 > **Owner:** Alex (validation). Companion to the [User Interview Guide](./user-interview-guide.md)
 > (method + ethics) and [Pitch Kit §5](./alex-pitch-kit.md) (probe sheet). Feeds the "have you
 > validated the problem?" answer in the [Pitch Kit §4](./alex-pitch-kit.md) Q&A map. Conditions-only
-> discipline (BR-001) and no-rescue (BR-002) per [PRD](../03-prd.md).
+> discipline (BR-001) and no-rescue (BR-002) per [PRD](../prd.md).
 >
 > **Interviews analyzed:** 7 (Mary Jean, Neil, John Christian, Elsa, Eden, Myrine, VJ).
 > **Method:** semi-structured chat interviews; product hidden until the end, then revealed for reaction.

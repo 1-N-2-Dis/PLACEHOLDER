@@ -4,7 +4,7 @@
 > (the 10 confirm-or-kill questions) — this doc is the *how* around those questions: the method, the
 > ethics, who to talk to, how to recruit, and how to log. Do not restate rubric weights (owned by
 > [00-hackathon-context.md](../00-hackathon-context.md)) or business rules (owned by
-> [03-prd.md](../03-prd.md)); this doc links to them.
+> [03-prd.md](../prd.md)); this doc links to them.
 >
 > **Why this exists:** "Is the problem validated?" is the judges' first question and our weakest
 > point ([hackathon context §7](../00-hackathon-context.md)). Desk research is not validation. One
@@ -128,7 +128,7 @@ way — the lighting? how empty it is?" You're learning what the product can act
 ## 5. Which segments/conditions to validate? (your strategic question)
 
 First, a reframe you need before you post anything: **you are not validating "danger zones."** That
-phrasing is exactly what **[BR-001](../03-prd.md)** forbids and what makes a judge call this a crime
+phrasing is exactly what **[BR-001](../prd.md)** forbids and what makes a judge call this a crime
 map. You are validating two things, in this priority order:
 
 1. **The behavior (highest value, location-independent):** does she consult a guide / group chat

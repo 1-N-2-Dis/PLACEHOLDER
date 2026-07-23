@@ -21,7 +21,7 @@ user interviews, one GAD conversation) and a working demo.
 **Concrete strategic guidance given (ranked by rubric leverage):**
 1. **Validation interviews** (highest ROI) — feeds Relevance (20 pts) + judges' first question "is
    it validated?" Alex is already on this; probe sheet exists in [pitch kit
-   §5](docs/analysis/alex-pitch-kit.md).
+   §5](docs/pitch-kit.md).
 2. **Working demo + video fallback** (Jim's lane) — feeds Technology (25) + Feasibility (15). Core
    path to score.
 3. **GAD budget number + one-paragraph pilot ask + outreach email** — cheap, together they
@@ -105,7 +105,7 @@ Per [BUILD-GUIDE.md](docs/BUILD-GUIDE.md) task board (the authoritative "who doe
    against the emulator (breaks submission otherwise).
 
 ### Alex — business + validation (highest ROI outside of the demo itself)
-1. **Run the interview probe sheet** ([pitch kit §5](docs/analysis/alex-pitch-kit.md)) with ≥3 real
+1. **Run the interview probe sheet** ([pitch kit §5](docs/pitch-kit.md)) with ≥3 real
    PUP women. This is the riskiest assumption *and* the judges' first question ("is the problem
    validated?"). Bring ≥1 real quote to the pitch.
 2. **GAD budget number research** (optional but cheap, high Q&A leverage) — see §4 below.
@@ -113,20 +113,20 @@ Per [BUILD-GUIDE.md](docs/BUILD-GUIDE.md) task board (the authoritative "who doe
    "we've already opened a conversation with PUP's GAD office." That reads as traction. Expect no
    signature; use whatever warmth you get as a Q&A asset.
 4. Rehearse the 5-min script + confirm every Q&A owner knows their rows ([pitch kit
-   §3–§4](docs/analysis/alex-pitch-kit.md)).
+   §3–§4](docs/pitch-kit.md)).
 
 ### Farhana — AI/data + technical Q&A
 1. Lock the one-liner: **Gemini structures real reports** (severity, dedupe, spam filter) and **adds
    no facts** (BR-006). This is the answer to "isn't this AI theater?"
 2. Own and rehearse the AI Q&A rows: "how does the AI work," "isn't this a crime map," "is the data
-   real" ([pitch kit §4](docs/analysis/alex-pitch-kit.md)).
+   real" ([pitch kit §4](docs/pitch-kit.md)).
 3. `[guardrail]` Seeds stay Tier-B hypotheses; no synthetic crime data ([mentor-synthesis
    §2](docs/analysis/mentor-synthesis.md)).
 
 ### Helena — product/UI + outreach
 1. **Reach out to Ate Ayen and Kuya Troy** for UI/UX and branding improvements; capture their input
    in the feedback table ([design-system.md §11](docs/design-system.md)) and fold actionable changes
-   into the demo screens. Record who suggested what in [POSTMORTEM §3](docs/POSTMORTEM.md).
+   into the demo screens. Record who suggested what in [POSTMORTEM §3](docs/DECISION-LEDGER.md).
 2. Every demo screen shows **GuidHer** and is clean for recording.
 3. Final wordmark/palette pass.
 4. `[guardrail]` Trust-first UI: no emoji (use `lucide-react` icons), no AI-purple gimmicks, no
@@ -184,18 +184,18 @@ Feasibility + "is it validated?").
 ## References (read these, don't re-derive)
 
 All committed to `1-N-2-Dis/GuidHer`, current as of PR #21:
-- [START-HERE.md](docs/START-HERE.md) — human entry point: repo navigation + per-person next actions.
+- [START-HERE.md](docs/onboarding.md) — human entry point: repo navigation + per-person next actions.
 - [index.md §0](docs/index.md) — source-of-truth map (which doc owns which fact).
-- [POSTMORTEM.md](docs/POSTMORTEM.md) — change/decision log, naming truth, TRUE/PROVISIONAL/UNVALIDATED table.
+- [POSTMORTEM.md](docs/DECISION-LEDGER.md) — change/decision log, naming truth, TRUE/PROVISIONAL/UNVALIDATED table.
 - [00-hackathon-context.md](docs/00-hackathon-context.md) — SparkFest judging rubric + format (the scoreboard).
 - [BUILD-GUIDE.md](docs/BUILD-GUIDE.md) — per-owner task board (authoritative "who does what now").
-- [alex-pitch-kit.md](docs/analysis/alex-pitch-kit.md) — narrative, BMC, 5-min script, 12-Q Q&A map, probe sheet.
+- [alex-pitch-kit.md](docs/pitch-kit.md) — narrative, BMC, 5-min script, 12-Q Q&A map, probe sheet.
 - [pitch-deck-playbook.md](docs/analysis/pitch-deck-playbook.md) — VC method → rubric.
 - [mentor-synthesis.md](docs/analysis/mentor-synthesis.md) — Jerico + Troy reconciled.
 - [competitive-analysis.md](docs/analysis/competitive-analysis.md) — ALAITAPTAP teardown.
 - [design-system.md](docs/design-system.md) — brand, tokens, components, UI voice (Helena-owned).
-- [PRD](docs/03-prd.md) (F-###, BR-###), [System Design](docs/06-system-design.md) (architecture),
-  [QA](docs/11-qa-test-plan.md) (traceability), [Security](docs/12-security-compliance.md) (auth/secrets).
+- [PRD](docs/prd.md) (F-###, BR-###), [System Design](docs/system-design.md) (architecture),
+  [QA](docs/qa-test-plan.md) (traceability), [Security](docs/security-compliance.md) (auth/secrets).
 
 ## Session-specific notes (drift-avoiders)
 

@@ -4,7 +4,7 @@
 > [User Interview Guide](./user-interview-guide.md) (recruiting via orgs = channel B there) and the
 > [Pitch Kit](./alex-pitch-kit.md) (how orgs show up in the pitch). Does not restate the rubric
 > (owned by [00-hackathon-context.md](../00-hackathon-context.md)), business rules
-> (owned by [03-prd.md](../03-prd.md)), or the GAD-budget method (in the session handoff / pitch kit).
+> (owned by [03-prd.md](../prd.md)), or the GAD-budget method (in the session handoff / pitch kit).
 >
 > **Anti-hallucination rule (POSTMORTEM discipline):** every org below is tagged with a
 > **verification status**. Where a specific contact/office name is not confirmed, it says so — **do
@@ -226,7 +226,7 @@ and *citing* them. The distinction is the difference between credible and caught
   hours chasing a signature that can't happen in time.
 - **Do not fabricate a contact or a commitment.** A cited public stat is bulletproof; a claimed
   partnership you can't back is a Q&A landmine. This is the same anti-hallucination rule the whole
-  repo runs on ([POSTMORTEM](../POSTMORTEM.md)).
+  repo runs on ([POSTMORTEM](../DECISION-LEDGER.md)).
 
 ---
 

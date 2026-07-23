@@ -6,7 +6,7 @@ HTML marker, into a GitHub Project. It never changes the Markdown plan from GitH
 
 Default behaviour is read-only: validate the plan, inventory GitHub, and print a mutation
 manifest. Remote changes require --apply. The tool needs the GitHub CLI (gh) authenticated with
-repository issue access and the `project` scope. It uses a custom `FMD Status` field rather than
+repository issue access and the `project` scope. It uses a custom `Plan Status` field rather than
 assuming an owner's built-in Project Status options.
 """
 
@@ -52,9 +52,10 @@ STATUS_MAP = {
     "cut": "Cut",
 }
 FIELD_SPECS = (
-    ("FMD Task", "TEXT", None),
-    ("FMD Status", "SINGLE_SELECT", tuple(STATUS_MAP.values())),
-    ("FMD Wave", "NUMBER", None),
+    ("Task ID", "TEXT", None),
+    ("Run ID", "TEXT", None),
+    ("Plan Status", "SINGLE_SELECT", tuple(STATUS_MAP.values())),
+    ("Wave", "NUMBER", None),
 )
 
 
@@ -237,6 +238,28 @@ def list_project_items(owner: str, number: int) -> list[dict[str, Any]]:
     )
 
 
+def list_linked_repositories(project: dict[str, Any]) -> list[str]:
+    project_id = project.get("id")
+    if not isinstance(project_id, str):
+        raise GitHubError("Project JSON lacks a node id needed to inspect repository links")
+    value = gh_json(
+        [
+            "api",
+            "graphql",
+            "-f",
+            "query=query($id:ID!){node(id:$id){... on ProjectV2{repositories(first:100){nodes{nameWithOwner}}}}}",
+            "-F",
+            f"id={project_id}",
+        ]
+    )
+    nodes = value.get("data", {}).get("node", {}).get("repositories", {}).get("nodes", [])
+    return sorted(
+        str(node["nameWithOwner"])
+        for node in nodes
+        if isinstance(node, dict) and isinstance(node.get("nameWithOwner"), str)
+    )
+
+
 def item_issue_url(item: dict[str, Any]) -> str | None:
     content = item.get("content")
     if isinstance(content, dict):
@@ -247,8 +270,33 @@ def item_issue_url(item: dict[str, Any]) -> str | None:
     return url if isinstance(url, str) and "/issues/" in url else None
 
 
+def project_item_field_value(item: dict[str, Any], field_name: str) -> Any:
+    """Read a custom-field value from both CLI field-name serializations."""
+    if field_name in item:
+        return item[field_name]
+    cli_key = field_name[:1].lower() + field_name[1:]
+    return item.get(cli_key)
+
+
 def project_field_map(fields: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return {str(field.get("name")): field for field in fields if field.get("name")}
+
+
+def field_matches_data_type(field: dict[str, Any], expected: str) -> bool:
+    """Accept both GitHub CLI field shapes.
+
+    Some ``gh project field-list --format json`` versions expose GraphQL's
+    ``dataType`` while others expose only a concrete ``type``. Generic Project
+    fields cover both text and number values, so their names remain the
+    authoritative contract after this synchronizer creates them.
+    """
+    actual = str(field.get("dataType", "")).upper()
+    if actual:
+        return actual in {expected, expected.title()}
+    concrete_type = str(field.get("type", ""))
+    if expected == "SINGLE_SELECT":
+        return concrete_type == "ProjectV2SingleSelectField"
+    return expected in {"TEXT", "NUMBER"} and concrete_type == "ProjectV2Field"
 
 
 def required_field_manifest(fields: list[dict[str, Any]]) -> list[str]:
@@ -262,8 +310,9 @@ def required_field_manifest(fields: list[dict[str, Any]]) -> list[str]:
                 detail += f" options={','.join(options)}"
             operations.append(detail)
             continue
-        if str(field.get("dataType", "")).upper() not in {data_type, data_type.title()}:
-            operations.append(f"BLOCKED Project field {name!r}: expected {data_type}, found {field.get('dataType')}")
+        if not field_matches_data_type(field, data_type):
+            reported_type = field.get("dataType") or field.get("type")
+            operations.append(f"BLOCKED Project field {name!r}: expected {data_type}, found {reported_type}")
             continue
         if options:
             actual = {str(option.get("name")) for option in field.get("options", []) if isinstance(option, dict)}
@@ -302,6 +351,9 @@ def operation_manifest(
     fields: list[dict[str, Any]],
     project_exists: bool,
     create_title: str | None,
+    repo: str,
+    linked_repositories: list[str],
+    project_is_public: bool,
 ) -> list[str]:
     by_marker = {
         match.group(0): issue
@@ -310,8 +362,15 @@ def operation_manifest(
     }
     issue_urls_in_project = {url for item in project_items if (url := item_issue_url(item))}
     operations: list[str] = []
+    if project_is_public:
+        operations.append("BLOCKED GitHub Project must be private")
     if not project_exists:
         operations.append(f"CREATE GitHub Project {create_title!r}")
+    other_links = [item for item in linked_repositories if item.lower() != repo.lower()]
+    if other_links:
+        operations.append(f"BLOCKED GitHub Project links non-GuidHer repositories: {', '.join(other_links)}")
+    if repo.lower() not in {item.lower() for item in linked_repositories}:
+        operations.append(f"LINK GitHub Project exclusively to {repo}")
     operations.extend(required_field_manifest(fields))
     for projection in projections:
         issue = by_marker.get(issue_marker(projection.run_id, projection.task.task_id))
@@ -324,7 +383,7 @@ def operation_manifest(
             if issue.get("url") not in issue_urls_in_project:
                 operations.append(f"ADD Issue #{issue.get('number')} to Project for {projection.task.task_id}")
         operations.append(
-            f"SET Project fields for {projection.task.task_id}: FMD Status={STATUS_MAP[projection.task.status]!r}, Wave={projection.wave}"
+            f"SET Project fields for {projection.task.task_id}: Plan Status={STATUS_MAP[projection.task.status]!r}, Wave={projection.wave}"
         )
     return operations
 
@@ -336,11 +395,17 @@ def manifest_digest(
     fields: list[dict[str, Any]],
     project_exists: bool,
     create_title: str | None,
+    repo: str = "",
+    linked_repositories: list[str] | None = None,
+    project_is_public: bool = False,
 ) -> str:
     """Bind an apply to the exact previewed desired state, not a prose summary."""
     payload = {
         "project_exists": project_exists,
         "create_title": create_title,
+        "repo": repo,
+        "linked_repositories": linked_repositories or [],
+        "project_is_public": project_is_public,
         "fields": fields,
         "issues": issues,
         "project_items": project_items,
@@ -418,7 +483,7 @@ def apply_projection(
         raise GitHubError("Project JSON lacks a node id needed to update fields")
     status_options = {
         str(option.get("name")): str(option.get("id"))
-        for option in fields_by_name["FMD Status"].get("options", [])
+        for option in fields_by_name["Plan Status"].get("options", [])
         if isinstance(option, dict) and option.get("name") and option.get("id")
     }
     for projection in projections:
@@ -428,10 +493,15 @@ def apply_projection(
         if not isinstance(item_id, str):
             raise GitHubError(f"Project item for {projection.task.task_id} was not returned after add")
         for field_name, value_flag, value in (
-            ("FMD Task", "--text", projection.task.task_id),
-            ("FMD Status", "--single-select-option-id", status_options[STATUS_MAP[projection.task.status]]),
-            ("FMD Wave", "--number", str(projection.wave)),
+            ("Task ID", "--text", projection.task.task_id),
+            ("Run ID", "--text", projection.run_id),
+            ("Plan Status", "--single-select-option-id", status_options[STATUS_MAP[projection.task.status]]),
+            ("Wave", "--number", str(projection.wave)),
         ):
+            expected_value = STATUS_MAP[projection.task.status] if field_name == "Plan Status" else value
+            current_value = project_item_field_value(item, field_name)
+            if str(current_value) == str(expected_value):
+                continue
             run_gh(
                 [
                     "project",
@@ -487,18 +557,43 @@ def self_test() -> int:
             if body.count("<!-- fmd-sync:start -->") != 1:
                 failures.append("generated-body replacement produced duplicate managed blocks")
             projection = project_tasks("RUN-TEST-001", tasks, waves, [{"number": 7, "title": "Human title", "body": original, "url": "https://example.test/issues/7"}])
-            operations = operation_manifest(projection, [{"number": 7, "title": "Human title", "body": original, "url": "https://example.test/issues/7"}], [], [], True, None)
+            operations = operation_manifest(
+                projection,
+                [{"number": 7, "title": "Human title", "body": original, "url": "https://example.test/issues/7"}],
+                [],
+                [],
+                True,
+                None,
+                "example/GuidHer",
+                ["example/GuidHer"],
+                False,
+            )
             if any("Human title" in operation or "title" in operation.lower() for operation in operations):
                 failures.append("existing Issue title entered the managed mutation manifest")
             if not manifest_digest(projection, [], [], [], True, None):
                 failures.append("manifest digest was empty")
         fields = [
-            {"name": "FMD Task", "dataType": "TEXT"},
-            {"name": "FMD Status", "dataType": "SINGLE_SELECT", "options": [{"name": item} for item in STATUS_MAP.values()]},
-            {"name": "FMD Wave", "dataType": "NUMBER"},
+            {"name": "Task ID", "dataType": "TEXT"},
+            {"name": "Run ID", "dataType": "TEXT"},
+            {"name": "Plan Status", "dataType": "SINGLE_SELECT", "options": [{"name": item} for item in STATUS_MAP.values()]},
+            {"name": "Wave", "dataType": "NUMBER"},
         ]
         if required_field_manifest(fields):
             failures.append("complete field fixture was reported as needing changes")
+        cli_fields = [
+            {"name": "Task ID", "type": "ProjectV2Field"},
+            {"name": "Run ID", "type": "ProjectV2Field"},
+            {
+                "name": "Plan Status",
+                "type": "ProjectV2SingleSelectField",
+                "options": [{"name": item} for item in STATUS_MAP.values()],
+            },
+            {"name": "Wave", "type": "ProjectV2Field"},
+        ]
+        if required_field_manifest(cli_fields):
+            failures.append("GitHub CLI field fixture was reported as needing changes")
+        if project_item_field_value({"plan Status": "Ready"}, "Plan Status") != "Ready":
+            failures.append("GitHub CLI item field-name fixture was not read")
     if failures:
         print("SELF-TEST FAIL")
         for failure in failures:
@@ -547,10 +642,12 @@ def main(argv: list[str]) -> int:
             project = get_project(args.project_owner, args.project_number)
             fields = list_project_fields(args.project_owner, args.project_number)
             items = list_project_items(args.project_owner, args.project_number)
+            linked_repositories = list_linked_repositories(project)
         else:
             project = {}
             fields = []
             items = []
+            linked_repositories = []
         issues = list_issues(args.repo)
         projections = project_tasks(args.run_id, tasks, waves, issues)
         manifest = operation_manifest(
@@ -560,8 +657,21 @@ def main(argv: list[str]) -> int:
             fields,
             project_exists,
             args.create_project_title,
+            args.repo,
+            linked_repositories,
+            project.get("public") is True,
         )
-        digest = manifest_digest(projections, issues, items, fields, project_exists, args.create_project_title)
+        digest = manifest_digest(
+            projections,
+            issues,
+            items,
+            fields,
+            project_exists,
+            args.create_project_title,
+            args.repo,
+            linked_repositories,
+            project.get("public") is True,
+        )
         print(f"PLAN INTEGRITY PASS: {args.plan} contains {len(tasks)} coherent TASK-### rows")
         print("GitHub mutation manifest (read-only preview):")
         for operation in manifest:
@@ -572,11 +682,39 @@ def main(argv: list[str]) -> int:
             return 0
         if args.expected_manifest_sha != digest:
             raise GitHubError("preview no longer matches the current plan/GitHub state; run a fresh preview before applying")
+        blocked = [operation for operation in manifest if operation.startswith("BLOCKED")]
+        if blocked:
+            raise GitHubError("reviewed manifest contains blocked project configuration: " + "; ".join(blocked))
 
         if not project_exists:
             args.project_number = create_project(args.project_owner, args.create_project_title)
             project = get_project(args.project_owner, args.project_number)
+            if project.get("public") is True:
+                raise GitHubError("new GitHub Project is public; refusing task mutations")
             fields = []
+        if args.repo.lower() not in {item.lower() for item in linked_repositories}:
+            run_gh(
+                [
+                    "project",
+                    "link",
+                    str(args.project_number),
+                    "--owner",
+                    args.project_owner,
+                    "--repo",
+                    args.repo,
+                ]
+            )
+        # Re-read the remote project after create/link. Do not let a stale preview or concurrent
+        # configuration change project canonical tasks into a public or multi-repository board.
+        project = get_project(args.project_owner, args.project_number)
+        linked_repositories = list_linked_repositories(project)
+        if project.get("public") is True:
+            raise GitHubError("GitHub Project became public; refusing task mutations")
+        if {item.lower() for item in linked_repositories} != {args.repo.lower()}:
+            raise GitHubError(
+                "GitHub Project must link exclusively to "
+                f"{args.repo}; found {', '.join(linked_repositories) or 'no repository links'}"
+            )
         fields = ensure_fields(args.project_owner, args.project_number, fields)
         apply_projection(
             repo=args.repo,

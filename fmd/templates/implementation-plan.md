@@ -58,6 +58,11 @@ require observed evidence outside the command using `result: PASS`, `result: exi
 or `artifact: <URL>`; a success word printed inside the command is not evidence.
 Use comma-separated `TASK-###` dependencies or `—`. Use concrete file paths/globs in `Write scope`.
 
+The ledger may be split into four status tables for scanability, in this order: **Ready / Pending**,
+**Blocked**, **Finished**, **Deferred**. These are one canonical ledger, not separate task stores; the
+checker parses every categorized table, validates global uniqueness/dependencies, and derives waves
+from all rows. There is no separate `pending` status unless the status schema explicitly adds one.
+
 | ID | Outcome / trace | Depends on | Owner | Write scope | Work ref | Status | Gate / evidence |
 |----|-----------------|------------|-------|-------------|----------|--------|-----------------|
 | TASK-001 | <runnable skeleton; infra> | — | <owner> | <paths> | — | ready | `<boot/build command>` |
@@ -82,13 +87,13 @@ Use comma-separated `TASK-###` dependencies or `—`. Use concrete file paths/gl
 | Project number / create title | `<number> / <new Project title>` |
 | Projection direction | Markdown plan → Issue snapshot + Project fields |
 | Inbound rule | PR/CI/Issue evidence becomes a proposed Markdown diff or PR; it never silently rewrites this ledger |
-| Activation record | `<lead name> · <timestamp> · preview SHA-256 · scope: create Issues / FMD block / FMD fields>` |
+| Activation record | `<lead name> · <timestamp> · preview SHA-256 · scope: create Issues / managed block / implementation fields>` |
 
 The synchronizer creates one Issue per immutable `TASK-###`, marked with the run-scoped identity
 `<!-- fmd-task:RUN-...:TASK-### -->`, and owns only its generated Issue block. It preserves the
 Issue title after creation, comments, labels, assignees, and PR discussion. It creates/uses these terminal-manageable Project fields:
-`FMD Task` (text), `FMD Status` (Ready / In Progress / Blocked / In Review / Done / Cut), and
-`FMD Wave` (number). Do not substitute an Issue number or a card position for `TASK-###`.
+`Task ID` (text), `Run ID` (text), `Plan Status` (Ready / In Progress / Blocked / In Review / Done / Cut),
+and `Wave` (number). Do not substitute an Issue number or a card position for `TASK-###`.
 
 **First-run sequence:**
 
@@ -161,6 +166,8 @@ only after the post-build retro provides real evidence and a human curates the f
    steward either serializes the work or changes scopes/dependencies.
 3. Open a small draft PR early. It names `TASK-###`, affected `F-/INV-###`, docs impact (`none` is valid),
    and the exact validation commands.
+   A `blocked` task is sequencing information, not a PR prohibition. A scoped PR may proceed while
+   downstream tasks remain blocked; release/deployment/pilot gates are evaluated separately.
 4. **When the work is actually done (this is the owner's own checkpoint, not just the steward's):**
    a. Run `python3 fmd/tools/check-implementation-plan.py docs/implementation-plan.md` and fix any
       REJECT before proceeding.

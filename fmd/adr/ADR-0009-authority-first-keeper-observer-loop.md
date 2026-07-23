@@ -18,7 +18,7 @@ overwrite Issue titles despite claiming to own only generated content.
    pivot, and never makes product strategy or framework decisions.
 2. A **Framework Observer** runs only after `run_closed`, writes the product repository's
    postmortem, and proposes `FC-###` trials. It never edits the kits automatically.
-3. GitHub remains one-way: Markdown plan → managed Issue block + three FMD Project fields. Initial
+3. GitHub remains one-way: Markdown plan → managed Issue block + implementation Project fields. Initial
    activation requires a reviewed mutation digest; active runs may re-project checkpoint changes.
    Sync faults suspend only the projection. Issue titles, comments, labels, assignees, PR discussion,
    and inbound card changes remain human-owned/non-authoritative.

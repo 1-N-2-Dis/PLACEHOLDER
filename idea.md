@@ -1,10 +1,12 @@
 ---
 status: draft
-schema_version: 1.1.0
+schema_version: 2.1.0
+origin: PUP Sta. Mesa commuter safety problem, initially desk-researched
+payer_status: assumed
 ---
 
 <!--
-  idea.md — FMD input brief (schema v1.1.0). Frontmatter above is the machine-
+  idea.md — FMD input brief (shared schema v2.1.0). Frontmatter above is the machine-
   readable handshake (status + schema_version); FMD reads schema_version to pin
   section-schema compatibility. FMD consumes this brief as-is — no validation,
   no evidence floor, no freeze gate (FMD ADR-0002). Any sources cited below are
@@ -138,18 +140,29 @@ already do by hand.
   "no way to know before setting out" (§1).
 - **F-004** — Structured, deduplicated risk summary from free-text reports —
   solves "crowd noise isn't trustworthy signal" (§5 alternatives gap).
-- **F-005** — Severity-tiered, multi-route (2-3 alternative) recommendation —
+- **F-005** — Severity-tiered route recommendation with at most two visible routes
+  (safest + one alternative) —
   solves "one route recommendation hides the safety-vs-directness tradeoff"
   (added during build, 2026-07-01).
 - **F-006** — AI report classification + moderation (server-side) — solves
   "crowd noise and false reports need filtering before they reach the map"
   (added during build, 2026-07-01).
-- **F-007** — Photo evidence on reports (Firebase Storage, EXIF-stripped) —
-  solves "a text-only report is harder to trust and act on" (added during
-  build, 2026-07-01).
+- **F-007** — Photo evidence on reports, with client-side EXIF stripping when
+  photo storage is enabled — solves "a text-only report is harder to trust and
+  act on" (added during build, 2026-07-01; currently disabled in the MVP).
 - **F-008** — AI-assessed "is my route safe tonight?" for the recommended route
   — solves "the pre-trip check was disconnected from the actual route being
   taken" (added during build, 2026-07-01).
+- **F-009** — Account upgrade and remove-only administrator moderation — solves
+  "the team needs an authenticated way to remove harmful or invalid reports"
+  (added after the elimination build; demo-only account-verification limits remain
+  unvalidated).
+- **F-010** — Optional fresh-report condition layer — solves "a commuter cannot
+  quickly see where current validated conditions are concentrated" without
+  storing a place-level safety score (added after the elimination build).
+- **F-011** — Confirmed 911 quick-dial handoff — solves "a commuter may need a
+  direct way to use the device's emergency dialer" while making no claim that
+  GuidHer dispatches, tracks, or responds (added after interviews).
 
 **Final**:
 - **F-101** — Expansion to additional campus commute zones with enough
@@ -204,6 +217,19 @@ they instead "just go," or contribution density never reaches usefulness, the
 core thesis fails.
 
 **Kill criteria (explicit fail-states):**
+- **INV-001 — Conditions only.** The product must never render, store, or
+  aggregate place-level crime labels or neighborhood safety ratings. Reports
+  describe observable, fixable conditions only.
+- **INV-002 — No rescue promise.** The product must never claim SOS, real-time
+  rescue, dispatch, tracking, or a guaranteed in-the-moment intervention. A
+  confirmed `tel:911` handoff to the device dialer is permitted only when the
+  UI makes that boundary clear.
+- **INV-003 — One zone.** The product must never expand its active coverage
+  beyond the PUP Sta. Mesa commute zone without a recorded scope pivot.
+- **INV-004 — Grounded AI.** Gemini must never invent an incident, condition,
+  or route fact absent from the submitted/on-route inputs it is given.
+- **INV-005 — Report-level severity only.** AI severity must never become a
+  neighborhood, place, or crime rating.
 - Regulatory: if publishing segment-level "danger" data exposes the team to
   defamation/privacy liability or is found to unlawfully profile neighborhoods,
   stop and redesign around fixable conditions only (lighting, crowd, lit/unlit).
