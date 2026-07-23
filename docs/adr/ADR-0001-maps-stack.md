@@ -37,5 +37,5 @@
     tracked as an open security item (Security & Compliance doc, Threat T2; pre-demo checklist).
   - Fewer built-in POIs / no Google routing niceties — acceptable for the MVP.
   - Supersedes the original "Google Maps JavaScript API" assumption in the early docs. All MVP
-    docs were reconciled to this decision on 2026-07-01. System Design (`docs/06-system-design.md`)
+    docs were reconciled to this decision on 2026-07-01. System Design (`docs/system-design.md`)
     is the canonical owner of the stack; other docs link to it and must not restate it.

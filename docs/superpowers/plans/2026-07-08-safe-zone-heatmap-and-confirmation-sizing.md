@@ -410,12 +410,12 @@ git commit -m "feat: add a green safe-zones cloud layer from safe-heatmap.json"
 ### Task 3: Update docs to match the implemented behavior
 
 **Files:**
-- Modify: `docs/09-data-model.md`
+- Modify: `docs/data-model.md`
 
 **Interfaces:**
 - None (documentation only).
 
-- [ ] **Step 1: Note the new frontend data mirror in `docs/09-data-model.md`**
+- [ ] **Step 1: Note the new frontend data mirror in `docs/data-model.md`**
 
 Find the existing note about `heatmap-baseline.json` being mirrored into
 `frontend/src/data/heatmap-baseline.js` (search the file for `heatmap-baseline.json` if the exact
@@ -443,7 +443,7 @@ no network surface changed, map/routing stack unchanged).
 Ask the user before running `git commit`.
 
 ```bash
-git add docs/09-data-model.md
+git add docs/data-model.md
 git commit -m "docs: note the safe-heatmap.json frontend mirror and its green map layer"
 ```
 

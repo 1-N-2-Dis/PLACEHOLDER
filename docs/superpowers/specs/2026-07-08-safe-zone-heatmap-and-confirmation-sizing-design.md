@@ -12,7 +12,7 @@ Two related asks:
    `buildIncidentMarkers`), not by how many other people actually corroborated the report. The
    backend already tracks real corroboration: `submitReport` links a duplicate submission to the
    existing report doc and increments its `corroborationCount` instead of creating a new doc
-   (`backend/server/index.js:396-407`, `docs/09-data-model.md` report entity). That field is
+   (`backend/server/index.js:396-407`, `docs/data-model.md` report entity). That field is
    currently ignored by the heatmap aggregation.
 2. `backend/data/safe/safe-heatmap.json` (~500 landmark points — 24/7 stores, well-lit zones,
    high-foot-traffic spots, police presence — each with `lat`, `lng`, `weight` 0.4–1.0,

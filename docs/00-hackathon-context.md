@@ -58,7 +58,7 @@ everything now points at July 9.
   **core idea must not change**.
 - Semi-formal / formal attire.
 - **This is the source of the "5-minute" pitch figure** used in
-  [alex-pitch-kit.md](./analysis/alex-pitch-kit.md). The 15-minute Q&A is why the Q&A ownership
+  [alex-pitch-kit.md](./pitch-kit.md). The 15-minute Q&A is why the Q&A ownership
   map matters more than the script.
 
 ## 5. Judging rubric — final round (this is the scoreboard)
@@ -87,7 +87,7 @@ only 10).
 
 - **At least ONE Google technology.** We satisfy this with **Firebase (Auth + Firestore) + Gemini**.
   Do not let a refactor remove both — this is a disqualification risk, tracked as a health-check
-  invariant in [index.md](./index.md) §2. Owned by [System Design](./06-system-design.md) / ADR-0001.
+  invariant in [index.md](./index.md) §2. Owned by [System Design](./system-design.md) / ADR-0001.
 - **One community sector.** Ours: **women students (18–24) commuting the PUP Sta. Mesa zone**, plus
   trans women riders in the same zone. This is a named judging expectation, not just our framing.
 - **Working prototype required.** Not concept-only — a functional output by end of hackathon.
@@ -105,9 +105,9 @@ The brief also lists what judges look for overall. Map each to where we answer i
 
 | Judge asks | Where we answer it |
 |------------|--------------------|
-| Is the problem real and validated? | [evidence-register.md](./evidence-register.md) + interview probe sheet ([pitch kit](./analysis/alex-pitch-kit.md)) — **our weakest point; be honest about it** |
+| Is the problem real and validated? | [evidence-register.md](./evidence-register.md) + interview probe sheet ([pitch kit](./pitch-kit.md)) — **our weakest point; be honest about it** |
 | Is the solution creative? | Conditions-only + bottom-up crowdsourcing wedge |
-| Is it well-built? | Live core loop + [System Design](./06-system-design.md) |
+| Is it well-built? | Live core loop + [System Design](./system-design.md) |
 | Is it intuitive and accessible? | The pre-trip check UX (F-003) |
 | Will it improve lives? | Women changing routes / not staying home |
 | Can it grow? | Roadmap only — single zone by design now (BR-003); expansion is P-later |
@@ -121,6 +121,6 @@ The brief also lists what judges look for overall. Map each to where we answer i
 
 ## References
 - [Docs Index](./index.md) — source-of-truth map (this doc owns hackathon rules/rubric/format)
-- [Alex's pitch kit](./analysis/alex-pitch-kit.md) — pitch script, BMC, Q&A map, interview probe sheet
-- [Idea brief](./idea.md) · [PRD](./03-prd.md) · [System Design](./06-system-design.md)
+- [Alex's pitch kit](./pitch-kit.md) — pitch script, BMC, Q&A map, interview probe sheet
+- [Idea brief](../idea.md) · [PRD](./prd.md) · [System Design](./system-design.md)
 - [Evidence Register](./evidence-register.md) — current (desk-only) validation state

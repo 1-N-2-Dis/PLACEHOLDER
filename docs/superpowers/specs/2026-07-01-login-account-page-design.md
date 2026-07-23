@@ -10,7 +10,7 @@ Every visitor is already signed in anonymously (`frontend/src/lib/auth.js` `ensu
 report submission has a `uid` (BR-005), but there is no UI for it and no way to upgrade to a
 persistent account. AGENTS.md, the PRD (BR-005), System Design, and Security & Compliance already
 describe the target auth method as "Firebase Auth (anonymous or Google sign-in)" and explicitly
-reject a full email/password flow ("more UI, more time" — `docs/06-system-design.md`), but mark it
+reject a full email/password flow ("more UI, more time" — `docs/system-design.md`), but mark it
 `[unverified]`/"undecided". This spec builds the missing UI for that already-decided direction.
 
 ## Scope
@@ -20,8 +20,8 @@ In scope (frontend): `frontend/src/lib/auth.js` (add `signInWithGoogle()`, `sign
 `frontend/src/pages/AccountPage.jsx` (new page shell, mirrors `pages/ReportPage.jsx`), `App.jsx`
 (new `/login` route), `AppHeader.jsx` (auth-aware nav entry), `styles.css` (small additive rules).
 
-In scope (docs): resolve the `[unverified]` auth-method tags in `docs/03-prd.md`,
-`docs/06-system-design.md`, `docs/12-security-compliance.md`, and the "auth method undecided" open
+In scope (docs): resolve the `[unverified]` auth-method tags in `docs/prd.md`,
+`docs/system-design.md`, `docs/security-compliance.md`, and the "auth method undecided" open
 item in `docs/index.md`, now that the method is implemented.
 
 Out of scope: password-based accounts, route guards/gating on `/` or `/report` (anonymous stays
@@ -71,7 +71,7 @@ now need spacing) and `.account-avatar` (24px circular avatar).
 **Problem.** The user explicitly asked for an actual login/signup form (email + password, with
 only a `@gmail.com`-suffix check, "for now" — no real verification), plus 1 admin + 2 end-user
 demo accounts to try it with. This is a deliberate, confirmed override of this doc's original
-"anonymous/Google only" scope (see [[docs/06-system-design.md]]'s rejected-email/password
+"anonymous/Google only" scope (see [[docs/system-design.md]]'s rejected-email/password
 rationale) — not a re-litigation of it. Two open questions were resolved with the user first:
 admin gets a real capability (view + delete all reports, not just a role label), and the 3 demo
 accounts are seeded against the **Auth emulator**, not a live project.
@@ -96,9 +96,9 @@ accounts are seeded against the **Auth emulator**, not a live project.
   (role `user`), shared demo password, both the Auth user and its `users/{uid}` Firestore doc via
   the Admin SDK (bypasses Rules, the only way to set `role: admin`).
 
-**Docs updated:** `docs/03-prd.md` (new F-009), `docs/09-data-model.md` (`users` collection +
-rules addition), `docs/12-security-compliance.md` (email/password + `users` authz surface,
-demo-credential checklist item), `docs/11-qa-test-plan.md` (TC-028/TC-029).
+**Docs updated:** `docs/prd.md` (new F-009), `docs/data-model.md` (`users` collection +
+rules addition), `docs/security-compliance.md` (email/password + `users` authz surface,
+demo-credential checklist item), `docs/qa-test-plan.md` (TC-028/TC-029).
 
 **Verification (addendum):**
 1. Run `npm run seed:users` (from `backend/`, against the Auth + Firestore emulators) — creates

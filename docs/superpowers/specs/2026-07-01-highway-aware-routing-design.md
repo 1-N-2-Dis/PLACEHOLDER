@@ -17,7 +17,7 @@ that avoids them when one exists — the same preference already applied to flag
 ## Scope
 
 In scope: `RouteLayer.jsx`, the new `frontend/src/lib/routing.js` extraction, `ZoneMap.jsx` badge
-rendering, `docs/06-system-design.md`, `docs/11-qa-test-plan.md`.
+rendering, `docs/system-design.md`, `docs/qa-test-plan.md`.
 
 Out of scope: `RouteCheck.jsx` (F-003 pre-trip checklist) — a different feature, unaffected.
 Full reconciliation of all doc/code drift (e.g. Google Maps Platform references elsewhere) — only
@@ -26,8 +26,8 @@ the routing-relevant parts are touched here.
 ## Background finding
 
 `ZoneMap.jsx`'s point-to-point router (MapLibre + OpenFreeMap + ORS foot-walking) is not described
-anywhere in `docs/03-prd.md` or `docs/06-system-design.md` — those docs still describe Google Maps
-Platform for routing. This document updates `docs/06-system-design.md` to describe the real stack
+anywhere in `docs/prd.md` or `docs/system-design.md` — those docs still describe Google Maps
+Platform for routing. This document updates `docs/system-design.md` to describe the real stack
 and this new behavior; full PRD reconciliation is a separate, later effort.
 
 ## Algorithm
@@ -105,9 +105,9 @@ behavior.
 
 ## Docs to update
 
-- `docs/06-system-design.md` — describe the actual stack (MapLibre/OpenFreeMap/ORS, not Google Maps
+- `docs/system-design.md` — describe the actual stack (MapLibre/OpenFreeMap/ORS, not Google Maps
   Platform, for the map+routing components) and this safety-scored routing behavior.
-- `docs/11-qa-test-plan.md` — add test cases for the four badge states and the Tier A→B fallback
+- `docs/qa-test-plan.md` — add test cases for the four badge states and the Tier A→B fallback
   behavior (e.g. a destination chosen so the only path crosses a known-flagged segment; a
   destination reachable only via a major road).
 

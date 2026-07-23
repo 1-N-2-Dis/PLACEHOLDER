@@ -442,8 +442,7 @@ dist/
 
 agents/
 
-# FMD documents-factory tooling (external submodule; not part of the product build)
-fmd/
+# FMD is tracked framework source. It is intentionally available to contributors and agents.
 
 # macOS Finder metadata
 .DS_Store

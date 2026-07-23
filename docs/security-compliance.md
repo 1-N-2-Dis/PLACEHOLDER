@@ -4,7 +4,7 @@
 
 > **Purpose:** risk and obligations for the 2-day SparkFest hackathon MVP. Default posture: flag
 > missing auth on every exposed surface.
-> Traces back to: system design (`docs/06-system-design.md`), data model (`docs/09-data-model.md`),
+> Traces back to: system design (`docs/system-design.md`), data model (`docs/data-model.md`),
 > `idea.md` (esp. §9 kill-criteria).
 > **Sensitivity note:** this is a SAFETY app for women + LGBTQ+ commuters. Data sensitivity is HIGH
 > even though the MVP stores little — the *subject matter* (who is unsafe, where) is itself sensitive,
@@ -70,7 +70,7 @@ a silent unauthenticated surface is a factory-gate failure.
 1a. **Cloud Firestore (`users/{uid}.role` only, ADR-0004)** — reads: self or admin. Writes: self-create
     as `role: 'user'` only; `admin` is Admin-SDK-only (`backend/scripts/seed-admin-role.mjs`), same
     posture as before this change. No longer governs `reports` or `segments` (the latter was already
-    a static frontend module, an existing documented drift — see `docs/09-data-model.md`).
+    a static frontend module, an existing documented drift — see `data-model.md`).
 2. **Firebase Auth** — the identity surface. Anonymous sign-in by default (demo speed), with an
    optional upgrade via Google sign-in (`linkWithPopup`) **or email/password** (`linkWithCredential`)
    at `/login` (`frontend/src/lib/auth.js`), either of which preserves the existing `uid`. While
@@ -98,7 +98,7 @@ a silent unauthenticated surface is a factory-gate failure.
 4. **Gemini API key** — **server-side only**, held as a Render env var on `backend/server`
    (moved off Firebase Cloud Functions, ADR-0002); invoked by the authenticated client for
    `summarizeSegment` (P1), `submitReport` (P0, critical path — every report write depends on it),
-   and `assessRoute` (P0, F-003/F-008 — reads each on-route segment's real Firestore report
+   and `assessRoute` (P0, F-003/F-008 — reads each on-route segment's real Supabase report
    itself, never trusts client-supplied report content). Client-side Gemini calls **leak the key**
    and are acceptable ONLY as a knowingly-throwaway demo fallback, never for any real deployment
    (Threat T2).
@@ -129,7 +129,7 @@ Scoped to the MVP's real attack surface. T1–T7 are the priority threats called
 
 | # | Threat (STRIDE) | Vector | Impact | Mitigation |
 |---|-----------------|--------|--------|------------|
-| **T1** | **Tampering / Elevation — world-writable Firestore** | Default Firestore has no rules → anyone writes/reads any document | Data poisoning, junk/abusive docs, schema breakage, total trust collapse of the map | **Changed (F-006):** client `create` on `reports` is denied outright by Rules; the real gate is that only `submitReport`'s Admin SDK credential can write at all, and its code enforces BR-001/004/005. **Deploy the deny-create rule only after `submitReport` is verified** (see design doc) — until then, keep the previous auth-to-write/closed-enum/field-allowlist rules as the interim gate. `segments` remains write-locked. |
+| **T1** | **Tampering / Elevation — writable report store** | A Supabase RLS policy permits browser writes, or the service-role credential leaks | Data poisoning, junk/abusive rows, schema breakage, total trust collapse of the map | Supabase allows `SELECT` only for browser roles; no browser write policy exists. `submitReport` on the authenticated server is the only writer and enforces BR-001/004/005. Verify this path before changing RLS or credentials. |
 | **T2** | **Info disclosure / DoS — API key abuse (Gemini)** | Gemini key shipped in client (only remaining vector — the ORS-key half of this threat is **resolved by elimination, ADR-0003**: routing is now a client-side WASM engine with no external key at all) | Gemini key theft, billing abuse | Gemini key: **`backend/server` (Render) env var only**, never in client bundle — now guards a P0 path (`submitReport`), not just P1. No secrets in repo (checklist). |
 | **T3** | **Spoofing / abuse — report spam via anonymous auth** | Anonymous auth lets a user churn `uid`s and flood reports | Flag inflation, fake "danger tonight," map made useless (ties to idea §9 technical kill-criterion: usable density) | Auth-to-write gate (BR-005, now enforced in `submitReport`) raises the floor; **anonymous = weak control, documented.** F-006's spam-rejection classification adds a content-level filter on top, but is not a substitute for rate-limiting — MVP still has **no rate-limit** `[unverified]`, flagged as a known gap. |
 | **T4** | **Tampering — malicious / false reports (false-flag poisoning)** | A bad actor flags a safe segment as bad, or floods to bury real signal | Wrong routing advice; could defame a place/business; erodes trust | Closed condition enum (no crime labels) limits blast radius (BR-001); immutable reports + `createdAt` give an audit trail; **freshness window** decays stale/maliciously-old flags (BR-004; window value `[unverified]`). **F-006's fail-closed AI reject/dedupe is a new, stronger mitigation** — spam is rejected before it's ever written, and duplicates corroborate rather than flood. Still no reputation/verification system, and the AI itself could be fooled by a plausible-sounding false report — `[unverified]`, flagged. |

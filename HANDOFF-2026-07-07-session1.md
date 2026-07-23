@@ -68,7 +68,7 @@ per-report, not a place rating)** and the [mentor-synthesis](./docs/analysis/men
 BR-001 note + conditions-only note fields, so someone was thinking about it — **but it has not been
 audited against BR-001/006/007 or the mentor guardrail.** This is Farhana's #1 Q&A landmine
 ("isn't this just a crime map?"). **Action: audit these five artifacts against the BRs before the
-pitch; decide keep / reframe / walk back; log the decision in [POSTMORTEM](./docs/POSTMORTEM.md) §3.**
+pitch; decide keep / reframe / walk back; log the decision in [POSTMORTEM](./docs/DECISION-LEDGER.md) §3.**
 *(User was offered this audit and it is pending their go-ahead.)*
 
 ### Alex — validation + outreach (his lane, highest non-demo ROI)
@@ -81,9 +81,9 @@ pitch; decide keep / reframe / walk back; log the decision in [POSTMORTEM](./doc
 4. **Confirm PUP's actual GAD office name/contact on campus** — do not invent it.
 
 ### Product decision to record
-- If the forum "no" is accepted, log it in [POSTMORTEM](./docs/POSTMORTEM.md) §3 as a decision
+- If the forum "no" is accepted, log it in [POSTMORTEM](./docs/DECISION-LEDGER.md) §3 as a decision
   (considered → rejected, reasons: BR-001/006/007 + moderation + privacy + scope). Optionally note in
-  [PRD](./docs/03-prd.md) as an explicit non-goal.
+  [PRD](./docs/prd.md) as an explicit non-goal.
 
 ### Jim — demo (critical path, unchanged from prior handoff)
 Still the score's center of gravity: fix pin-load, render first screen from static seed, verify the
@@ -94,8 +94,8 @@ Still the score's center of gravity: fix pin-load, render first screen from stat
 - **Conditions only (BR-001)**; **no rescue/SOS (BR-002)**; **single zone (BR-003)**.
 - **Gemini adds no facts (BR-006); severity is per-report, not a place label (BR-007).**
 - Gemini key + `FIREBASE_SERVICE_ACCOUNT_KEY` + ORS key handling per
-  [Security](./docs/12-security-compliance.md).
-- **No fabricated facts / contacts / metrics** ([POSTMORTEM](./docs/POSTMORTEM.md) anti-hallucination
+  [Security](./docs/security-compliance.md).
+- **No fabricated facts / contacts / metrics** ([POSTMORTEM](./docs/DECISION-LEDGER.md) anti-hallucination
   anchor). Branch + PR, never straight to main.
 
 ## The one thing that matters most
@@ -107,9 +107,9 @@ crime map?" question lands on unaudited ground.
 ## References (read, don't re-derive)
 - [index.md §0](./docs/index.md) — source-of-truth map (now includes the two new analysis docs)
 - [User Interview Guide](./docs/analysis/user-interview-guide.md) · [Partnerships & Outreach](./docs/analysis/partnerships-outreach.md) — new this session
-- [Pitch Kit](./docs/analysis/alex-pitch-kit.md) (probe sheet §5, Q&A map §4) · [Mentor Synthesis](./docs/analysis/mentor-synthesis.md) (§2 no-synthetic-data guardrail)
-- [Hackathon Context](./docs/00-hackathon-context.md) (rubric/format) · [POSTMORTEM](./docs/POSTMORTEM.md) (truth table, decision log)
-- [PRD](./docs/03-prd.md) (F-###, BR-###) · [BUILD-GUIDE](./docs/BUILD-GUIDE.md) (task board)
+- [Pitch Kit](./docs/pitch-kit.md) (probe sheet §5, Q&A map §4) · [Mentor Synthesis](./docs/analysis/mentor-synthesis.md) (§2 no-synthetic-data guardrail)
+- [Hackathon Context](./docs/00-hackathon-context.md) (rubric/format) · [POSTMORTEM](./docs/DECISION-LEDGER.md) (truth table, decision log)
+- [PRD](./docs/prd.md) (F-###, BR-###) · [BUILD-GUIDE](./docs/BUILD-GUIDE.md) (task board)
 - Crime-map artifacts under review: [HEATMAP_INTEGRATION_GUIDE.md](./docs/HEATMAP_INTEGRATION_GUIDE.md), [updated-evidence-register.md](./docs/updated-evidence-register.md)
 
 ## Session notes (drift-avoiders)

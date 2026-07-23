@@ -15,7 +15,7 @@ AI has validated the report as real.
 In scope: `frontend/src/features/report/PinMap.jsx`, `frontend/src/features/report/steps/
 LocationStep.jsx`, new `frontend/src/lib/overpass.js`, new `frontend/src/lib/segments.js`,
 `frontend/src/App.jsx` (merge live segments), `backend/functions/index.js` (`submitReport` gains
-a `newSegment` path), `docs/09-data-model.md`.
+a `newSegment` path), `docs/data-model.md`.
 
 Not in scope, already done: `backend/firestore.rules` already has a `match /segments/{id} {
 allow read: if true; allow write: if false; }` block (comment: "seeded out-of-band by the admin
@@ -40,7 +40,7 @@ or get assessed exactly like a static one.
 2. Nothing known within range → query the Overpass API for the nearest `highway=*` way within
    30m of the tap: `way(around:30,{lat},{lng})[highway];out geom;` against
    `https://overpass-api.de/api/interpreter` (same data source the original seed streets were
-   built from, per `docs/09-data-model.md`'s ERD note). New helper `frontend/src/lib/overpass.js`
+   built from, per `docs/data-model.md`'s ERD note). New helper `frontend/src/lib/overpass.js`
    exports `findNearestRoad(point)` → `{ name } | null` (`name` from the way's `name` tag, or
    `null` if the way is unnamed — see naming fallback below).
    - Road found → valid new-pin candidate: `{ geo: {lat,lng}, name: <way name or 'Reported
@@ -98,8 +98,8 @@ New `segments/{segmentId}` fields for dynamically-created docs: `name` (string, 
 the `'Reported location'` fallback), `geo` (`{lat, lng}`), `createdBy` (uid, string),
 `createdAt` (server timestamp). Rules mirror `reports`': `allow read: if true; allow write: if
 false;` — public read, write only via the Admin SDK inside `submitReport` (already the documented
-intended shape in `docs/09-data-model.md`, just previously unused since segments were 100%
-static). `docs/09-data-model.md` updated to describe the two segment origins (static seed module
+intended shape in `docs/data-model.md`, just previously unused since segments were 100%
+static). `docs/data-model.md` updated to describe the two segment origins (static seed module
 vs. dynamic Firestore docs) side by side rather than as drift to reconcile "post-July-2."
 
 ## Code structure
@@ -113,7 +113,7 @@ vs. dynamic Firestore docs) side by side rather than as drift to reconcile "post
 - `backend/functions/index.js` — `submitReport` gains the `newSegment` branch (bounding-box check,
   dynamic-proximity merge, create-on-accept batch write); new haversine helper + zone-bounds
   constant duplicated from frontend, per existing project convention for this file.
-- `docs/09-data-model.md` — segment entity section updated for the two origins.
+- `docs/data-model.md` — segment entity section updated for the two origins.
 
 ## Error handling
 

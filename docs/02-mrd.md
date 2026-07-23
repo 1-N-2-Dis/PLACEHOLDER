@@ -1,6 +1,6 @@
 # MRD — Market Requirements Document
 
-> ⚠️ PROVENANCE: Generated from `docs/idea.md` (status: draft) + `docs/evidence-register.md`.
+> ⚠️ PROVENANCE: Generated from `idea.md` (status: draft) + `docs/evidence-register.md`.
 > Evidence is **desk research and leads, not validation** — `said` never validates; `did`/`paid`
 > from third-party sources are leads until a first-party interview confirms them. Market size is
 > top-of-funnel `[said]`. No facts fabricated. Traces to `idea.md` §2, §5.
@@ -84,4 +84,4 @@ the route-safety crowdsourcing women already do by hand (`idea.md` §6).
   which areas to avoid after dark (quora, reddit; `[did]`) — demand signal to intercept.
 - **The cold-start reality:** value is two-sided — the map is useless until contribution density
   crosses a usefulness threshold in the one zone. GTM must manufacture early density
-  (do-things-that-don't-scale), not just acquire users. See [GTM](./13-release-gtm.md).
+  (do-things-that-don't-scale), not just acquire users. See [GTM](./release-gtm.md).

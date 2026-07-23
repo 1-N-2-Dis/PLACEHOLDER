@@ -413,13 +413,13 @@ git commit -m "feat: split route caution badge into flagged/highway/both reasons
 ### Task 3: Update docs to match the implemented behavior
 
 **Files:**
-- Modify: `docs/06-system-design.md`
-- Modify: `docs/11-qa-test-plan.md`
+- Modify: `docs/system-design.md`
+- Modify: `docs/qa-test-plan.md`
 
 **Interfaces:**
 - None (documentation only).
 
-- [ ] **Step 1: Fix the Mermaid context diagram in `docs/06-system-design.md`**
+- [ ] **Step 1: Fix the Mermaid context diagram in `docs/system-design.md`**
 
 Change:
 
@@ -556,7 +556,7 @@ to:
    item, not a resolved gate. MapLibre's OpenFreeMap tiles require no key at all.
 ```
 
-- [ ] **Step 8: Add the new test cases to `docs/11-qa-test-plan.md`**
+- [ ] **Step 8: Add the new test cases to `docs/qa-test-plan.md`**
 
 After `### TC-016 — Offline behavior` and its existing 4 lines, and before `## Acceptance
 criteria`, insert:
@@ -609,6 +609,6 @@ Map routing TCs: TC-017 (safe), TC-018 (caution — flagged), TC-019 (caution �
 Ask the user before running `git commit`.
 
 ```bash
-git add docs/06-system-design.md docs/11-qa-test-plan.md
+git add docs/system-design.md docs/qa-test-plan.md
 git commit -m "docs: reflect the real MapLibre/ORS routing stack and new safety-scored behavior"
 ```
